@@ -18,23 +18,23 @@
 
     <div id="app" class="container">
         <form v-on:submit.prevent="submit">
-            <div>
+            <div class="input-field">
                 <label>Bus</label>
-                <input v-model="bus" list="buses" required>
+                <input v-model="bus" list="buses" type="text" required>
                 <datalist id="buses">
-                <option v-for="bus in buses" v-bind:value="bus">
-            </datalist>
+                    <option v-for="bus in buses" v-bind:value="bus">
+                </datalist>
             </div>
-            <div>
+            <div class="input-field">
                 <label>Stop</label>
-                <input v-model="stop" list="stops" required>
+                <input type="text" v-model="stop" list="stops" required>
                 <datalist id="stops">
-                <option v-for="stop in stops" v-bind:value="stop">
-            </datalist>
+                    <option v-for="stop in stops" v-bind:value="stop">
+                </datalist>
             </div>
-            <div>
+            <div class="input-field">
                 <label>Time</label>
-                <input readnoly v-bind:value="time">
+                <input type="text" readnoly v-bind:value="time">
             </div>
             <div>
                 <input type="checkbox" v-model="freeze" id="freeze-switch">

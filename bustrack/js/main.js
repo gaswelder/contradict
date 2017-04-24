@@ -56,6 +56,7 @@ var app = new Vue({
 			}
 		},
 
+		// Post the event on the server
 		submit(e) {
 			this.sending = true;
 
@@ -69,12 +70,16 @@ var app = new Vue({
 
 			client.addEvent(data)
 				.then(function() {
+					// Add new bus and stop name to the autocompletion
 					if (!t.buses.includes(t.bus)) {
 						t.buses.push(t.bus);
 					}
 					if (!t.stops.includes(t.stop)) {
 						t.stops.push(t.stop);
 					}
+
+					t.freeze = false;
+					Materialize.toast('Sent', 2000);
 				})
 				.catch((err) => {
 					alert(err);
