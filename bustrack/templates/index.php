@@ -10,40 +10,12 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
-
+    <script src="https://unpkg.com/vue"></script>
 </head>
 
 <body>
-    <script src="https://unpkg.com/vue"></script>
-
-    <div id="app" class="container">
-        <form v-on:submit.prevent="submit">
-            <div class="input-field">
-                <label>Bus</label>
-                <input v-model="bus" list="buses" type="text" required>
-                <datalist id="buses">
-                    <option v-for="bus in buses" v-bind:value="bus">
-                </datalist>
-            </div>
-            <div class="input-field">
-                <label>Stop</label>
-                <input type="text" v-model="stop" list="stops" required>
-                <datalist id="stops">
-                    <option v-for="stop in stops" v-bind:value="stop">
-                </datalist>
-            </div>
-            <div class="input-field">
-                <label>Time</label>
-                <input type="text" readnoly v-bind:value="time">
-            </div>
-            <div>
-                <input type="checkbox" v-model="freeze" id="freeze-switch">
-                <label for="freeze-switch">Freeze time</label>
-            </div>
-            <div class="fixed-action-btn">
-                <button type="submit" v-bind:disabled="sending" class="btn-floating btn-large red waves-effect waves-light">Save</button>
-            </div>
-        </form>
+    <div id="app">
+        <app/>
     </div>
     <script src="res/runtime.js"></script>
     <script src="res/main.js"></script>

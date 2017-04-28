@@ -26,6 +26,11 @@ $app->post('/bustrack/events', function () {
     return created;
 });
 
+$app->get('/bustrack/events', function() {
+	$list = db()->getRecords('select bus, stop, time from events');
+	return Response::json($list);
+});
+
 $app->get('/bustrack/init', function () {
     $data = [
         'buses' => db()->getValues('select distinct bus from events'),
