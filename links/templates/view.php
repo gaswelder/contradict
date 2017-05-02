@@ -1,6 +1,6 @@
 <?= tpl('header') ?>
 
-    <p>{{$title}}</p>
+    <h1>{{$title}}</h1>
 
     <p>Direct link: <a href="{{$link->url}}">{{$link->url}}</a></p>
 
