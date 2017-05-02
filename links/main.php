@@ -43,6 +43,24 @@ $app->post('/links/logout', function () {
 
 $app->get('/', function () {
     $links = Link::fromRows(db()->getRecords('SELECT * FROM links WHERE archive = 0 ORDER BY updated_at'));
+    return linksListView($links);
+});
+
+$app->get('/category/{.+}', function($cat) {
+    if($cat == 'other') {
+        $cat = '';
+    }
+    $links = Link::fromRows(db()->getRecords('select * from links where category = ?', $cat));
+    return linksListView($links);
+});
+
+function alt($a, $b)
+{
+    return $a ? $a : $b;
+}
+
+function linksListView($links)
+{
     $groups = [];
     foreach ($links as $link) {
         $groups[$link->category][] = $link;
@@ -51,7 +69,7 @@ $app->get('/', function () {
         return count($b) - count($a);
     });
     return tpl('list', compact('groups'));
-});
+}
 
 $app->get('/new', function () {
     $categories = db()->getValues("select distinct category from links where category <> ''");
@@ -119,5 +137,6 @@ $app->post('/{\d+}/action', function ($id) {
 
     return Response::redirect('/links');
 });
+
 
 $app->run();
