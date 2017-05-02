@@ -21,11 +21,13 @@ $app->beforeDispatch(function ($url) {
     }
 });
 
-$app->get('/links/login', function () {
+$app->setPrefix('/links');
+
+$app->get('/login', function () {
     return tpl('login');
 });
 
-$app->post('/links/login', function () {
+$app->post('/login', function () {
     $pass = Request::post('password');
     if ($pass == '123') {
         user::auth('user');
@@ -39,7 +41,7 @@ $app->post('/links/logout', function () {
     return Response::redirect('/links/login');
 });
 
-$app->get('/links', function () {
+$app->get('/', function () {
     $links = Link::fromRows(db()->getRecords('SELECT * FROM links WHERE archive = 0 ORDER BY updated_at'));
     $groups = [];
     foreach ($links as $link) {
@@ -51,12 +53,12 @@ $app->get('/links', function () {
     return tpl('list', compact('groups'));
 });
 
-$app->get('/links/new', function () {
+$app->get('/new', function () {
     $categories = db()->getValues("select distinct category from links where category <> ''");
     return tpl('form', compact('categories'));
 });
 
-$app->post('/links', function () {
+$app->post('/', function () {
     $url = Request::post('url');
     $cat = Request::post('category');
     $link = new Link();
@@ -88,17 +90,17 @@ function getPageTitle($url)
     return $m[1];
 }
 
-$app->post('/links/{\d+}/category', function ($id) {
+$app->post('/{\d+}/category', function ($id) {
     $link = Link::get($id);
     if (!$link) {
         return 404;
     }
     $link->category = Request::post('category');
     $link->save();
-    return Response::redirect('/');
+    return Response::redirect('/links');
 });
 
-$app->post('/links/{\d+}/action', function ($id) {
+$app->post('/{\d+}/action', function ($id) {
     $link = Link::get($id);
     if (!$link) {
         return 404;
