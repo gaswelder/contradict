@@ -50,7 +50,8 @@ $app->get('/category/{.+}', function($cat) {
     if($cat == 'other') {
         $cat = '';
     }
-    $links = Link::fromRows(db()->getRecords('select * from links where category = ?', $cat));
+    $cat = str_replace(':', '/', $cat);
+    $links = Link::fromRows(db()->getRecords('select * from links where category = ? and archive = 0', $cat));
     return linksListView($links);
 });
 
