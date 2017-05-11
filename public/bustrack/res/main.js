@@ -31,8 +31,29 @@ var client = {
 	}
 };
 
+Vue.component('input-autocomplete', {
+	props: ['options', 'value', 'required'],
+
+	data: function data() {
+		console.log('data');
+		return {
+			'id': 'id' + Date.now() + ':' + Math.random()
+		};
+	},
+
+
+	template: '<div>\n\t\t<input type="text" v-bind:list="id" v-bind:value="value" v-bind:required="required" v-on:input="update($event.target.value)">\n\t\t<datalist v-bind:id="id">\n\t\t\t<option v-for="option in options" v-bind:value="option"/>\n\t\t</datalist>\n\t</div>',
+
+	methods: {
+		update: function update(newVal) {
+			console.log(newVal);
+			this.$emit('input', newVal);
+		}
+	}
+});
+
 Vue.component('event-form', {
-	template: '<form v-on:submit.prevent="submit">\n\t\t<div class="input-field">\n\t\t\t<label>Bus</label>\n\t\t\t<input v-model="bus" list="buses" type="text" required>\n\t\t\t<datalist id="buses">\n\t\t\t\t<option v-for="bus in buses" v-bind:value="bus"/>\n\t\t\t</datalist>\n\t\t</div>\n\t\t<div class="input-field">\n\t\t\t<label>Stop</label>\n\t\t\t<input type="text" v-model="stop" list="stops" required>\n\t\t\t<datalist id="stops">\n\t\t\t\t<option v-for="stop in stops" v-bind:value="stop"/>\n\t\t\t</datalist>\n\t\t</div>\n\t\t<div class="input-field">\n\t\t\t<label>Time</label>\n\t\t\t<input type="text" readnoly v-bind:value="time">\n\t\t</div>\n\t\t<div>\n\t\t\t<input type="checkbox" v-model="freeze" id="freeze-switch">\n\t\t\t<label for="freeze-switch">Freeze time</label>\n\t\t</div>\n\t\t<div class="fixed-action-btn">\n\t\t\t<button type="submit" v-bind:disabled="sending" class="btn-floating btn-large red waves-effect waves-light">Save</button>\n\t\t</div>\n\t</form>',
+	template: '<form v-on:submit.prevent="submit">\n\t\t<div class="input-field">\n\t\t\t<label>Bus</label>\n\t\t\t<input-autocomplete v-bind:options="buses" v-model="bus" required />\n\t\t</div>\n\t\t<div class="input-field">\n\t\t\t<label>Stop</label>\n\t\t\t<input-autocomplete v-bind:options="stops" v-model="stop" required />\n\t\t</div>\n\t\t<div class="input-field">\n\t\t\t<label>Time</label>\n\t\t\t<input type="text" readnoly v-bind:value="time">\n\t\t</div>\n\t\t<div>\n\t\t\t<input type="checkbox" v-model="freeze" id="freeze-switch">\n\t\t\t<label for="freeze-switch">Freeze time</label>\n\t\t</div>\n\t\t<div class="fixed-action-btn">\n\t\t\t<button type="submit" v-bind:disabled="sending" class="btn-floating btn-large red waves-effect waves-light">Save</button>\n\t\t</div>\n\t</form>',
 
 	data: function data() {
 		return {

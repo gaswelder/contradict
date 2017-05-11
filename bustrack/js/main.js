@@ -33,22 +33,39 @@ var client = {
 	}
 };
 
+Vue.component('input-autocomplete', {
+	props: ['options', 'value', 'required'],
+
+	data() {
+		return {
+			'id': 'id' + Date.now() + ':' + Math.random()
+		};
+	},
+
+	template: `<div>
+		<input type="text" v-bind:list="id" v-bind:value="value" v-bind:required="required" v-on:input="update($event.target.value)">
+		<datalist v-bind:id="id">
+			<option v-for="option in options" v-bind:value="option"/>
+		</datalist>
+	</div>`,
+
+	methods: {
+		update(newVal) {
+			this.$emit('input', newVal);
+		}
+	}
+});
+
 
 Vue.component('event-form', {
 	template: `<form v-on:submit.prevent="submit">
 		<div class="input-field">
 			<label>Bus</label>
-			<input v-model="bus" list="buses" type="text" required>
-			<datalist id="buses">
-				<option v-for="bus in buses" v-bind:value="bus"/>
-			</datalist>
+			<input-autocomplete v-bind:options="buses" v-model="bus" required />
 		</div>
 		<div class="input-field">
 			<label>Stop</label>
-			<input type="text" v-model="stop" list="stops" required>
-			<datalist id="stops">
-				<option v-for="stop in stops" v-bind:value="stop"/>
-			</datalist>
+			<input-autocomplete v-bind:options="stops" v-model="stop" required />
 		</div>
 		<div class="input-field">
 			<label>Time</label>
