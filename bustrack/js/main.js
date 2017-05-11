@@ -72,8 +72,7 @@ Vue.component('event-form', {
 			<input type="text" readnoly v-bind:value="time">
 		</div>
 		<div>
-			<input type="checkbox" v-model="freeze" id="freeze-switch">
-			<label for="freeze-switch">Freeze time</label>
+			<button type="button" class="btn" v-on:click="setTime">Set current time</button>
 		</div>
 		<div class="fixed-action-btn">
 			<button type="submit" v-bind:disabled="sending" class="btn-floating btn-large red waves-effect waves-light">Save</button>
@@ -87,8 +86,7 @@ Vue.component('event-form', {
 			time: new Date(),
 			sending: false,
 			buses: [],
-			stops: [],
-			freeze: false
+			stops: []
 		};
 	},
 
@@ -97,14 +95,11 @@ Vue.component('event-form', {
 			this.buses = x.buses;
 			this.stops = x.stops;
 		});
-		setInterval(this.tick.bind(this), 1000);
 	},
 
 	methods: {
-		tick() {
-			if (!this.freeze) {
-				this.time = new Date();
-			}
+		setTime() {
+			this.time = new Date();
 		},
 
 		// Post the event on the server
@@ -129,7 +124,6 @@ Vue.component('event-form', {
 						t.stops.push(t.stop);
 					}
 
-					t.freeze = false;
 					Materialize.toast('Sent', 2000);
 				})
 				.catch((err) => {
