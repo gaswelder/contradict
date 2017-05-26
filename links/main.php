@@ -77,14 +77,50 @@ $app->get('/new', function () {
     return tpl('form', compact('categories'));
 });
 
-$app->post('/', function () {
-    $url = Request::post('url');
-    $cat = Request::post('category');
-    $link = new Link();
-    $link->url = $url;
-    $link->category = $cat;
-    $link->save();
+class Arr
+{
+    private $a;
 
+    static function make($a = []) {
+        return new self($a);
+    }
+
+    function __construct($a = [])
+    {
+        $this->a = $a;
+    }
+
+    function map($func) {
+        return new self(array_map($func, $this->a));
+    }
+
+    function filter($func = null) {
+        $a = $func ? array_filter($this->a, $func) : array_filter($this->a);
+        return new self($a);
+    }
+
+    function each($func) {
+        foreach($this->a as $k => $v) {
+            call_user_func($func, $v, $k);
+        }
+    }
+
+    function get() {
+        return $this->a;
+    }
+}
+
+$app->post('/', function () {
+    $cat = Request::post('category');
+
+    Arr::make(explode("\n", Request::post('url')))
+        ->map('trim')->filter()
+        ->each(function($url) use ($cat) {
+            $link = new Link();
+            $link->url = $url;
+            $link->category = $cat;
+            $link->save();
+        });
     return Response::redirect('/links');
 });
 

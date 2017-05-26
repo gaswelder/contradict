@@ -9,8 +9,8 @@
             <?php endforeach; ?>
         </datalist>
         <div>
-            <label>URL</label>
-            <input name="url" required autofocus>
+            <label>URLs</label>
+            <textarea name="url" required autofocus></textarea>
         </div>
         <div>
             <label>Category</label>
