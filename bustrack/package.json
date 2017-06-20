@@ -1,9 +1,14 @@
 {
+  "scripts": {
+    "start": "webpack -wd"
+  },
   "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.0",
     "babel-polyfill": "^6.23.0",
     "babel-preset-env": "^1.4.0",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
-    "gulp-browserify": "^0.5.1"
+    "promise-polyfill": "^6.0.2",
+    "webpack": "2.*.*",
+    "whatwg-fetch": "^2.0.3"
   }
 }
