@@ -1,0 +1,366 @@
+/*
+ * App-specific rules
+ */
+@large-input-width: 520px;
+@import "vars.less";
+
+:link {
+	color: blue;
+}
+
+#content {
+	max-width: 44em;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+article h2 {
+	margin-top: 2em;
+	margin-bottom: 1em;
+}
+
+form h1 {
+	font-size: 1em;
+}
+
+textarea {
+	height: 6em;
+	width: @large-input-width;
+	width: calc(~"100% - 255px");
+	max-width: @large-input-width;
+}
+
+.create {
+	color: white;
+}
+
+.create:before {
+	content: "+";
+	font-size: large;
+	font-weight: bold;
+	display: inline-block;
+	vertical-align: middle;
+	margin-right: 0.5em;
+}
+
+#navbar {
+	padding: 0.5em 1em;
+
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	border-bottom: thin solid @light-gray;
+	box-shadow: 0 1px 4px @light-gray;
+	background: white;
+}
+
+#navbar :link, #navbar :visited {
+	color: #333;
+}
+
+#navbar a {
+	/* margin-right: 1em; */
+}
+#navbar .right {
+	float: right;
+}
+#navbar .right a {
+	margin-left: 0.5em;
+	margin-right: 0;
+}
+#navbar .right nav {
+	display: inline;
+}
+
+#login-form {
+	width: 300px;
+	margin: auto;
+}
+
+/*
+ * Projects tasks page.
+ */
+
+#project-tasks-menu {
+	margin: 1em 0;
+}
+#project-tasks-menu a {
+	font-weight: bold;
+	margin-right: 1em;
+}
+
+
+/*
+ * Tasks table.
+ */
+#tasks-list {
+	table {
+		margin-top: 1em;
+	}
+
+	tr.closed {
+		background-color: #899;
+	}
+
+	tr:not(.closed) + tr.closed td {
+		border-top: @step solid white;
+	}
+
+	tr.cancelled {
+		background-color: #eed;
+	}
+	tr.cancelled .name:before {
+		content: "\2613";
+		margin-right: 0.5em;
+	}
+
+	tr.done {
+		background-color: #bfb;
+	}
+
+	tr.done td.name:before {
+		content: "\2713";
+		margin-right: 0.5em;
+	}
+
+	tr.later td {
+		color: #444;
+	}
+}
+
+
+#task-settings {
+	float: right;
+	margin-left: 2em;
+	margin-bottom: 1em;
+	background-color: #efefef;
+	max-width: 8em;
+}
+
+#task-settings form {
+	border-bottom: thin dotted @blue;
+	border-bottom: thin solid white;
+	padding: 0.6em;
+}
+
+#task-settings form:last-child {
+	border-bottom: none;
+}
+
+#task-settings label {
+	display: block;
+}
+
+#task-settings button {
+	/*display: inline;
+	border: none;
+	background: none;
+	text-decoration: underline;
+	color: @blue; */
+	cursor: pointer;
+	font-size: 13px;
+	min-width: 7em;
+	padding: 0;
+}
+
+#task-settings button:hover {
+	/*color: orange; */
+}
+
+
+#comment-form {
+	padding-top: 1.5em;
+
+	textarea {
+		width: 90%;
+		width: calc(~"100% - 18px");
+		max-width: none;
+	}
+}
+
+#task-comments time {
+	font-size: smaller;
+}
+
+.comment {
+	padding: 1em 0;
+
+	.head + p {
+		margin-top: 0.5em;
+	}
+}
+
+.comment + .comment,
+#task-comments {
+	border-top: 1px solid #aab;
+}
+
+.comment:last-of-type {
+	border-bottom: 1px solid #aab;
+}
+
+.comment-anchor {
+	position: relative;
+	top: -40px;
+}
+
+
+#projects-list > div {
+	border: thin solid #ddf;
+	display: inline-block;
+	padding: 2em;
+	border-radius: 4px;
+}
+
+#projects-list .info {
+	font-size: smaller;
+}
+
+#task-form input[name="name"],
+#task-form input[name="ref"],
+#task-form textarea {
+	width: @large-input-width;
+}
+#task-form input[name="size"] {
+	width: 3em;
+}
+
+#settings-form {
+	margin-bottom: 2em;
+}
+
+#footer {
+	background: #99ccff;
+	height: 2em;
+	margin-top: 2em;
+}
+
+@media (max-width: 600px)
+{
+	body {
+		padding: 1.4cm 0 0 0;
+		border-bottom: 4em solid @light-gray;
+	}
+
+	#navbar .right {
+		position: relative;
+	}
+	#navbar #user-icon {
+		background: @light-gray;
+		display: block;
+		border: thin solid #999;
+		padding: 0 0.5em;
+		font-size: 10pt;
+		margin-bottom: -0.5em;
+	}
+	#navbar .right a {
+		display: none;
+		position: absolute;
+		right: 0;
+		background: white;
+		width: 6em;
+		padding: 0 0.5em;
+	}
+	#navbar .right:hover a {
+		display: block;
+	}
+	#navbar .right a:nth-child(1) {
+		top: 100%;
+	}
+	#navbar .right a:nth-child(2) {
+		top: 200%;
+	}
+	#navbar .right a:nth-child(3) {
+		top: 300%;
+	}
+
+	#tasks-list tr {
+		display: block;
+		padding: 1em;
+		border-bottom: thin dotted #999;
+	}
+	/*
+	#tasks-list tr:nth-child(odd) {
+		background: #f6f6f6;
+	}*/
+	#tasks-list thead {
+		display: none;
+	}
+	#tasks-list td {
+		display: block;
+		border: none;
+		padding: 0;
+		font-size: smaller;
+	}
+	#tasks-list td:nth-child(5) {
+		display: none;
+	}
+	#tasks-list td a {
+		font-size: larger;
+	}
+	#tasks-list td:first-child {
+		display: none;
+	}
+	#tasks-list td:first-child:before {
+		content: "#";
+	}
+	#tasks-list table, #tasks-list tbody {
+		display: block;
+		width: 100%;
+	}
+
+	#project-tasks-menu {
+		margin: 1em;
+	}
+	#new-task-button {
+		margin: 0 0 1em 1em;
+	}
+
+	#task-form {
+		margin: 1em;
+	}
+	#task-form input[name="name"],
+	#task-form textarea {
+		width: 90%;
+		width: calc( ~"100% - 2em" );
+	}
+
+	h1 + p {
+		margin: 1em;
+	}
+
+	#task-settings {
+		float: none;
+		margin: 1em;
+	}
+
+	#task-settings form {
+		margin: 0.1em 0;
+		padding: 0.5em;
+		max-width: none;
+	}
+
+	article, h1 {
+		margin: 1em;
+	}
+
+	#task-comments textarea {
+		margin: 1em 1em 0 1em;
+		width: 90%;
+		width: calc( ~"100% - 3.5em" );
+	}
+	#task-comments button {
+		margin-left: 1em;
+	}
+}
+
+@media (max-width: 400px)
+{
+	#new-task-button {
+		display: block;
+		width: auto;
+		margin-right: 1em;
+		text-align: center;
+	}
+}
