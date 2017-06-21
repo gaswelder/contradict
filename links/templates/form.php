@@ -2,7 +2,7 @@
 
     <h1>New link</h1>
 
-    <form method="post" action="/links">
+    <form method="post" action="/links/">
         <datalist id="categories">
             <?php foreach ($categories as $cat) : ?>
                 <option value="{{$cat}}">
