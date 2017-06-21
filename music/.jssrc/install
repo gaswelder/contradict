@@ -1,0 +1,3 @@
+
+jscat lib src > out/mdb.js
+cp out/mdb.js ../res/mdb.js

@@ -1,0 +1,39 @@
+.w {
+	font-family: sans-serif;
+	cursor: default;
+}
+
+.w.context-menu, .w.dialog {
+	background-color: #fafafa;
+	box-shadow: 1px 1px 3px #c9c0c0;
+}
+
+.w.dialog {
+	padding: 0.5em;
+}
+
+.w.dialog .buttons {
+	margin-top: 0.5em;
+}
+
+.w.dialog textarea {
+	width: 90vw;
+	max-width: 40em;
+	height: 20em;
+}
+
+.w.context-menu > div {
+	padding: 0.2em 0.4em;
+}
+.w.context-menu > div:hover {
+	background-color: #d7dbf9;
+}
+
+.w.dialog .image-preview {
+	width: 300px;
+	height: 300px;
+}
+.w.dialog .image-preview img {
+	max-width: 300px;
+	max-height: 300px;
+}
