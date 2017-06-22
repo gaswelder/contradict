@@ -1,5 +1,16 @@
+<style scoped>
+.app {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+.container {
+	flex: 1 1 auto;
+	overflow-y: scroll;
+}
+</style>
 <template>
-	<div>
+	<div class="app">
 		<nav>
 			<div class="nav-wrapper">
 			  <ul id="nav-mobile" class="left">

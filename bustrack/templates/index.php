@@ -11,6 +11,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
     <script src="https://unpkg.com/vue"></script>
+<style>
+html, body, #app {
+	height: 100%;
+	padding: 0;
+	margin: 0;
+}
+</style>
 </head>
 
 <body>
