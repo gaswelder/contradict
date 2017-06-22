@@ -5,7 +5,7 @@ module.exports = {
 	},
 	output: {
 		path: __dirname + '/../public/bustrack/res',
-		filename: '[name].js'
+		filename: '[name].bin.js'
 	},
 	module: {
 		rules: [

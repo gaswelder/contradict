@@ -5,4 +5,4 @@ res/*.js
 *.gif
 vendor
 *.ser
-
+*.bin.js

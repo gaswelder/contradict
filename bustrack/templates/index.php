@@ -17,8 +17,8 @@
     <div id="app">
         <app/>
     </div>
-    <script src="res/runtime.js"></script>
-    <script src="res/main.js"></script>
+    <script src="res/runtime.bin.js"></script>
+    <script src="res/main.bin.js"></script>
 </body>
 
 </html>
