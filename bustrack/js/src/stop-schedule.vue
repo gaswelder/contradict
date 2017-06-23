@@ -1,17 +1,11 @@
 <template>
-	<table class="stop-schedule">
-		<tr v-for="(records, day) in daysInfo">
-			<td>{{day | dayOfWeek}}</td>
-			<td><stop-day-schedule v-bind:records="records"/></td>
-		</tr>
-	</table>
+	<main>
+		<section v-for="(records, day) in daysInfo">
+			<h4>{{day}}</h4>
+			<stop-day-schedule v-bind:records="records"/>
+		</section>
+	</main>
 </template>
-
-<style>
-.stop-schedule td {
-	vertical-align: top;
-}
-</style>
 
 <script>
 import TimesList from './times-list.vue';
@@ -20,7 +14,7 @@ Vue.component('stop-day-schedule', {
 	props: ['records'],
 	components: {TimesList},
 
-	template: `<table>
+	template: `<table class="day-schedule">
 		<tr v-for="(times, bus) in busInfo">
 			<td>{{bus}}</td>
 			<td><TimesList v-bind:times="times"/></td>
@@ -46,9 +40,17 @@ export default {
 	computed: {
 		daysInfo() {
 			let days = {};
+
+			function dayName(day) {
+				if(day == 0 || day == 6) {
+					return 'Sat, Sun';
+				}
+				return 'Mon-Fri';
+			}
+
 			this.records.forEach(function({bus, time}) {
 				let date = new Date(time * 1000);
-				let day = date.getDay();
+				let day = dayName(date.getDay());
 				if(!days[day]) {
 					days[day] = [];
 				}
