@@ -1,7 +1,7 @@
 <template>
 	<main>
 		<section v-for="(records, stopName) in stopInfo">
-			<h3>{{stopName}}</h3>
+			<h4>{{stopName}}</h4>
 			<stop-schedule v-bind:records="records"/>
 		</section>
 	</main>

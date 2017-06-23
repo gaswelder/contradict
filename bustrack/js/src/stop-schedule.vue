@@ -1,7 +1,7 @@
 <template>
 	<main>
 		<section v-for="(records, day) in daysInfo">
-			<h4>{{day}}</h4>
+			<h5>{{day}}</h5>
 			<stop-day-schedule v-bind:records="records"/>
 		</section>
 	</main>
