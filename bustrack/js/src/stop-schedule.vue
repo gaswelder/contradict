@@ -1,9 +1,11 @@
 <template>
 	<main>
-		<section v-for="(records, day) in daysInfo">
-			<h5>{{day}}</h5>
-			<stop-day-schedule v-bind:records="records"/>
-		</section>
+		<div class="card" v-for="(records, day) in daysInfo">
+			<div class="card-content">
+				<span class="card-title">{{day}}</span>
+				<stop-day-schedule v-bind:records="records"/>
+			</div>
+		</div>
 	</main>
 </template>
 
