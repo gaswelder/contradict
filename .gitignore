@@ -6,3 +6,5 @@ res/*.js
 vendor
 *.ser
 *.bin.js
+var
+
