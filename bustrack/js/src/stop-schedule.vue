@@ -1,27 +1,35 @@
 <template>
 	<main>
-		<div class="card" v-for="(records, day) in daysInfo">
-			<div class="card-content">
-				<span class="card-title">{{day}}</span>
-				<stop-day-schedule v-bind:records="records"/>
-			</div>
-		</div>
+		<section v-for="(records, day) in daysInfo">
+			<h5>{{day}}</h5>
+			<stop-day-schedule v-bind:records="records"/>
+		</section>
 	</main>
 </template>
 
 <script>
 import TimesList from './times-list.vue';
 
+Vue.component('bus-times', {
+	props: ['bus', 'times'],
+	components: {TimesList},
+	template: `
+		<div class="card">
+			<div class="card-content">
+				<span class="card-title">{{bus}}</span>
+				<TimesList v-bind:times="times"/>
+			</div>
+		</div>
+	`
+});
+
 Vue.component('stop-day-schedule', {
 	props: ['records'],
-	components: {TimesList},
 
-	template: `<table class="day-schedule">
-		<tr v-for="(times, bus) in busInfo">
-			<td>{{bus}}</td>
-			<td><TimesList v-bind:times="times"/></td>
-		</tr>
-		</table>`,
+	template: `
+		<div class="day-schedule">
+			<bus-times v-for="(times, bus) in busInfo" v-bind:bus="bus" v-bind:times="times"/>
+		</div>`,
 
 	computed: {
 		busInfo() {
