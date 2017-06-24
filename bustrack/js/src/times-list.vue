@@ -19,7 +19,7 @@ export default {
 	props: ['times'],
 	computed: {
 		fmt() {
-			return this.times.map(formatTime).sort(cmp).join(', ');
+			return this.times.map(formatTime).sort(cmp).join(' • ');
 		}
 	}
 };
