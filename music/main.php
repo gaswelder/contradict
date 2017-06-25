@@ -7,7 +7,30 @@ ini_set('display_errors', 'on');
 
 class TrackStudio extends dbobject
 {
+	const TABLE_NAME = 'track_studios';
+}
 
+class AlbumStudio
+{
+	public $roles = [];
+	public $track_ids = [];
+	public $studio_id;
+
+	function push($k, $v)
+	{
+		if(in_array($v, $this->$k)) return;
+		$this->{$k}[] = $v;
+	}
+}
+
+class TrackPerformer extends dbobject
+{
+	const TABLE_NAME = 'track_performers';
+}
+
+class TrackStaff extends dbobject
+{
+	const TABLE_NAME = 'track_staff';
 }
 
 class Studio extends dbobject

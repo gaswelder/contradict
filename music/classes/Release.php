@@ -94,17 +94,34 @@ class Release extends dbobject
 	}
 
 	/**
-	 * Returns studios associated with this album.
+	 * Returns studios associated with this album, as AlbumStudio objects.
 	 *
 	 * @return array
 	 */
 	public function studios()
 	{
 		$studios = [];
-		foreach($this->tracks() as $track) {
-			$studios = array_merge($studios, $track->studios());
+
+		$rows = db()->getRecords('SELECT track_id, studio_id, role
+			FROM track_studios
+			WHERE track_id IN (
+				SELECT id FROM tracks WHERE album_id = ?)', $this->id);
+
+		foreach($rows as $row) {
+			$id = $row['studio_id'];
+			if(!isset($studios[$id])) {
+				$st = Studio::get($id);
+				$s = new AlbumStudio();
+				$s->id = $st->id;
+				$s->name = $st->name;
+				$studios[$id] = $s;
+			}
+			$s = $studios[$id];
+			$s->push('roles', $row['role']);
+			$studios[$id]->track_ids[] = $row['track_id'];
 		}
-		return $studios;
+
+		return array_values($studios);
 	}
 
 	/**

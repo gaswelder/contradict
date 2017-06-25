@@ -10,10 +10,14 @@
 
 	<p>{{$album->year}}, {{$album->label}}</p>
 
+
+
 	<div class="quick-details">
 		<dl>
 			<dt>Studio</dt>
-			<dd>{{$album->studio}}</dd>
+			<?php foreach($album->studios() as $studio): ?>
+				<dd>{{$studio->name}} - {{implode(', ', $studio->roles)}}</dd>
+			<?php endforeach; ?>
 			<dt>Producer</dt>
 			<dd>{{$album->producer}}</dd>
 			<dt>Artist</dt>
@@ -27,10 +31,6 @@
 
 	<?= tpl('parts/tracklist', compact('album')) ?>
 	<?= tpl('parts/lineup', ['lineup' => $album->lineup()]) ?>
-
-	<?php
-	var_dump($album->studios());
-	?>
 
 	<div>{{$album->info}}</div>
 
