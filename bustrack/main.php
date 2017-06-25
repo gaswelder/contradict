@@ -6,13 +6,13 @@ $app = new App(__DIR__);
 
 $app->get('/bustrack/', function () {
 	if($_SERVER['REQUEST_URI'] == '/bustrack') {
-		return Response::redirect('/bustrack/');
+		return response::redirect('/bustrack/');
 	}
     return tpl('index');
 });
 
 $app->post('/bustrack/events', function () {
-    list($bus, $stop, $time) = array_values(Request::posts('bus', 'stop', 'time'));
+    list($bus, $stop, $time) = array_values(request::posts('bus', 'stop', 'time'));
     if (!$bus || !$stop || !$time) {
         return response::STATUS_BADREQ;
     }
@@ -28,7 +28,7 @@ $app->post('/bustrack/events', function () {
 
 $app->get('/bustrack/events', function() {
 	$list = db()->getRecords('select bus, stop, time from events');
-	return Response::json($list);
+	return response::json($list);
 });
 
 $app->get('/bustrack/init', function () {
@@ -36,7 +36,7 @@ $app->get('/bustrack/init', function () {
         'buses' => db()->getValues('select distinct bus from events'),
         'stops' => db()->getValues('select distinct stop from events')
     ];
-    return Response::json($data);
+    return response::json($data);
 });
 
 $app->run();
