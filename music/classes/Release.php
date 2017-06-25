@@ -31,13 +31,9 @@ class Release extends dbobject
 	 */
 	public function bands()
 	{
-		$bandIds = db()->getValues("
-			SELECT DISTINCT b.id, b.name
-			FROM bands b
-			JOIN tracks t ON t.band_id = b.id
-			JOIN release_tracks rt ON rt.track_id = t.id
-			WHERE rt.release_id = ?", $this->id);
-		return Band::getMultiple($bandIds);
+		$rows = db()->getRecords('SELECT * FROM bands
+			WHERE id IN (SELECT band_id FROM tracks WHERE album_id = ?)', $this->id);
+		return Band::fromRows($rows);
 	}
 
 	/**
@@ -47,8 +43,8 @@ class Release extends dbobject
 	 */
  	public function tracks()
 	{
-		$ids = db()->getValues('select track_id from release_tracks where release_id = ? order by num', $this->id);
-		return Track::getMultiple($ids);
+		$rows = db()->getRecords('SELECT * FROM tracks WHERE album_id = ? ORDER BY num', $this->id);
+		return Track::fromRows($rows);
 	}
 
 	/**
@@ -60,11 +56,9 @@ class Release extends dbobject
 	{
 		$rows = db()->getRecords(
 			'SELECT
-				rt.track_id, p.person_id, p.role, p.stagename, p.guest
-			FROM releases r
-				JOIN release_tracks rt ON rt.release_id = r.id
-				JOIN track_performers p ON p.track_id = rt.track_id
-			WHERE r.id = ?', $this->id);
+				t.id AS track_id, p.person_id, p.role, p.stagename, p.guest
+			FROM tracks t JOIN track_performers p ON p.track_id = t.id
+			WHERE t.band_id = ?', $this->id);
 
 		$fields = ['track_id', 'role', 'stagename', 'guest'];
 		// Group by person

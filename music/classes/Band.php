@@ -19,13 +19,10 @@ class Band extends dbobject
 	 */
 	public function albums()
 	{
-		$ids = db()->getValues('SELECT DISTINCT r.id
-			FROM releases r
-			JOIN release_tracks rt ON rt.release_id = r.id
-			JOIN tracks t ON t.id = rt.track_id
-			WHERE t.band_id = ?
-			ORDER BY r."year", r.zindex', $this->id);
-		return Release::getMultiple($ids);
+		$rows = db()->getRecords('SELECT * FROM releases
+			WHERE id IN (SELECT album_id FROM tracks WHERE band_id = ?)
+			ORDER BY "year"', $this->id);
+		return Release::fromRows($rows);
 	}
 
 	/**
