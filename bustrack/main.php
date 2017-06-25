@@ -14,7 +14,7 @@ $app->get('/bustrack/', function () {
 $app->post('/bustrack/events', function () {
     list($bus, $stop, $time) = array_values(Request::posts('bus', 'stop', 'time'));
     if (!$bus || !$stop || !$time) {
-        return Response::BADREQ;
+        return response::STATUS_BADREQ;
     }
 
     db()->insert('events', [

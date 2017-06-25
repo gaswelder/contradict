@@ -19,7 +19,7 @@ class actions
 		$text = request::post( 'text' );
 
 		if( !task_permission( $uid, $tid, 'add-comment' ) ) {
-			return response::FORBIDDEN;
+			return response::STATUS_FORBIDDEN;
 		}
 
 		$c = new comment();
@@ -62,7 +62,7 @@ class actions
 		$task_id = request::post( 'task-id' );
 
 		if( !$user_id || !$task_id )
-			return response::BADREQ;
+			return response::STATUS_BADREQ;
 
 		$t = new task( $task_id );
 		$t->worker_id( $user_id );
@@ -74,7 +74,7 @@ class actions
 		$user_id = user::id();
 		$task_id = request::post( 'task-id' );
 		if( !$user_id || !$task_id )
-			return response::BADREQ;
+			return response::STATUS_BADREQ;
 
 		$t = new task( $task_id );
 		$t->status( 'done' );
@@ -88,7 +88,7 @@ class actions
 		$user_id = user::id();
 		$task_id = request::post( 'task-id' );
 		if( !$user_id || !$task_id )
-			return response::BADREQ;
+			return response::STATUS_BADREQ;
 
 		$t = new task( $task_id );
 		$t->status( 'open' );
@@ -146,7 +146,7 @@ class actions
 		$priority = request::post( 'priority' );
 
 		if( !$user_id || !$task_id )
-			return response::BADREQ;
+			return response::STATUS_BADREQ;
 
 		$t = new task( $task_id );
 		if( $t->status() == 'closed' || $t->status() == 'cancelled' ) {
@@ -173,7 +173,7 @@ class actions
 		$task_id = request::post( 'task-id' );
 
 		if( !task_permission( $user_id, $task_id, 'delete-task' ) ) {
-			return response::FORBIDDEN;
+			return response::STATUS_FORBIDDEN;
 		}
 
 		tasks::delete( $task_id );
@@ -228,7 +228,7 @@ class actions
 		$login = request::post( 'login' );
 		$pass = request::post( 'password' );
 		$name = request::post( 'name' );
-		if( !$login ) return response::BADREQ;
+		if( !$login ) return response::STATUS_BADREQ;
 		t::create_user( $login, $pass, $name );
 	}
 
