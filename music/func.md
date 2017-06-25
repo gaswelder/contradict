@@ -1,4 +1,3 @@
-First date should be the date when the recording was finished.
 
 Other dates might come from release history:
 	date	label_id

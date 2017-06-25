@@ -2,13 +2,39 @@
 
 <h1>Rationale</h1>
 
-<section>
-	<h2>Only original conceptual albums</h2>
+<h2>A band is only a name</h2>
 
-	<p>There may be plenty versions of an album. The goal is only to present the album as it was intended at the moment of its creation. That means, bonus tracks and alternative covers are generally out, unless the first release didn't have the intended form due to censorship or other problems.</p>
+<p>A band is only a name, nothing else. A band's country is determined by
+countries of its participants. Thus, a single band be rooted in multiple
+countries, and the countries may change as the lineup changes.</p>
 
-	<p>There may be valuable bonus tracks that are present only on some alternative release but not on any of the original albums. But that is it: they are not part of any original album. If there is need, such a release can be listed on its own, and it would be considered a compilation including the original album and some new tracks.</p>
-</section>
+
+<h2>Only original conceptual albums</h2>
+
+<p>There may be plenty versions of an album. The goal is only to present the
+album as it was intended at the moment of its creation. That means, bonus tracks
+and alternative covers are generally out, unless the first release didn't have
+the intended form due to censorship or other problems.</p>
+
+<p>There may be valuable bonus tracks that are present only on some alternative
+release but not on any of the original albums. But that is it: they are not part
+of any original album. If there is need, such a release can be listed on its
+own, and it would be considered a compilation including the original album and
+these other tracks.</p>
+
+<p>There is no media info. Since an album is a concept, it's unimportant whether
+it was printed on vinyl, CD or tape. The media is just a way to share the album
+with others. There are digital-only albums too. There are specialised sites with
+information about dates and forms of physical album releases.</p>
+
+<p>The cover picture is technically a part of the package, but it is also a
+graphical conceptual supplement to the album, thus it is included. The original
+covers are preferred over the covers on the reissued/relicensed packages, unless
+the original cover was not the intended cover.</p>
+
+<p>The album's date should ideally be the date when the recording was finished.
+But since that information is rarely available, the first publication is used as
+the closest approximation.</p>
 
 <section>
 	<h2>Only actual performers</h2>
@@ -23,5 +49,9 @@
 
 	<p>Also, whether an album is a "full-length" or "mini" or "EP" is subjective. There are releases considered to be EPs which are longer than some "full-length" albums.</p>
 </section>
+
+<p>The track-by-track info about who wrote lyrics and who wrote music is
+nice to have, but too cumbersome and it's not available in most cases
+anyways. Those who are interested can read it in the free-form description.</p>
 
 <?= tpl( 'bottom' ) ?>
