@@ -38,6 +38,11 @@ class Studio extends dbobject
 	const TABLE_NAME = 'studios';
 }
 
+class AlbumArtist extends dbobject
+{
+	const TABLE_NAME = 'album_artists';
+}
+
 class Performer
 {
 	public function person()
@@ -255,6 +260,158 @@ $app->get('/search', function() {
 	$q = request::get('q');
 	$bands = Band::search($q);
 	return tpl('search', compact('q', 'bands'));
+});
+
+$app->get('/edit', function() {
+	return tpl('edit/index');
+});
+
+$app->get('/edit/bands', function() {
+	return tpl('edit/band-new');
+});
+
+$app->post('/edit/bands', function() {
+	$name = request::post('name');
+	$band = new Band;
+	$band->name = $name;
+	$id = $band->save();
+	return response::redirect('/music/edit/bands/'.$id);
+});
+
+$app->get('/edit/bands/{\d+}', function($id) {
+	$band = Band::get($id);
+	if(!$band) return 404;
+	return tpl('edit/band', compact('band'));
+});
+
+$app->get('/edit/albums', function() {
+	return tpl('edit/album-new');
+});
+
+function year($s)
+{
+	preg_match('/(\d\d\d\d)-(\d\d)-(\d\d)/', $s, $m);
+	if(!$m) {
+		throw new Exception("Couldn't parse datetime: '$s'");
+	}
+	return $m[1];
+}
+
+class SilentBob
+{
+	private $__data;
+
+	function __construct($data)
+	{
+		$this->__data = $data;
+	}
+
+	static function wrap($v)
+	{
+		if(is_scalar($v)) return $v;
+		if(is_array($v)) {
+			return array_map(function($element) {
+				return self::wrap($element);
+			}, $v);
+		}
+		return new static($v);
+	}
+
+	function __get($k)
+	{
+		if(property_exists($this->__data, $k)) {
+			return self::wrap($this->__data->$k);
+		}
+		return null;
+	}
+}
+
+function coalesce(...$args) {
+	foreach($args as $arg) {
+		if($arg) break;
+	}
+	return $arg;
+}
+
+$app->post('/edit/albums', function() {
+	$data = request::post('data');
+	$data = json_decode($data);
+	if(!$data) {
+		throw new Exception("Couldn't parse JSON data: ".json_last_error_msg());
+	}
+	$data = new SilentBob($data);
+
+	db()->begin();
+
+	$band = Band::findOrCreate(["name" => $data->band]);
+
+	$album = new Release();
+	$album->label = $data->label->name;
+	$album->date = $data->label->date;
+	$album->name = $data->name;
+	$album->year = year($album->date);
+	$album->save();
+
+	foreach($data->tracklist as $trackData) {
+		$track = new Track();
+		$track->album_id = $album->id;
+		$track->band_id = $band->id;
+		$track->name = $trackData->name;
+		$track->length = $trackData->length;
+		if(strlen($track->length < 6)) {
+			$track->length = '00:'.$track->length;
+		}
+		$track->comment = coalesce($trackData->comment, '');
+		$track->save();
+
+		foreach($data->lineup as $lineupData) {
+			$person = Person::findOrCreate(["name" => $lineupData->name]);
+			foreach($lineupData->roles as $role) {
+				$p = new TrackPerformer();
+				$p->track_id = $track->id;
+				$p->person_id = $person->id;
+				$p->role = $role;
+				$p->save();
+			}
+		}
+
+		foreach($data->staff as $staffData) {
+			$person = Person::findOrCreate(["name" => $staffData->name]);
+			foreach($staffData->roles as $role) {
+				$p = new TrackStaff();
+				$p->track_id = $track->id;
+				$p->person_id = $person->id;
+				$p->role = $role;
+				$p->save();
+			}
+		}
+
+		foreach($data->studios as $studioData) {
+			$studio = Studio::findOrCreate(["name" => $studioData->name]);
+			foreach($studioData->roles as $role) {
+				$s = new TrackStudio();
+				$s->track_id = $track->id;
+				$s->studio_id = $studio->id;
+				$s->role = $role;
+				$s->save();
+			}
+		}
+	}
+
+	foreach($data->cover->artists as $artistData) {
+		$person = Person::findOrCreate(["name" => $artistData->name]);
+		$a = new AlbumArtist();
+		$a->person_id = $person->id;
+		$a->release_id = $album->id;
+	}
+
+	db()->end();
+
+	dd($data);
+});
+
+$app->post('/edit/bands/{\d+}', function($id) {
+	dd($_POST);
 });
 
 

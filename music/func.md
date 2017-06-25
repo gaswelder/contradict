@@ -1,6 +1,108 @@
 
-Other dates might come from release history:
-	date	label_id
+
+Each track has a different set of (studio, engineer, job)
+
+Split is a kind of compilation.
+
+An album is a collection of tracks by one or more bands.
+Each track has one band
+Each track has different lineup
+
+{
+	"name": "Album name",
+	"label": {
+		"name": "Roadrunner Records",
+		"date": "1991-00-00"
+	},
+	tracklist: [
+		{
+			title: "Liege of Inveracity",
+			length: "4:31"
+		},
+		{
+			title: "Effigy of the Forgotten",
+			length: "3:50"
+		}
+	],
+
+	lineup: [
+		{
+			name: "Mike Smith",
+			roles: ["drums"],
+			tracks: [0, 1]
+		},
+		{
+			name: "Mike Smith",
+			roles: ["vocals"],
+			tracks: [3]
+		},
+		{
+			name: "Ralf Schönberg",
+			roles: ["drums"]
+		},
+		{
+			name: "Timo Knopf",
+			roles: ["Vocals (lead)", "Guitars (lead)"]
+		},
+		{
+			name: "Karsten Boehnke",
+			roles: ["Bass", "Vocals (backing)"],
+			stagename: "Boehni"
+		}
+	}
+
+	guests: [
+		{
+			name: "Glen Benton",
+			roles: ["vocals"],
+			tracks: [0]
+		},
+	]
+
+	staff: [
+		// Produced by Scott Burns
+		// Engineered and mixed by Scott Burns
+		// Mastered by Eddy Shreyer
+		{
+			name: "Scott Burns",
+			roles: ["production", "engineering", "mixing"]
+		},
+		{
+			name: "Eddy Shreyer",
+			roles: ["mastering"]
+		}
+	],
+
+
+
+	studios: [
+		// Recorded at Tonstudio Mohrmann in Bochum, Germany on July 1992.
+		{
+			name: "Tonstudio Mohrmann",
+			roles: ["recording"],
+			tracks: [0,1,2,3,4,5]
+		},
+		// Mastered at S.N.B.
+		{
+			name: "S.N.B.",
+			roles: ["mastering"]
+		},
+		// Recorded and mixed at Morrisound Recording, Tampa, FL
+		{
+			name: "Morrisound Recording",
+			roles: ["recording", "mixing"]
+		}
+
+	],
+
+	cover: {
+		title: "Entry of the Crusaders Into Constantinople",
+		artists: [{name: "Delacroix"}]
+	},
+
+	description: "This album is dedicated to the memory of Roger Patterson"
+}
+
 
 
 
