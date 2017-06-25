@@ -205,23 +205,32 @@ function parse_ranges( $s )
 
 
 
-
-function main_page_ids()
+class MainPageController
 {
-	$date = date( "Y-m-d" );
-
-	$data = files::get( "main_page_releases" );
-	if( $data ) $data = unserialize( $data );
-
-	if( !$data || $data['date'] != $date ) {
-		$random = Release::getRandom(9);
-		$ids = array_map(function($release) {
-			return $release->id;
-		}, $random);
-		$data = array( 'date' => $date, 'ids' => $ids );
-		files::save( "main_page_releases", serialize( $data ) );
+	public function run()
+	{
+		$ids = $this->albumIds();
+		$albums = Release::getMultiple($ids);
+		return tpl('home', ['albums' => $albums]);
 	}
-	return $data['ids'];
+
+	private function albumIds()
+	{
+		$date = date( "Y-m-d" );
+
+		$data = files::get( "main_page_releases" );
+		if( $data ) $data = unserialize( $data );
+
+		if( !$data || $data['date'] != $date ) {
+			$random = Release::getRandom(9);
+			$ids = array_map(function($release) {
+				return $release->id;
+			}, $random);
+			$data = array( 'date' => $date, 'ids' => $ids );
+			files::save( "main_page_releases", serialize( $data ) );
+		}
+		return $data['ids'];
+	}
 }
 
 
@@ -230,11 +239,7 @@ $app = new App(__DIR__);
 
 $app->setPrefix('/music');
 
-$app->get('/', function() {
-	$ids = main_page_ids();
-	$albums = Release::getMultiple($ids);
-	return tpl('home', ['albums' => $albums]);
-});
+$app->get('/', MainPageController::class);
 
 $app->get('/bands/{\d+}', function($id) {
 	$band = Band::get($id);
