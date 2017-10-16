@@ -17,22 +17,6 @@ function tplvar($name) {
     }
 }
 
-class Link extends dbobject
-{
-    const TABLE_NAME = 'links';
-
-    public $created_at;
-    public $updated_at;
-    public $category;
-    public $url;
-
-    function __construct()
-    {
-        $this->created_at = time();
-        $this->updated_at = time();
-    }
-}
-
 $app = new App(__DIR__);
 
 $app->middleware(function($next) {
@@ -97,39 +81,6 @@ $app->get('/new', function () {
     $categories = db()->getValues("select distinct category from links where category <> ''");
     return tpl('form', compact('categories'));
 });
-
-class Arr
-{
-    private $a;
-
-    static function make($a = []) {
-        return new self($a);
-    }
-
-    function __construct($a = [])
-    {
-        $this->a = $a;
-    }
-
-    function map($func) {
-        return new self(array_map($func, $this->a));
-    }
-
-    function filter($func = null) {
-        $a = $func ? array_filter($this->a, $func) : array_filter($this->a);
-        return new self($a);
-    }
-
-    function each($func) {
-        foreach($this->a as $k => $v) {
-            call_user_func($func, $v, $k);
-        }
-    }
-
-    function get() {
-        return $this->a;
-    }
-}
 
 $app->post('/', function () {
     $cat = request::post('category');
