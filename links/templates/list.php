@@ -1,5 +1,15 @@
 <?= tpl('header') ?>
 
+<?php
+$groups = [];
+foreach ($links as $link) {
+    $groups[$link->category][] = $link;
+}
+uasort($groups, function ($a, $b) {
+    return count($b) - count($a);
+});
+?>
+
 <?php foreach ($groups as $category => $links) : ?>
 <a href="/links/category/{{alt(urlencode(str_replace('/', ':', $category)), 'other')}}"><h2>{{$category ? $category : 'Other'}}</h2></a>
 <ul>

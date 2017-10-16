@@ -48,7 +48,7 @@ $app->post('/logout', function () {
 
 $app->get('/', function () {
     $links = Link::active();
-    return linksListView($links);
+    return tpl('list', compact('links'));
 });
 
 $app->get('/category/{.+}', function($cat) {
@@ -57,24 +57,12 @@ $app->get('/category/{.+}', function($cat) {
     }
     $cat = str_replace(':', '/', $cat);
     $links = Link::fromCategory($cat);
-    return linksListView($links);
+    return tpl('list', compact('links'));
 });
 
 function alt($a, $b)
 {
     return $a ? $a : $b;
-}
-
-function linksListView($links)
-{
-    $groups = [];
-    foreach ($links as $link) {
-        $groups[$link->category][] = $link;
-    }
-    uasort($groups, function ($a, $b) {
-        return count($b) - count($a);
-    });
-    return tpl('list', compact('groups'));
 }
 
 $app->get('/new', function () {
