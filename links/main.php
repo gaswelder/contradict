@@ -2,7 +2,6 @@
 
 require __DIR__.'/../hl/main.php';
 
-use havana\dbobject;
 use havana\App;
 use havana\user;
 use havana\request;
