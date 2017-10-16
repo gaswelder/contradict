@@ -1,10 +1,30 @@
 <?php
 
-require __DIR__.'/../hl/app.php';
+require __DIR__.'/../hl/main.php';
+
+use havana\dbobject;
+use havana\App;
+use havana\user;
+use havana\request;
+use havana\response;
+
+function tplvar($name) {
+    switch ($name) {
+        case 'loggedIn':
+            return user::getRole('user');
+        default:
+            panic("Unknown tplvar: $name");
+    }
+}
 
 class Link extends dbobject
 {
     const TABLE_NAME = 'links';
+
+    public $created_at;
+    public $updated_at;
+    public $category;
+    public $url;
 
     function __construct()
     {
@@ -15,10 +35,11 @@ class Link extends dbobject
 
 $app = new App(__DIR__);
 
-$app->beforeDispatch(function ($url) {
-    if (!user::select('user') && $url != '/links/login') {
-        return Response::redirect('/links/login');
+$app->middleware(function($next) {
+    if (!user::getRole('user') && request::url()->path != '/links/login') {
+        return response::redirect('/links/login');
     }
+    return $next();
 });
 
 $app->setPrefix('/links');
@@ -28,21 +49,21 @@ $app->get('/login', function () {
 });
 
 $app->post('/login', function () {
-    $pass = Request::post('password');
+    $pass = request::post('password');
     if ($pass == '123') {
-        user::auth('user');
-        return Response::redirect('/links');
+        user::addRole('user');
+        return response::redirect('/links');
     }
     return tpl('login');
 });
 
-$app->post('/links/logout', function () {
-    user::clear('user');
-    return Response::redirect('/links/login');
+$app->post('/logout', function () {
+    user::removeRole('user');
+    return response::redirect('/links/login');
 });
 
 $app->get('/', function () {
-    $links = Link::fromRows(db()->getRecords('SELECT * FROM links WHERE archive = 0 ORDER BY updated_at'));
+    $links = Link::fromRows(db()->getRows('SELECT * FROM links WHERE archive = 0 ORDER BY updated_at'));
     return linksListView($links);
 });
 
@@ -111,9 +132,9 @@ class Arr
 }
 
 $app->post('/', function () {
-    $cat = Request::post('category');
+    $cat = request::post('category');
 
-    Arr::make(explode("\n", Request::post('url')))
+    Arr::make(explode("\n", request::post('url')))
         ->map('trim')->filter()
         ->each(function($url) use ($cat) {
             $link = new Link();
@@ -121,7 +142,7 @@ $app->post('/', function () {
             $link->category = $cat;
             $link->save();
         });
-    return Response::redirect('/links');
+    return response::redirect('/links');
 });
 
 $app->get('/{\d+}', function ($id) {
@@ -150,9 +171,9 @@ $app->post('/{\d+}/category', function ($id) {
     if (!$link) {
         return 404;
     }
-    $link->category = Request::post('category');
+    $link->category = request::post('category');
     $link->save();
-    return Response::redirect('/links');
+    return response::redirect('/links');
 });
 
 $app->post('/{\d+}/action', function ($id) {
@@ -161,7 +182,7 @@ $app->post('/{\d+}/action', function ($id) {
         return 404;
     }
 
-    $act = Request::post('act');
+    $act = request::post('act');
     switch ($act) {
         case 'archive':
             $link->archive = 1;
@@ -172,7 +193,7 @@ $app->post('/{\d+}/action', function ($id) {
     }
     $link->save();
 
-    return Response::redirect('/links');
+    return response::redirect('/links');
 });
 
 

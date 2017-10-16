@@ -5,7 +5,7 @@
 </head>
 <body>
 <header id="header">
-	<?php if (user::select('user')) : ?>
+	<?php if (tplvar('loggedIn')) : ?>
     <nav class="container">
         <a href="/links/">View links</a>
         <a href="/links/new">Add new link</a>

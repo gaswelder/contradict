@@ -1,6 +1,11 @@
 <?php
 
-require __DIR__.'/../hl/app.php';
+require __DIR__.'/../hl/main.php';
+
+use havana\App;
+use havana\user;
+use havana\response;
+use havana\request;
 
 class Page
 {
@@ -47,8 +52,8 @@ class Page
 $app = new App(__DIR__);
 
 $app->beforeDispatch(function ($url) {
-	if (!user::select('user') && $url != '/pages/login') {
-        return Response::redirect('/pages/login');
+	if (!user::getRole('user') && $url != '/pages/login') {
+        return response::redirect('/pages/login');
     }
 });
 
@@ -59,17 +64,17 @@ $app->get('/login', function () {
 });
 
 $app->post('/login', function () {
-    $pass = Request::post('password');
+    $pass = request::post('password');
     if ($pass == '123') {
-        user::auth('user');
-        return Response::redirect('/pages/p/new');
+        user::addRole('user');
+        return response::redirect('/pages/p/new');
     }
     return tpl('login');
 });
 
 
 $app->get('/', function() {
-	return Response::redirect('/pages/p/new');
+	return response::redirect('/pages/p/new');
 });
 
 $app->get('/p/{.+}', function($name) {
@@ -82,7 +87,7 @@ $app->post('/p/{.+}', function($name) {
 	$page = new Page($name);
 	$page->content = Request::post('content');
 	$page->save();
-	return Response::redirect('/pages/'.$name);
+	return response::redirect('/pages/'.$name);
 });
 
 $app->run();
