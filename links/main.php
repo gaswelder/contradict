@@ -60,11 +60,6 @@ $app->get('/category/{.+}', function($cat) {
     return tpl('list', compact('links'));
 });
 
-function alt($a, $b)
-{
-    return $a ? $a : $b;
-}
-
 $app->get('/new', function () {
     $categories = Link::categories();
     return tpl('form', compact('categories'));
