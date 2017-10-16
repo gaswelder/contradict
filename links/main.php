@@ -47,7 +47,7 @@ $app->post('/logout', function () {
 });
 
 $app->get('/', function () {
-    $links = Link::fromRows(db()->getRows('SELECT * FROM links WHERE archive = 0 ORDER BY updated_at'));
+    $links = Link::active();
     return linksListView($links);
 });
 
@@ -56,7 +56,7 @@ $app->get('/category/{.+}', function($cat) {
         $cat = '';
     }
     $cat = str_replace(':', '/', $cat);
-    $links = Link::fromRows(db()->getRecords('select * from links where category = ? and archive = 0', $cat));
+    $links = Link::fromCategory($cat);
     return linksListView($links);
 });
 
@@ -78,7 +78,7 @@ function linksListView($links)
 }
 
 $app->get('/new', function () {
-    $categories = db()->getValues("select distinct category from links where category <> ''");
+    $categories = Link::categories();
     return tpl('form', compact('categories'));
 });
 
@@ -101,7 +101,7 @@ $app->get('/{\d+}', function ($id) {
     if (!$link) {
         return 404;
     }
-    $categories = db()->getValues("select distinct category from links where category <> ''");
+    $categories = Link::categories();
 
     $title = getPageTitle($link->url);
 

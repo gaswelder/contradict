@@ -15,5 +15,20 @@ class Link extends dbobject
     {
         $this->created_at = time();
         $this->updated_at = time();
-    }
+	}
+
+	static function categories()
+	{
+		return db()->getValues("SELECT DISTINCT category FROM links WHERE category <> ''");
+	}
+
+	static function active()
+	{
+		return self::find(['archive' => 0], 'updated_at');
+	}
+
+	static function fromCategory($cat)
+	{
+		return self::find(['archive' => 0, 'category' => $cat]);
+	}
 }
