@@ -1,8 +1,13 @@
 <?php
 
+use havana\dbobject;
+
 class Band extends dbobject
 {
 	const TABLE_NAME = 'bands';
+
+	public $name;
+	public $info;
 
 	static function search($query)
 	{
@@ -19,7 +24,7 @@ class Band extends dbobject
 	 */
 	public function albums()
 	{
-		$rows = db()->getRecords('SELECT * FROM releases
+		$rows = db()->getRows('SELECT * FROM releases
 			WHERE id IN (SELECT album_id FROM tracks WHERE band_id = ?)
 			ORDER BY "year"', $this->id);
 		return Release::fromRows($rows);

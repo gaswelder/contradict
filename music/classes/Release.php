@@ -1,11 +1,23 @@
 <?php
 
+use havana\dbobject;
+
 /**
  * Represents an album.
  */
 class Release extends dbobject
 {
 	const TABLE_NAME = 'releases';
+
+	public $coverpath;
+	public $name;
+	public $year;
+	public $label;
+	public $info;
+
+	public $producer;
+	public $artworker;
+	
 
 	/**
 	 * Returns $count random albums.
@@ -21,7 +33,7 @@ class Release extends dbobject
 
 	public function coverpath()
 	{
-		return '/music/' . $this->coverpath;
+		return '/' . $this->coverpath;
 	}
 
 	/**
@@ -31,7 +43,7 @@ class Release extends dbobject
 	 */
 	public function bands()
 	{
-		$rows = db()->getRecords('SELECT * FROM bands
+		$rows = db()->getRows('SELECT * FROM bands
 			WHERE id IN (SELECT band_id FROM tracks WHERE album_id = ?)', $this->id);
 		return Band::fromRows($rows);
 	}
@@ -43,7 +55,7 @@ class Release extends dbobject
 	 */
  	public function tracks()
 	{
-		$rows = db()->getRecords('SELECT * FROM tracks WHERE album_id = ? ORDER BY num', $this->id);
+		$rows = db()->getRows('SELECT * FROM tracks WHERE album_id = ? ORDER BY num', $this->id);
 		return Track::fromRows($rows);
 	}
 
@@ -54,7 +66,7 @@ class Release extends dbobject
 	 */
 	public function lineup()
 	{
-		$rows = db()->getRecords(
+		$rows = db()->getRows(
 			'SELECT
 				t.id AS track_id, p.person_id, p.role, p.stagename, p.guest
 			FROM tracks t JOIN track_performers p ON p.track_id = t.id
@@ -102,7 +114,7 @@ class Release extends dbobject
 	{
 		$studios = [];
 
-		$rows = db()->getRecords('SELECT track_id, studio_id, role
+		$rows = db()->getRows('SELECT track_id, studio_id, role
 			FROM track_studios
 			WHERE track_id IN (
 				SELECT id FROM tracks WHERE album_id = ?)', $this->id);

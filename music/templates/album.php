@@ -5,7 +5,7 @@
 
 	<p>by <?php foreach( $album->bands() as $i => $band ): ?>
 		{{$i ? ',' : ''}}
-		<a href="/music/bands/{{$band->id}}">{{$band->name}}</a>
+		<a href="/bands/{{$band->id}}">{{$band->name}}</a>
 	<?php endforeach; ?></p>
 
 	<p>{{$album->year}}, {{$album->label}}</p>

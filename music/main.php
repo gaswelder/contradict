@@ -1,9 +1,9 @@
 <?php
 
-require __DIR__.'/../hl/app.php';
+use havana\app;
+use havana\dbobject;
 
-ini_set('display_errors', 'on');
-
+require __DIR__.'/../hl/main.php';
 
 class TrackStudio extends dbobject
 {
@@ -54,6 +54,8 @@ class Performer
 class Person extends dbobject
 {
 	const TABLE_NAME = 'people';
+
+	public $name;
 }
 
 class files
@@ -235,9 +237,7 @@ class MainPageController
 
 
 
-$app = new App(__DIR__);
-
-$app->setPrefix('/music');
+$app = new app(__DIR__);
 
 $app->get('/', MainPageController::class);
 

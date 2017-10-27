@@ -1,11 +1,19 @@
 <?php
 
+use havana\dbobject;
+
 /**
  * Represents a single track from an album.
  */
 class Track extends dbobject
 {
 	const TABLE_NAME = 'tracks';
+
+	public $band_id;
+	public $name;
+	public $comment;
+	public $length;
+	public $lyrics;
 
 	public function performers()
 	{
