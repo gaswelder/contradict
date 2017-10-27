@@ -53,7 +53,7 @@ form textarea {
 	<nav>
 		<ol>
 			<?php foreach($menu as $name): ?>
-				<li><a href="/pages/p/{{$name}}">{{$name}}</a></li>
+				<li><a href="/pages/{{$name}}">{{$name}}</a></li>
 			<?php endforeach; ?>
 		</ol>
 	</nav>

@@ -19,13 +19,11 @@ function tplvar($name) {
 $app = new App(__DIR__);
 
 $app->middleware(function($next) {
-    if (!user::getRole('user') && request::url()->path != '/links/login') {
-        return response::redirect('/links/login');
+    if (!user::getRole('user') && request::url()->path != '/login') {
+        return response::redirect('/login');
     }
     return $next();
 });
-
-$app->setPrefix('/links');
 
 $app->get('/login', function () {
     return tpl('login');
@@ -45,12 +43,12 @@ $app->post('/logout', function () {
     return response::redirect('/links/login');
 });
 
-$app->get('/', function () {
+$app->get('/links', function () {
     $links = Link::active();
     return tpl('list', compact('links'));
 });
 
-$app->get('/category/{.+}', function($cat) {
+$app->get('/links/category/{.+}', function($cat) {
     if($cat == 'other') {
         $cat = '';
     }
@@ -59,12 +57,12 @@ $app->get('/category/{.+}', function($cat) {
     return tpl('list', compact('links'));
 });
 
-$app->get('/new', function () {
+$app->get('/links/new', function () {
     $categories = Link::categories();
     return tpl('form', compact('categories'));
 });
 
-$app->post('/', function () {
+$app->post('/links', function () {
     $cat = request::post('category');
 
     Arr::make(explode("\n", request::post('url')))
@@ -78,7 +76,7 @@ $app->post('/', function () {
     return response::redirect('/links');
 });
 
-$app->get('/{\d+}', function ($id) {
+$app->get('/links/{\d+}', function ($id) {
     $link = Link::get($id);
     if (!$link) {
         return 404;
@@ -99,7 +97,7 @@ function getPageTitle($url)
     return $m[1];
 }
 
-$app->post('/{\d+}/category', function ($id) {
+$app->post('/links/{\d+}/category', function ($id) {
     $link = Link::get($id);
     if (!$link) {
         return 404;
@@ -109,7 +107,7 @@ $app->post('/{\d+}/category', function ($id) {
     return response::redirect('/links');
 });
 
-$app->post('/{\d+}/action', function ($id) {
+$app->post('/links/{\d+}/action', function ($id) {
     $link = Link::get($id);
     if (!$link) {
         return 404;
@@ -127,6 +125,23 @@ $app->post('/{\d+}/action', function ($id) {
     $link->save();
 
     return response::redirect('/links');
+});
+
+$app->get('/pages', function() {
+	return response::redirect('/pages/new');
+});
+
+$app->get('/pages/{.+}', function($name) {
+    $menu = Page::ls();
+	$page = new Page($name);
+	return tpl('pages', compact('menu', 'page'));
+});
+
+$app->post('/pages/{.+}', function($name) {
+	$page = new Page($name);
+	$page->content = Request::post('content');
+	$page->save();
+	return response::redirect('/pages/'.$name);
 });
 
 
