@@ -6,11 +6,10 @@
 	<link rel="stylesheet" href="/res/style.css">
 	<link rel="stylesheet" href="/res/main.css">
 	<link rel="stylesheet" href="/res/ui.css">
-	<script src="/music/res/jquery.js"></script>
 </head>
 <body>
 
-<form id="search-form" action="/music/search">
+<form id="search-form" action="/search">
 	<input type="search" name="q" value="">
 	<button type="submit">Search</button>
 </form>

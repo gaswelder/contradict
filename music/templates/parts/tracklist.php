@@ -1,26 +1,17 @@
 <div class="tracklist">
 	<table class="tracklist">
-	<?php
-
-	$band_id = 0;
-
-	foreach( $album->tracks() as $i => $track )
-	{
-		if( $album->isSplit() && $track->band_id != $band_id ) {
-			$band_id = $track->band_id;
-			?>
-			<tr><th colspan="3">{{$band->name}}</th></tr>
-			<?php
-		}
-		?>
-		<tr>
-			<td>{{$i + 1}}</td>
-			<td>{{$track->name}} <small>{{$track->comment}}</small></td>
-			<td>{{$track->length}}</td>
-		</tr>
-		<?php
-	}
-	?>
+		<?php foreach( $album->parts() as $part ): ?>
+			<?php if( $album->isSplit()): ?>
+				<tr><th colspan="3">{{$part->band->name}}</th></tr>
+			<?php endif; ?>
+			<?php foreach ($part->tracks as $track): ?>
+				<tr>
+					<td>{{counter('tracknumber')}}</td>
+					<td>{{$track->name}} <small>{{$track->comment}}</small></td>
+					<td>{{$track->length}}</td>
+				</tr>
+			<?php endforeach; ?>
+		<?php endforeach; ?>
 	</table>
 	<p>Total length: {{formatDuration($album->totalLength())}}</p>
 </div>

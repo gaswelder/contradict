@@ -2,6 +2,8 @@
 
 use havana\app;
 use havana\dbobject;
+use havana\request;
+use havana\response;
 
 require __DIR__.'/../hl/main.php';
 
@@ -300,6 +302,15 @@ function year($s)
 		throw new Exception("Couldn't parse datetime: '$s'");
 	}
 	return $m[1];
+}
+
+function counter($id) {
+	static $counters = [];
+	if (!isset($counters[$id])) {
+		$counters[$id] = 0;
+	}
+	$counters[$id]++;
+	return $counters[$id];
 }
 
 class SilentBob

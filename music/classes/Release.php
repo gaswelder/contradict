@@ -53,10 +53,9 @@ class Release extends dbobject
 	 *
 	 * @return array
 	 */
- 	public function tracks()
+ 	private function tracks()
 	{
-		$rows = db()->getRows('SELECT * FROM tracks WHERE album_id = ? ORDER BY num', $this->id);
-		return Track::fromRows($rows);
+		return Track::find(['album_id' => $this->id], 'num');
 	}
 
 	/**
@@ -161,5 +160,26 @@ class Release extends dbobject
 			$sum += fmt::parseDuration($track->length);
 		}
 		return $sum;
+	}
+
+	/**
+	 * Returns album sections.
+	 *
+	 * @return array
+	 */
+	function parts()
+	{
+		$band = null;
+		$parts = [];
+		foreach ($this->tracks() as $track) {
+			if (!$band || $band->id != $track->band_id) {
+				$band = $track->band();
+				$part = new AlbumPart();
+				$part->band = $band;
+				$parts[] = $part;
+			}
+			$parts[count($parts)-1]->tracks[] = $track;
+		}
+		return $parts;
 	}
 }

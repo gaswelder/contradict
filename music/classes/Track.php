@@ -15,20 +15,23 @@ class Track extends dbobject
 	public $length;
 	public $lyrics;
 
-	public function performers()
-	{
-		$performers = db()->getRecords("select * from track_performers where track_id = ?", $this->id);
-		return Performer::fromRows($performers);
-	}
-
 	/**
 	 * Returns studios associated with this track.
 	 *
 	 * @return array
 	 */
-	public function studios()
+	function studios()
 	{
-		$studios = db()->getRecords('select * from track_studios where track_id = ?', $this->id);
-		return TrackStudio::fromRows($studios);
+		return TrackStudio::find(['track_id' => $this->id]);
+	}
+
+	/**
+	 * Returns band to which this track belongs.
+	 *
+	 * @return Band
+	 */
+	function band()
+	{
+		return Band::get($this->band_id);
 	}
 }

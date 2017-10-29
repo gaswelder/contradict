@@ -18,10 +18,6 @@
 			<?php foreach($album->studios() as $studio): ?>
 				<dd>{{$studio->name}} - {{implode(', ', $studio->roles)}}</dd>
 			<?php endforeach; ?>
-			<dt>Producer</dt>
-			<dd>{{$album->producer}}</dd>
-			<dt>Artist</dt>
-			<dd>{{$album->artworker}}</dd>
 		</dl>
 	</div>
 

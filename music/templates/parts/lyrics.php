@@ -1,12 +1,9 @@
-<?php
-foreach ($album->tracks() as $i => $track) {
-	if (!$track->lyrics) {
-		continue;
-	}
-	?>
-	<article>
-		<h3>{{$i + 1}}. {{$track->name}}</h3>
-		<pre>{{$track->lyrics}}</pre>
-	</article>
-	<?php
-}
+<?php foreach ($album->parts() as $part): ?>
+	<?php foreach ($part->tracks as $track): ?>
+		<?php if (!$track->lyrics) continue; ?>
+		<article>
+			<h3>{{$track->name}}</h3>
+			<pre>{{$track->lyrics}}</pre>
+		</article>
+	<?php endforeach; ?>
+<?php endforeach; ?>
