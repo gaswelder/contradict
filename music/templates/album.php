@@ -2,6 +2,7 @@
 
 <nav>
 	<a href="/albums/{{$album->id}}/json">JSON</a>
+	<a href="/albums/{{$album->id}}/newcover">Upload a cover</a>
 </nav>
 
 <div id="albumInfo">
@@ -13,8 +14,6 @@
 	<?php endforeach; ?></p>
 
 	<p>{{$album->year}}, {{$album->label}}</p>
-
-
 
 	<div class="quick-details">
 		<dl>

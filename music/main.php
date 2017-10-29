@@ -326,6 +326,21 @@ $app->get('/albums/{\d+}/json', function($id) {
 	return $album->toJSON();
 });
 
+$app->get('/albums/{\d+}/newcover', function($id) {
+	$album = Release::get($id);
+	if (!$album) return 404;
+	return tpl('edit/newcover', compact('album'));
+});
+
+$app->post('/albums/{\d+}/newcover', function($id) {
+	$album = Release::get($id);
+	if (!$album) return 404;
+	request::files('file')[0]->saveTo('covers/'.$id.'.jpg');
+	$album->coverpath = 'covers/'.$id.'.jpg';
+	$album->save();
+	return response::redirect('/albums/'.$id);
+});
+
 $app->get('/rationale', function() {
 	return tpl('rationale');
 });
