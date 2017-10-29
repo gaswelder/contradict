@@ -182,4 +182,16 @@ class Release extends dbobject
 		}
 		return $parts;
 	}
+
+	function toJSON()
+	{
+		return [
+			'name' => $this->name,
+			'year' => $this->year,
+			'label' => $this->label,
+			'parts' => array_map(function(AlbumPart $p) {
+				return $p->toJSON();
+			}, $this->parts())
+		];
+	}
 }

@@ -18,4 +18,15 @@ class Lineup
 		sort($ids);
 		return implode(',', $ids);
 	}
+
+	function toJSON()
+	{
+		$lineup = [];
+		foreach ($this->performers as $p) {
+			foreach ($p->roles as $role) {
+				$lineup[$p->person()->name][] = $role;
+			}
+		}
+		return $lineup;
+	}
 }

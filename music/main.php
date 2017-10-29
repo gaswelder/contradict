@@ -259,6 +259,12 @@ $app->get('/albums/{\d+}', function($id) {
 	return tpl('album', ['album' => $album]);
 });
 
+$app->get('/albums/{\d+}/json', function($id) {
+	$album = Release::get($id);
+	if (!$album) return 404;
+	return $album->toJSON();
+});
+
 $app->get('/rationale', function() {
 	return tpl('rationale');
 });

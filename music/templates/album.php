@@ -1,5 +1,9 @@
 <?= tpl('top') ?>
 
+<nav>
+	<a href="/albums/{{$album->id}}/json">JSON</a>
+</nav>
+
 <div id="albumInfo">
 	<h1>{{$album->name}}</h1>
 
