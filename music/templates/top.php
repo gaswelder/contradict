@@ -16,5 +16,6 @@
 
 <nav id="main-menu">
 	<a href="/">Main Page</a>
+	<a href="/albums/new">Add an album</a>
 	<a href="/rationale">Rationale</a>
 </nav>

@@ -9,14 +9,14 @@ class Release extends dbobject
 {
 	const TABLE_NAME = 'releases';
 
-	public $coverpath;
+	public $coverpath = '';
 	public $name;
 	public $year;
 	public $label;
 	public $info;
 
-	public $producer;
-	public $artworker;
+	public $producer = '';
+	public $artworker = '';
 	
 
 	/**

@@ -10,10 +10,12 @@ class Track extends dbobject
 	const TABLE_NAME = 'tracks';
 
 	public $band_id;
+	public $album_id;
 	public $name;
-	public $comment;
+	public $num;
+	public $comment = '';
 	public $length;
-	public $lyrics;
+	public $lyrics = '';
 
 	/**
 	 * Returns studios associated with this track.

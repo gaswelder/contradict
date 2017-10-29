@@ -1,8 +1,8 @@
-<?= tpl('edit/top') ?>
+<?= tpl('top') ?>
 
 <h1>New album</h1>
 
-<form method="post">
+<form method="post" action="/albums">
 	<div>
 		<label>Data</label>
 		<textarea name="data"></textarea>
@@ -10,4 +10,4 @@
 	<button>Create</button>
 </form>
 
-<?= tpl('edit/bottom') ?>
+<?= tpl('bottom') ?>

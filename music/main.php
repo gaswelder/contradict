@@ -253,6 +253,67 @@ $app->get('/bands', function() {
 	return tpl('bands');
 });
 
+$app->get('/albums/new', function() {
+	return tpl('edit/album-new');
+});
+
+$app->post('/albums', function() {
+	$data = json_decode(request::post('data'), true);
+
+	db()->exec('start transaction');
+
+	$album = new Release;
+	$album->name = $data['name'];
+	$album->year = $data['year'];
+	$album->label = $data['label'] ?? '';
+	$album->save();
+
+	foreach ($data['parts'] as $part) {
+
+		$bands = Band::find(['name' => $part['band']]);
+		if (count($bands) > 1) {
+			panic("Ambiguous band name: $part[band]");
+		}
+		if (count($bands) == 1) {
+			$band = $bands[0];
+		} else {
+			$band = new Band();
+			$band->name = $part['band'];
+			$band->save();
+		}
+
+		$lineup = [];
+		foreach ($part['lineup'] as $name => $roles) {
+			$people = Person::find(['name' => $name]);
+			if (count($people) > 1) {
+				panic("Ambiguous person name: $name");
+			}
+			if (count($people) == 0) {
+				$person = new Person();
+				$person->name = $name;
+				$person->save();
+			} else {
+				$person = $people[0];
+			}
+			$lineup[] = [$person, $roles];
+		}
+
+		foreach ($part['tracks'] as $i => $data) {
+			$track = new Track;
+			$track->band_id = $band->id;
+			$track->length = $data['length'];
+			$track->name = $data['name'];
+			$track->album_id = $album->id;
+			$track->num = $i + 1;
+			$track->save();
+		}
+	}
+
+	db()->exec('commit');
+
+	return response::redirect('/albums/'.$album->id);
+});
+
 $app->get('/albums/{\d+}', function($id) {
 	$album = Release::get($id);
 	if(!$album) return 404;
