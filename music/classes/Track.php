@@ -9,13 +9,14 @@ class Track extends dbobject
 {
 	const TABLE_NAME = 'tracks';
 
-	public $band_id;
-	public $album_id;
+	//public $album_id;
 	public $name;
 	public $num;
 	public $comment = '';
 	public $length;
 	public $lyrics = '';
+
+	public $part_id;
 
 	/**
 	 * Returns studios associated with this track.
@@ -34,6 +35,7 @@ class Track extends dbobject
 	 */
 	function band()
 	{
+		oops();
 		return Band::get($this->band_id);
 	}
 }

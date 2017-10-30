@@ -18,31 +18,15 @@ class Band extends dbobject
 	}
 
 	/**
-	 * Returns band's albums
+	 * Returns this band's albums.
 	 *
 	 * @return array
 	 */
-	public function albums()
+	function albums()
 	{
 		$rows = db()->getRows('SELECT * FROM releases
-			WHERE id IN (SELECT album_id FROM tracks WHERE band_id = ?)
+			WHERE id IN (SELECT album_id FROM album_parts WHERE band_id = ?)
 			ORDER BY "year"', $this->id);
 		return Release::fromRows($rows);
-	}
-
-	/**
-	 * Returns band's lineups.
-	 *
-	 * @return array
-	 */
-	public function lineups()
-	{
-		$lineups = [];
-		foreach ($this->albums() as $album) {
-			$l = $album->lineup();
-			$h = $l->hash();
-			$lineups[$h] = $l;
-		}
-		return array_values($lineups);
 	}
 }

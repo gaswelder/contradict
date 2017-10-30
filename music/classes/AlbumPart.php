@@ -1,14 +1,29 @@
 <?php
 
-class AlbumPart
+use havana\dbobject;
+
+class AlbumPart extends dbobject
 {
-	public $tracks = [];
-	public $band;
+	const TABLE_NAME = 'album_parts';
+
+	public $album_id;
+	public $band_id;
+	public $num;
+
+	function band()
+	{
+		return Band::get($this->band_id);
+	}
+
+	function tracks()
+	{
+		return Track::find(['part_id' => $this->id], 'num');
+	}
 
 	function toJSON()
 	{
 		$list = [];
-		foreach ($this->tracks as $i) {
+		foreach ($this->tracks() as $i) {
 			$list[] = [
 				'name' => $i->name,
 				'length' => $i->length
@@ -16,7 +31,7 @@ class AlbumPart
 		}
 
 		return [
-			'band' => $this->band->name,
+			'band' => $this->band()->name,
 			'tracks' => $list
 		];
 	}

@@ -2,9 +2,9 @@
 	<table class="tracklist">
 		<?php foreach( $album->parts() as $part ): ?>
 			<?php if( $album->isSplit()): ?>
-				<tr><th colspan="3">{{$part->band->name}}</th></tr>
+				<tr><th colspan="3">{{$part->band()->name}}</th></tr>
 			<?php endif; ?>
-			<?php foreach ($part->tracks as $track): ?>
+			<?php foreach ($part->tracks() as $track): ?>
 				<tr>
 					<td>{{counter('tracknumber')}}</td>
 					<td>{{$track->name}} <small>{{$track->comment}}</small></td>
@@ -13,5 +13,5 @@
 			<?php endforeach; ?>
 		<?php endforeach; ?>
 	</table>
-	<p>Total length: {{formatDuration($album->totalLength())}}</p>
+	<p>Total length: {{$album->duration()->format()}}</p>
 </div>
