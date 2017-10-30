@@ -3,6 +3,7 @@
 <nav>
 	<a href="/albums/{{$album->id}}/json">JSON</a>
 	<a href="/albums/{{$album->id}}/newcover">Upload a cover</a>
+	<a href="/albums/{{$album->id}}/edit">Edit</a>
 </nav>
 
 <div id="albumInfo">

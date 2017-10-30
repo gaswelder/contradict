@@ -20,6 +20,12 @@ class AlbumPart extends dbobject
 		return Track::find(['part_id' => $this->id], 'num');
 	}
 
+	function delete()
+	{
+		db()->exec('DELETE FROM tracks WHERE part_id = ?', $this->id);
+		db()->exec('DELETE FROM album_parts WHERE id = ?', $this->id);
+	}
+
 	function toJSON()
 	{
 		$list = [];

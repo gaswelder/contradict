@@ -98,4 +98,67 @@ class Release extends dbobject
 			}, $this->parts())
 		];
 	}
+
+	function saveData($data)
+	{
+		db()->exec('start transaction');
+
+		if ($this->id) {
+			foreach ($this->parts() as $part) {
+				$part->delete();
+			}
+		}
+
+		$this->name = $data['name'];
+		$this->year = $data['year'];
+		$this->label = $data['label'] ?? '';
+		$this->save();
+	
+		foreach ($data['parts'] as $partIndex => $partData) {
+	
+			$bands = Band::find(['name' => $partData['band']]);
+			if (count($bands) > 1) {
+				panic("Ambiguous band name: $partData[band]");
+			}
+			if (count($bands) == 1) {
+				$band = $bands[0];
+			} else {
+				$band = new Band();
+				$band->name = $partData['band'];
+				$band->save();
+			}
+	
+			// $lineup = [];
+			// foreach ($part['lineup'] as $name => $roles) {
+			// 	$people = Person::find(['name' => $name]);
+			// 	if (count($people) > 1) {
+			// 		panic("Ambiguous person name: $name");
+			// 	}
+			// 	if (count($people) == 0) {
+			// 		$person = new Person();
+			// 		$person->name = $name;
+			// 		$person->save();
+			// 	} else {
+			// 		$person = $people[0];
+			// 	}
+			// 	$lineup[] = [$person, $roles];
+			// }
+	
+			$part = new AlbumPart;
+			$part->album_id = $this->id;
+			$part->band_id = $band->id;
+			$part->num = $partIndex;
+			$part->save();
+	
+			foreach ($partData['tracks'] as $i => $data) {
+				$track = new Track;
+				$track->part_id = $part->id;
+				$track->length = $data['length'];
+				$track->name = $data['name'];
+				$track->num = $i + 1;
+				$track->save();
+			}
+		}
+		db()->exec('commit');
+	}
 }
