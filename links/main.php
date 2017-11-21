@@ -144,5 +144,128 @@ $app->post('/pages/{.+}', function($name) {
 	return response::redirect('/pages/'.$name);
 });
 
+$app->get('/dict', function() {
+    return tpl('dict/home');
+});
+
+$app->get('/dict/add', function() {
+    return tpl('dict/add');
+});
+
+class Dict
+{
+    static function load() {
+        return new self();
+    }
+
+    function __construct() {
+        $path = $this->path();
+        $this->rows = [];
+        if (!file_exists($path)) {
+            return;
+        }
+        $f = fopen($path, 'rb');
+        while (1) {
+            $row = fgetcsv($f);
+            if (!$row) break;
+            $this->rows[] = $row;
+        }
+        fclose($f);
+    }
+
+    private function path()
+    {
+        return __DIR__ . '/dict.csv';
+    }
+
+    function append($tuples) {
+        foreach ($tuples as $t) {
+            $t[] = 0;
+            $t[] = 0;
+            $this->rows[] = $t;
+        }
+        return $this;
+    }
+
+    function pick($n) {
+        $is = array_rand($this->rows, $n);
+        $rows = [];
+        foreach ($is as $i) {
+            $rows[] = array_slice($this->rows[$i], 0, 2);
+        }
+        return $rows;
+    }
+
+    function save() {
+        $path = $this->path();
+        if (file_exists($path)) {
+            copy($path, $path.date('ymd-his'));
+        }
+        $f = fopen($path, 'wb');
+        foreach ($this->rows as $row) {
+            fputcsv($f, $row);
+        }
+        fclose($f);
+        return $this;
+    }
+
+    private function find($q, $dir) {
+        foreach ($this->rows as $row) {
+            if ($row[$dir] == $q) {
+                return $row;
+            }
+        }
+        return null;
+    }
+
+    function check($q, $a, $dir)
+    {
+        $row = $this->find($q, $dir);
+        $expected = $row[abs($dir-1)];
+        return [
+            'q' => $q,
+            'a' => $a,
+            'expected' => $expected,
+            'ok' => $a == $expected
+        ];
+    }
+}
+
+$app->post('/dict/add', function() {
+    $lines = Arr::make(explode("\n", request::post('words')))
+        ->map('trim')
+        ->filter()
+        ->map(function($line) {
+            return preg_split('/\s+-\s+/', $line, 2);
+        });
+    
+    Dict::load() -> append($lines->get()) -> save();
+
+    return response::redirect('/dict');
+});
+
+$app->get('/dict/test', function() {
+    $d = Dict::load();
+    $tuples1 = $d->pick(3);
+    $tuples2 = $d->pick(3);
+    return tpl('dict/test', compact('tuples1', 'tuples2'));
+});
+
+$app->post('/dict/test', function() {
+    $Q = request::post('q');
+    $A = request::post('a');
+    $dir = request::post('dir');
+
+    $d = Dict::load();
+
+    $results = [];
+    foreach ($Q as $i => $q) {
+        $a = $A[$i];
+        $results[] = $d->check($q, $a, $dir[$i]);
+    }
+    $d->save();
+    return tpl('dict/results', compact('results'));
+});
+
 
 $app->run();
