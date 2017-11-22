@@ -145,7 +145,9 @@ $app->post('/pages/{.+}', function($name) {
 });
 
 $app->get('/dict', function() {
-    return tpl('dict/home');
+    $d = Dict::load();
+    $stats = $d->stats();
+    return tpl('dict/home', compact('stats'));
 });
 
 $app->get('/dict/add', function() {
@@ -239,6 +241,19 @@ class Dict
             'a' => $a,
             'expected' => $expected,
             'ok' => $a == $expected
+        ];
+    }
+
+    function stats()
+    {
+        $ok = 0;
+        foreach ($this->rows as $row) {
+            $ok += $row[2] + $row[3];
+        }
+        $n = count($this->rows);
+        return [
+            'pairs' => $n,
+            'progress' => $ok / self::GOAL / $n
         ];
     }
 }
