@@ -1,4 +1,10 @@
 <?= tpl('dict/header') ?>
+
+<nav>
+	<a href="/dict/test">New test</a>
+	<a href="/dict">Home</a>
+</nav>
+
 <table>
 <tr>
 	<th>Q</th>

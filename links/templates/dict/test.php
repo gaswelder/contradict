@@ -1,6 +1,14 @@
 <?= tpl('dict/header') ?>
-
+<style>
+form > section {
+	display: inline-block;
+	vertical-align: top;
+	margin-bottom: 1em;
+	margin-right: 1em;
+}
+</style>
 <form method="post">
+	<section>
 	<?php foreach ($tuples1 as $t): ?>
 	<div>
 		<input type="hidden" name="q[]" value="{{$t[0]}}">
@@ -9,7 +17,9 @@
 		<input name="a[]" value="">
 	</div>
 	<?php endforeach; ?>
+	</section>
 
+	<section>
 	<?php foreach ($tuples2 as $t): ?>
 	<div>
 		<input type="hidden" name="q[]" value="{{$t[1]}}">
@@ -18,5 +28,8 @@
 		<input name="a[]" value="">
 	</div>
 	<?php endforeach; ?>
-	<button>Submit</button>
+	</section>
+	<div>
+		<button>Submit</button>
+	</div>
 </form>
