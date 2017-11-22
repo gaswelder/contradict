@@ -179,7 +179,7 @@ class Dict
 
     private function path()
     {
-        return __DIR__ . '/dict.csv';
+        return __DIR__ . '/data/dict/dict.csv';
     }
 
     function append($tuples) {
