@@ -154,6 +154,8 @@ $app->get('/dict/add', function() {
 
 class Dict
 {
+    const GOAL = 10;
+
     static function load() {
         return new self();
     }
@@ -187,13 +189,18 @@ class Dict
         return $this;
     }
 
-    function pick($n) {
-        $is = array_rand($this->rows, $n);
-        $rows = [];
-        foreach ($is as $i) {
-            $rows[] = array_slice($this->rows[$i], 0, 2);
-        }
-        return $rows;
+    function pick($n, $dir)
+    {
+        return Arr::make($this->rows)
+            ->filter(function($row) use ($dir) {
+                return $row[$dir + 2] < self::GOAL;
+            })
+            ->shuffle()
+            ->take($n)
+            ->map(function($row) {
+                return array_slice($row, 0, 2);
+            })
+            ->get();
     }
 
     function save() {
@@ -210,18 +217,23 @@ class Dict
     }
 
     private function find($q, $dir) {
-        foreach ($this->rows as $row) {
+        foreach ($this->rows as $i => $row) {
             if ($row[$dir] == $q) {
-                return $row;
+                return $i;
             }
         }
-        return null;
+        return -1;
     }
 
     function check($q, $a, $dir)
     {
-        $row = $this->find($q, $dir);
+        $i = $this->find($q, $dir);
+        $row = $this->rows[$i];
         $expected = $row[abs($dir-1)];
+        $ok = $a == $expected;
+        if ($ok) {
+            $this->rows[$i][$dir + 2]++;
+        }
         return [
             'q' => $q,
             'a' => $a,
@@ -246,8 +258,8 @@ $app->post('/dict/add', function() {
 
 $app->get('/dict/test', function() {
     $d = Dict::load();
-    $tuples1 = $d->pick(3);
-    $tuples2 = $d->pick(3);
+    $tuples1 = $d->pick(3, 0);
+    $tuples2 = $d->pick(3, 1);
     return tpl('dict/test', compact('tuples1', 'tuples2'));
 });
 

@@ -28,6 +28,16 @@ class Arr
         }
     }
 
+    function shuffle() {
+        $copy = $this->a;
+        shuffle($copy);
+        return new self($copy);
+    }
+
+    function take($n) {
+        return new self(array_slice($this->a, 0, $n));
+    }
+
     function get() {
         return $this->a;
     }
