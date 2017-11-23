@@ -232,7 +232,7 @@ class Dict
         $i = $this->find($q, $dir);
         $row = $this->rows[$i];
         $expected = $row[abs($dir-1)];
-        $ok = $a == $expected;
+        $ok = mb_strtolower($a) == mb_strtolower($expected);
         if ($ok) {
             $this->rows[$i][$dir + 2]++;
         }
