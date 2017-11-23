@@ -229,18 +229,44 @@ class Dict
 
     function check($q, $a, $dir)
     {
-        $i = $this->find($q, $dir);
-        $row = $this->rows[$i];
-        $expected = $row[abs($dir-1)];
-        $ok = mb_strtolower($a) == mb_strtolower($expected);
-        if ($ok) {
-            $this->rows[$i][$dir + 2]++;
+        // Find all rows with this question
+        $all = [];
+        foreach ($this->rows as $i => $row) {
+            if ($row[$dir] == $q) {
+                $all[] = $i;
+            }
         }
+
+        // Find one that we got right
+        $right = -1;
+        foreach ($all as $i) {
+            if (mb_strtolower($this->rows[$i][abs($dir-1)]) == mb_strtolower($a)) {
+                $right = $i;
+                break;
+            }
+        }
+
+        if ($right >= 0) {
+            $expected = $this->rows[$right][abs($dir-1)];
+            $this->rows[$right][$dir+2]++;
+            return [
+                'q' => $q,
+                'a' => $a,
+                'expected' => $expected,
+                'ok' => true
+            ];
+        }
+
+        $expected = [];
+        foreach ($all as $i) {
+            $expected[] = $this->rows[$i][abs($dir-1)];
+        }
+
         return [
             'q' => $q,
             'a' => $a,
-            'expected' => $expected,
-            'ok' => $a == $expected
+            'expected' => implode(' || ', $expected),
+            'ok' => false
         ];
     }
 
