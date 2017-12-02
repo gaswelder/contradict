@@ -1,2 +1,2 @@
 <?php
-require '../../links/main.php';
+require '../main.php';
