@@ -181,13 +181,19 @@ $app->post('/dict/test', function() {
 
     $d = Dict::load();
 
-    $results = [];
+    $ok = [];
+    $fail = [];
     foreach ($Q as $i => $q) {
         $a = $A[$i];
-        $results[] = $d->check($q, $a, $dir[$i]);
+        $result = $d->check($q, $a, $dir[$i]);
+        if ($result['ok']) {
+            $ok[] = $result;
+        } else {
+            $fail[] = $result;
+        }
     }
     $d->save();
-    return tpl('dict/results', compact('results'));
+    return tpl('dict/results', compact('ok', 'fail'));
 });
 
 
