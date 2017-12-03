@@ -1,5 +1,8 @@
 <?php
 
+use havana\request;
+use havana\response;
+
 $app->get('/dict', function() {
     $d = Dict::load();
     $stats = $d->stats();
