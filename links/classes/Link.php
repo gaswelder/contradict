@@ -9,7 +9,8 @@ class Link extends dbobject
     public $created_at;
     public $updated_at;
     public $category;
-    public $url;
+	public $url;
+	public $archive;
 
     function __construct()
     {
@@ -20,6 +21,11 @@ class Link extends dbobject
 	static function categories()
 	{
 		return db()->getValues("SELECT DISTINCT category FROM links WHERE category <> ''");
+	}
+
+	static function all()
+	{
+		return self::find([]);
 	}
 
 	static function active()

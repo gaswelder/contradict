@@ -127,6 +127,44 @@ $app->post('/links/{\d+}/action', function ($id) {
     return response::redirect('/links');
 });
 
+$app->get('/links/export', function() {
+    $links = Link::all();
+    $f = tmpfile();
+    foreach ($links as $link) {
+        $row = [
+            $link->created_at,
+            $link->updated_at,
+            $link->category,
+            $link->url,
+            $link->archive
+        ];
+        fputcsv($f, $row);
+    }
+    rewind($f);
+    return response::make($f)->download('links.csv');
+});
+
+$app->get('/links/import', function() {
+    return tpl('import');
+});
+
+$app->post('/links/import', function() {
+    $upload = request::files('file')[0];
+    $fields = ['created_at', 'updated_at', 'category', 'url', 'archive'];
+    $f = $upload->stream();
+    for (;;) {
+        $row = fgetcsv($f);
+        if ($row === false) break;
+        $link = new Link;
+        foreach ($fields as $i => $k) {
+            $link->$k = $row[$i];
+        }
+        $link->save();
+    }
+    fclose($f);
+    exit;
+});
+
 $app->get('/pages', function() {
 	return response::redirect('/pages/new');
 });
