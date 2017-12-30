@@ -8,9 +8,9 @@ class Link extends dbobject
 
     public $created_at;
     public $updated_at;
-    public $category;
+    public $category = '';
 	public $url;
-	public $archive;
+	public $archive = 0;
 
     function __construct()
     {
