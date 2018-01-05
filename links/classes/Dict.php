@@ -3,6 +3,7 @@
 class Dict
 {
     const GOAL = 10;
+    private $rows = [];
 
     static function load() {
         return new self();
@@ -28,13 +29,27 @@ class Dict
         return __DIR__ . '/../data/dict/dict.csv';
     }
 
-    function append($tuples) {
+    function append($tuples)
+    {
         foreach ($tuples as $t) {
-            $t[] = 0;
-            $t[] = 0;
-            $this->rows[] = $t;
+            list ($q, $a) = $t;
+            if ($this->has($q, $a)) {
+                continue;
+            }
+            $row = [$q, $a, 0, 0];
+            $this->rows[] = $row;
         }
         return $this;
+    }
+
+    private function has($q, $a)
+    {
+        foreach ($this->rows as $row) {
+            if ($row[0] == $q && $row[1] == $a) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function pick($n, $dir)
