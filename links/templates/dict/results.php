@@ -18,7 +18,15 @@
 		<td>
 			<?php foreach ($r->entries() as $i => $entry): ?>
 				<?php if ($i > 0): ?>||<?php endif; ?>
-				<a href="/dict/entries/{{$entry->id}}">{{ $entry->expected($r->dir()) }}</a>
+				<?php
+					$exp = $entry->expected($r->dir());
+					$wiki = array_reduce(explode(' ', $exp), function($prev, $next) {
+						if (mb_strlen($next) > mb_strlen($prev)) return $next;
+						return $prev;
+					}, '');
+				?>
+				<a href="/dict/entries/{{$entry->id}}">{{ $exp }}</a>
+				(<small><a href="{{ 'https://de.wiktionary.org/w/index.php?search='.urlencode($wiki).'&title=Spezial%3ASuche&go=Seite' }}">wiki</a></small>)
 			<?php endforeach; ?>
 		</td>
 		<td>{{$r->answer()}}</td>
