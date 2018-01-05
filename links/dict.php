@@ -3,6 +3,13 @@
 use havana\request;
 use havana\response;
 
+class Answer
+{
+    public $dir;
+    public $q;
+    public $a;
+}
+
 function stats() {
     return Dict::load()->stats();
 }
@@ -39,20 +46,28 @@ $app->post('/dict/test', function() {
     $Q = request::post('q');
     $A = request::post('a');
     $dir = request::post('dir');
+    $dict = Dict::load();
 
-    $d = Dict::load();
+    $a = Arr::make(request::post('q'))
+        ->map(function($q, $i) use ($A, $dir) {
+            $a = new Answer;
+            $a->dir = $dir[$i];
+            $a->q = $q;
+            $a->a = $A[$i];
+            return $a;
+        })
+        ->map(function($answer) use ($dict) {
+            return $dict->result($answer);
+        });
+    $dict->save();
 
-    $ok = [];
-    $fail = [];
-    foreach ($Q as $i => $q) {
-        $a = $A[$i];
-        $result = $d->check($q, $a, $dir[$i]);
-        if ($result['ok']) {
-            $ok[] = $result;
-        } else {
-            $fail[] = $result;
-        }
-    }
-    $d->save();
+    $ok = $a->filter(function(Result $item) {
+        return $item->ok();
+    })->get();
+
+    $fail = $a->filter(function(Result $item) {
+        return !$item->ok();
+    })->get();
+
     return tpl('dict/results', compact('ok', 'fail'));
 });

@@ -14,12 +14,12 @@ class Arr
     }
 
     function map($func) {
-        return new self(array_map($func, $this->a));
+        return new self(array_map($func, $this->a, array_keys($this->a)));
     }
 
     function filter($func = null) {
         $a = $func ? array_filter($this->a, $func) : array_filter($this->a);
-        return new self($a);
+        return new self(array_values($a));
     }
 
     function each($func) {

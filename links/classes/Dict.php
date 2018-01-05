@@ -1,59 +1,5 @@
 <?php
 
-class Entry
-{
-    public $q;
-    public $a;
-    public $answers1 = 0;
-    public $answers2 = 0;
-
-    function toRow() {
-        return [$this->q, $this->a, $this->answers1, $this->answers2];
-    }
-
-    static function fromRow($row) {
-        $e = new self();
-        $e->q = array_shift($row);
-        $e->a = array_shift($row);
-        $e->answers1 = array_shift($row);
-        $e->answers2 = array_shift($row);
-        return $e;
-    }
-
-    function eq(Entry $e) {
-        return $e->q == $this->q && $e->a == $this->a;
-    }
-
-    function score($dir) {
-        if ($dir == 0) return $this->answers1;
-        if ($dir == 1) return $this->answers2;
-        throw new Exception("score(dir): got dir=$dir");
-    }
-
-    function val($dir) {
-        if ($dir == 0) return $this->q;
-        if ($dir == 1) return $this->a;
-        throw new Exception("val(dir): got dir=$dir");
-    }
-
-    function expected($dir) {
-        if ($dir == 0) {
-            $expected = $this->a;
-        } else {
-            $expected = $this->q;
-        }
-        return $expected;
-    }
-
-    function addScore($dir) {
-        if ($dir == 0) {
-            $this->answers1++;
-        } else {
-            $this->answers2++;
-        }
-    }
-}
-
 class Dict
 {
     const GOAL = 10;
@@ -143,49 +89,6 @@ class Dict
         return -1;
     }
 
-    function check($q, $a, $dir)
-    {
-        // Find all rows with this question
-        $all = [];
-        foreach ($this->rows as $i => $row) {
-            if ($row->val($dir) == $q) {
-                $all[] = $i;
-            }
-        }
-
-        // Find one that we got right
-        $right = -1;
-        foreach ($all as $i) {
-            if (mb_strtolower($this->rows[$i]->expected($dir)) == mb_strtolower($a)) {
-                $right = $i;
-                break;
-            }
-        }
-
-        if ($right >= 0) {
-            $expected = $this->rows[$right]->expected($dir);
-            $this->rows[$right]->addScore($dir);
-            return [
-                'q' => $q,
-                'a' => $a,
-                'expected' => $expected,
-                'ok' => true
-            ];
-        }
-
-        $expected = [];
-        foreach ($all as $i) {
-            $expected[] = $this->rows[$i]->expected($dir);
-        }
-
-        return [
-            'q' => $q,
-            'a' => $a,
-            'expected' => implode(' || ', $expected),
-            'ok' => false
-        ];
-    }
-
     function stats()
     {
         $ok = 0;
@@ -197,5 +100,40 @@ class Dict
             'pairs' => $n,
             'progress' => $ok / self::GOAL / $n
         ];
+    }
+
+    // Returns list of entries matching the given question for the given direction.
+    private function entries($dir, $q)
+    {
+        $entries = [];
+        foreach ($this->rows as $row) {
+            if (mb_strtolower($row->val($dir)) == mb_strtolower($q)) {
+                $entries[] = $row;
+            }
+        }
+        return $entries;
+    }
+
+    function result(Answer $answer)
+    {
+        $dir = $answer->dir;
+        $q = $answer->q;
+        $a = $answer->a;
+
+        // Find all rows with this question
+        $entries = $this->entries($dir, $q);
+
+        // Find one that matches.
+        $match = array_reduce($entries, function($prev, Entry $entry) use ($dir, $a) {
+            if ($prev) return $prev;
+            if ($entry->match($dir, $a)) return $entry;
+            return null;
+        });
+
+        if ($match) {
+            $match->addScore($dir);
+        }
+
+        return new Result($answer, $entries, $match);
     }
 }

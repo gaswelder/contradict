@@ -14,9 +14,14 @@
 </tr>
 <?php foreach ($fail as $r): ?>
 	<tr class="nope">
-		<td>{{$r['q']}}</td>
-		<td>{{$r['expected']}}</td>
-		<td>{{$r['a']}}</td>
+		<td>{{$r->question()}}</td>
+		<td>
+			<?php foreach ($r->entries() as $i => $entry): ?>
+				<?php if ($i > 0): ?>||<?php endif; ?>
+				{{ $entry->expected($r->dir()) }}
+			<?php endforeach; ?>
+		</td>
+		<td>{{$r->answer()}}</td>
 	</tr>
 <?php endforeach; ?>
 </table>
@@ -29,8 +34,8 @@
 </tr>
 <?php foreach ($ok as $r): ?>
 	<tr>
-		<td>{{$r['q']}}</td>
-		<td>{{$r['expected']}}</td>
+	<td>{{$r->question()}}</td>
+		<td>{{$r->match()->expected($r->dir())}}</td>
 		<td>ok</td>
 	</tr>
 <?php endforeach; ?>
