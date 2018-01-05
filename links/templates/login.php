@@ -2,7 +2,7 @@
 
 <form method="post" id="login-form">
     <div>
-        <input name="password" autofocus>
+        <input type="password" name="password" autofocus>
     </div>
     <button type="submit">Login</button>
 </form>
