@@ -3,10 +3,12 @@
 use havana\request;
 use havana\response;
 
+function stats() {
+    return Dict::load()->stats();
+}
+
 $app->get('/dict', function() {
-    $d = Dict::load();
-    $stats = $d->stats();
-    return tpl('dict/home', compact('stats'));
+    return tpl('dict/home');
 });
 
 $app->get('/dict/add', function() {
