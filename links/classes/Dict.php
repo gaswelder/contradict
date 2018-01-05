@@ -1,8 +1,64 @@
 <?php
 
+class Entry
+{
+    public $q;
+    public $a;
+    public $answers1 = 0;
+    public $answers2 = 0;
+
+    function toRow() {
+        return [$this->q, $this->a, $this->answers1, $this->answers2];
+    }
+
+    static function fromRow($row) {
+        $e = new self();
+        $e->q = array_shift($row);
+        $e->a = array_shift($row);
+        $e->answers1 = array_shift($row);
+        $e->answers2 = array_shift($row);
+        return $e;
+    }
+
+    function eq(Entry $e) {
+        return $e->q == $this->q && $e->a == $this->a;
+    }
+
+    function score($dir) {
+        if ($dir == 0) return $this->answers1;
+        if ($dir == 1) return $this->answers2;
+        throw new Exception("score(dir): got dir=$dir");
+    }
+
+    function val($dir) {
+        if ($dir == 0) return $this->q;
+        if ($dir == 1) return $this->a;
+        throw new Exception("val(dir): got dir=$dir");
+    }
+
+    function expected($dir) {
+        if ($dir == 0) {
+            $expected = $this->a;
+        } else {
+            $expected = $this->q;
+        }
+        return $expected;
+    }
+
+    function addScore($dir) {
+        if ($dir == 0) {
+            $this->answers1++;
+        } else {
+            $this->answers2++;
+        }
+    }
+}
+
 class Dict
 {
     const GOAL = 10;
+
+    // Array of entries
     private $rows = [];
 
     static function load() {
@@ -19,7 +75,7 @@ class Dict
         while (1) {
             $row = fgetcsv($f);
             if (!$row) break;
-            $this->rows[] = $row;
+            $this->rows[] = Entry::fromRow($row);
         }
         fclose($f);
     }
@@ -32,22 +88,21 @@ class Dict
     function append($tuples)
     {
         foreach ($tuples as $t) {
-            list ($q, $a) = $t;
-            if ($this->has($q, $a)) {
+            $entry = new Entry;
+            $entry->q = $t[0];
+            $entry->a = $t[1];
+            if ($this->has($entry)) {
                 continue;
             }
-            $row = [$q, $a, 0, 0];
-            $this->rows[] = $row;
+            $this->rows[] = $entry;
         }
         return $this;
     }
 
-    private function has($q, $a)
+    private function has(Entry $e)
     {
-        foreach ($this->rows as $row) {
-            if ($row[0] == $q && $row[1] == $a) {
-                return true;
-            }
+        foreach ($this->rows as $r) {
+            if ($r->eq($e)) return true;
         }
         return false;
     }
@@ -55,13 +110,13 @@ class Dict
     function pick($n, $dir)
     {
         return Arr::make($this->rows)
-            ->filter(function($row) use ($dir) {
-                return $row[$dir + 2] < self::GOAL;
+            ->filter(function(Entry $row) use ($dir) {
+                return $row->score($dir) < self::GOAL;
             })
             ->shuffle()
             ->take($n)
-            ->map(function($row) {
-                return array_slice($row, 0, 2);
+            ->map(function(Entry $row) {
+                return [$row->q, $row->a];
             })
             ->get();
     }
@@ -73,7 +128,7 @@ class Dict
         }
         $f = fopen($path, 'wb');
         foreach ($this->rows as $row) {
-            fputcsv($f, $row);
+            fputcsv($f, $row->toRow());
         }
         fclose($f);
         return $this;
@@ -81,7 +136,7 @@ class Dict
 
     private function find($q, $dir) {
         foreach ($this->rows as $i => $row) {
-            if ($row[$dir] == $q) {
+            if ($row->val($dir) == $q) {
                 return $i;
             }
         }
@@ -93,7 +148,7 @@ class Dict
         // Find all rows with this question
         $all = [];
         foreach ($this->rows as $i => $row) {
-            if ($row[$dir] == $q) {
+            if ($row->val($dir) == $q) {
                 $all[] = $i;
             }
         }
@@ -101,15 +156,15 @@ class Dict
         // Find one that we got right
         $right = -1;
         foreach ($all as $i) {
-            if (mb_strtolower($this->rows[$i][abs($dir-1)]) == mb_strtolower($a)) {
+            if (mb_strtolower($this->rows[$i]->expected($dir)) == mb_strtolower($a)) {
                 $right = $i;
                 break;
             }
         }
 
         if ($right >= 0) {
-            $expected = $this->rows[$right][abs($dir-1)];
-            $this->rows[$right][$dir+2]++;
+            $expected = $this->rows[$right]->expected($dir);
+            $this->rows[$right]->addScore($dir);
             return [
                 'q' => $q,
                 'a' => $a,
@@ -120,7 +175,7 @@ class Dict
 
         $expected = [];
         foreach ($all as $i) {
-            $expected[] = $this->rows[$i][abs($dir-1)];
+            $expected[] = $this->rows[$i]->expected($dir);
         }
 
         return [
@@ -135,7 +190,7 @@ class Dict
     {
         $ok = 0;
         foreach ($this->rows as $row) {
-            $ok += $row[2] + $row[3];
+            $ok += $row->answers1 + $row->answers2;
         }
         $n = count($this->rows);
         return [
