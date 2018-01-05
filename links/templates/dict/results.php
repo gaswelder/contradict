@@ -18,7 +18,7 @@
 		<td>
 			<?php foreach ($r->entries() as $i => $entry): ?>
 				<?php if ($i > 0): ?>||<?php endif; ?>
-				{{ $entry->expected($r->dir()) }}
+				<a href="/dict/entries/{{$entry->id}}">{{ $entry->expected($r->dir()) }}</a>
 			<?php endforeach; ?>
 		</td>
 		<td>{{$r->answer()}}</td>

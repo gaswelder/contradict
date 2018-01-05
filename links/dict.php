@@ -71,3 +71,17 @@ $app->post('/dict/test', function() {
 
     return tpl('dict/results', compact('ok', 'fail'));
 });
+
+$app->get('/dict/entries/{\d+}', function($id) {
+    $entry = Dict::load()->entry($id);
+    return tpl('dict/entry', compact('entry'));
+});
+
+$app->post('/dict/entries/{\d+}', function($id) {
+    $dict = Dict::load();
+    $entry = $dict->entry($id);
+    $entry->q = request::post('q');
+    $entry->a = request::post('a');
+    $dict->save();
+    return response::redirect('/dict/entries/'.$id);
+});

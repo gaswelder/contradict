@@ -6,17 +6,19 @@ class Entry
     public $a;
     public $answers1 = 0;
     public $answers2 = 0;
+    public $id;
 
     function toRow() {
         return [$this->q, $this->a, $this->answers1, $this->answers2];
     }
 
-    static function fromRow($row) {
+    static function fromRow($row, $id) {
         $e = new self();
         $e->q = array_shift($row);
         $e->a = array_shift($row);
         $e->answers1 = array_shift($row);
         $e->answers2 = array_shift($row);
+        $e->id = $id;
         return $e;
     }
 

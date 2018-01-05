@@ -11,6 +11,10 @@ class Dict
         return new self();
     }
 
+    function entry($id) {
+        return $this->rows[$id];
+    }
+
     function __construct() {
         $path = $this->path();
         $this->rows = [];
@@ -18,10 +22,12 @@ class Dict
             return;
         }
         $f = fopen($path, 'rb');
+        $i = 0;
         while (1) {
             $row = fgetcsv($f);
             if (!$row) break;
-            $this->rows[] = Entry::fromRow($row);
+            $this->rows[] = Entry::fromRow($row, $i);
+            $i++;
         }
         fclose($f);
     }
