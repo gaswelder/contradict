@@ -1,9 +1,5 @@
 <?= tpl('dict/header') ?>
 
-<nav>
-	<a href="/dict/test">New test</a>
-	<a href="/dict">Home</a>
-</nav>
 <style>
 .nope td:nth-child(3) {
 	color: red;
@@ -39,3 +35,8 @@
 	</tr>
 <?php endforeach; ?>
 </table>
+
+<nav>
+	<a class="btn" href="/dict/test">New test</a>
+	<a class="btn" href="/dict">Home</a>
+</nav>
