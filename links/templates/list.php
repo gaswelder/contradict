@@ -17,7 +17,7 @@ $catname = urlencode(str_replace('/', ':', $category)) ?: 'other';
 <a href="/links/category/{{$catname}}"><h2>{{$category ? $category : 'Other'}}</h2></a>
 <ul>
     <?php foreach ($links as $link) : ?>
-    <li>{{date('Y-m-d', $link->created_at)}} <a href="/links/{{$link->id}}">{{$link->url}}</a></li>
+    <li>{{date('Y-m-d', $link->created_at)}} <a href="/links/{{$link->id}}">{{$link->title ?: $link->url}}</a></li>
 <?php endforeach; ?>
 </ul>
 <?php endforeach; ?>

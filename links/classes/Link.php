@@ -11,6 +11,7 @@ class Link extends dbobject
     public $category = '';
 	public $url;
 	public $archive = 0;
+	public $title = '';
 
     function __construct()
     {

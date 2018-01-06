@@ -71,6 +71,11 @@ $app->post('/links', function () {
             $link = new Link();
             $link->url = $url;
             $link->category = $cat;
+            try {
+                $link->title = getPageTitle($url);
+            } catch (Exception $e) {
+                $link->title = '';
+            }
             $link->save();
         });
     return response::redirect('/links');
@@ -83,18 +88,16 @@ $app->get('/links/{\d+}', function ($id) {
     }
     $categories = Link::categories();
 
-    $title = getPageTitle($link->url);
-
-    return tpl('view', compact('link', 'categories', 'title'));
+    return tpl('view', compact('link', 'categories'));
 });
 
 function getPageTitle($url)
 {
     $s = file_get_contents($url);
-    if (!preg_match('@<title>(.+)</title>@', $s, $m)) {
+    if (!preg_match('@<title>(.*?)</title>@', $s, $m)) {
         return null;
     }
-    return $m[1];
+    return html_entity_decode($m[1]);
 }
 
 $app->post('/links/{\d+}/category', function ($id) {
@@ -136,7 +139,8 @@ $app->get('/links/export', function() {
             $link->updated_at,
             $link->category,
             $link->url,
-            $link->archive
+            $link->archive,
+            $link->title
         ];
         fputcsv($f, $row);
     }
@@ -150,7 +154,7 @@ $app->get('/links/import', function() {
 
 $app->post('/links/import', function() {
     $upload = request::files('file')[0];
-    $fields = ['created_at', 'updated_at', 'category', 'url', 'archive'];
+    $fields = ['created_at', 'updated_at', 'category', 'url', 'archive', 'title'];
     $f = $upload->stream();
     for (;;) {
         $row = fgetcsv($f);

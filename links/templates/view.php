@@ -1,8 +1,8 @@
 <?= tpl('header') ?>
 
-    <h1>{{$title}}</h1>
+    <h1>{{$link->title}}</h1>
 
-    <p>Direct link: <a href="{{$link->url}}">{{$link->url}}</a></p>
+    <p><a href="{{$link->url}}">{{$link->url}}</a></p>
 
     <form method="post" action="/links/{{$link->id}}/action">
         <button type="submit" name="act" value="archive">Archive</button>
