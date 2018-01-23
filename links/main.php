@@ -7,7 +7,8 @@ use havana\user;
 use havana\request;
 use havana\response;
 
-function tplvar($name) {
+function tplvar($name)
+{
     switch ($name) {
         case 'loggedIn':
             return user::getRole('user');
@@ -18,7 +19,7 @@ function tplvar($name) {
 
 $app = new App(__DIR__);
 
-$app->middleware(function($next) {
+$app->middleware(function ($next) {
     if (!user::getRole('user') && request::url()->path != '/login') {
         return response::redirect('/login');
     }
@@ -48,8 +49,8 @@ $app->get('/links', function () {
     return tpl('list', compact('links'));
 });
 
-$app->get('/links/category/{.+}', function($cat) {
-    if($cat == 'other') {
+$app->get('/links/category/{.+}', function ($cat) {
+    if ($cat == 'other') {
         $cat = '';
     }
     $cat = str_replace(':', '/', $cat);
@@ -67,7 +68,7 @@ $app->post('/links', function () {
 
     Arr::make(explode("\n", request::post('url')))
         ->map('trim')->filter()
-        ->each(function($url) use ($cat) {
+        ->each(function ($url) use ($cat) {
             $link = new Link();
             $link->url = $url;
             $link->category = $cat;
@@ -130,7 +131,7 @@ $app->post('/links/{\d+}/action', function ($id) {
     return response::redirect('/links');
 });
 
-$app->get('/links/export', function() {
+$app->get('/links/export', function () {
     $links = Link::all();
     $f = tmpfile();
     foreach ($links as $link) {
@@ -148,17 +149,19 @@ $app->get('/links/export', function() {
     return response::make($f)->download('links.csv');
 });
 
-$app->get('/links/import', function() {
+$app->get('/links/import', function () {
     return tpl('import');
 });
 
-$app->post('/links/import', function() {
+$app->post('/links/import', function () {
     $upload = request::files('file')[0];
     $fields = ['created_at', 'updated_at', 'category', 'url', 'archive', 'title'];
     $f = $upload->stream();
     for (;;) {
         $row = fgetcsv($f);
-        if ($row === false) break;
+        if ($row === false) {
+            break;
+        }
         $link = new Link;
         foreach ($fields as $i => $k) {
             $link->$k = $row[$i];
@@ -169,21 +172,21 @@ $app->post('/links/import', function() {
     exit;
 });
 
-$app->get('/pages', function() {
-	return response::redirect('/pages/new');
+$app->get('/pages', function () {
+    return response::redirect('/pages/new');
 });
 
-$app->get('/pages/{.+}', function($name) {
+$app->get('/pages/{.+}', function ($name) {
     $menu = Page::ls();
-	$page = new Page($name);
-	return tpl('pages', compact('menu', 'page'));
+    $page = new Page($name);
+    return tpl('pages', compact('menu', 'page'));
 });
 
-$app->post('/pages/{.+}', function($name) {
-	$page = new Page($name);
-	$page->content = Request::post('content');
-	$page->save();
-	return response::redirect('/pages/'.$name);
+$app->post('/pages/{.+}', function ($name) {
+    $page = new Page($name);
+    $page->content = Request::post('content');
+    $page->save();
+    return response::redirect('/pages/'.$name);
 });
 
 require __DIR__ . '/dict.php';
