@@ -24,7 +24,9 @@ $app->get('/dict/add', function() {
 
 $app->post('/dict/add', function() {
     $lines = Arr::make(explode("\n", request::post('words')))
-        ->map('trim')
+        ->map(function($line) {
+            return trim($line);
+        })
         ->filter()
         ->map(function($line) {
             return preg_split('/\s+-\s+/', $line, 2);
