@@ -4,37 +4,12 @@ class Dict
 {
     const GOAL = 10;
 
-    // Array of entries
-    private $rows = [];
-
     static function load() {
         return new self();
     }
 
     function entry($id) {
-        return $this->rows[$id];
-    }
-
-    function __construct() {
-        $path = $this->path();
-        $this->rows = [];
-        if (!file_exists($path)) {
-            return;
-        }
-        $f = fopen($path, 'rb');
-        $i = 0;
-        while (1) {
-            $row = fgetcsv($f);
-            if (!$row) break;
-            $this->rows[] = Entry::fromRow($row, $i);
-            $i++;
-        }
-        fclose($f);
-    }
-
-    private function path()
-    {
-        return __DIR__ . '/../data/dict/dict.csv';
+        return Entry::get($id);
     }
 
     function append($tuples)
@@ -46,78 +21,31 @@ class Dict
             if ($this->has($entry)) {
                 continue;
             }
-            $this->rows[] = $entry;
+            $entry->save();
         }
         return $this;
     }
 
     private function has(Entry $e)
     {
-        foreach ($this->rows as $r) {
-            if ($r->eq($e)) return true;
-        }
-        return false;
+        return Entry::db()->getValue("select count(*) from words where q = ? and a = ?", $e->q, $e->a) > 0;
     }
 
     function pick($n, $dir)
     {
-        return Arr::make($this->rows)
-            ->filter(function(Entry $row) use ($dir) {
-                return $row->score($dir) < self::GOAL;
-            })
-            ->shuffle()
-            ->take($n)
-            ->map(function(Entry $row) {
-                return [$row->q, $row->a];
-            })
-            ->get();
-    }
-
-    function save() {
-        $path = $this->path();
-        if (file_exists($path)) {
-            copy($path, $path.date('ymd-his'));
-        }
-        $f = fopen($path, 'wb');
-        foreach ($this->rows as $row) {
-            fputcsv($f, $row->toRow());
-        }
-        fclose($f);
-        return $this;
-    }
-
-    private function find($q, $dir) {
-        foreach ($this->rows as $i => $row) {
-            if ($row->val($dir) == $q) {
-                return $i;
-            }
-        }
-        return -1;
+        return Entry::pick($n, $dir);
     }
 
     function stats()
     {
-        $ok = 0;
-        foreach ($this->rows as $row) {
-            $ok += $row->answers1 + $row->answers2;
-        }
-        $n = count($this->rows);
-        return [
-            'pairs' => $n,
-            'progress' => $ok / self::GOAL / $n
-        ];
+        return Entry::stats();
     }
 
     // Returns list of entries matching the given question for the given direction.
     private function entries($dir, $q)
     {
-        $entries = [];
-        foreach ($this->rows as $row) {
-            if (mb_strtolower($row->val($dir)) == mb_strtolower($q)) {
-                $entries[] = $row;
-            }
-        }
-        return $entries;
+        $f = $dir == 0 ? 'q' : 'a';
+        return Entry::fromRows(Entry::db()->getRows("select * from words where lower($f) = ?", mb_strtolower($q)));
     }
 
     function result(Answer $answer)
@@ -138,6 +66,7 @@ class Dict
 
         if ($match) {
             $match->addScore($dir);
+            $match->save();
         }
 
         return new Result($answer, $entries, $match);

@@ -29,8 +29,8 @@ $app->post('/dict/add', function() {
         ->map(function($line) {
             return preg_split('/\s+-\s+/', $line, 2);
         });
-    
-    Dict::load() -> append($lines->get()) -> save();
+
+    Dict::load()->append($lines->get());
 
     return response::redirect('/dict');
 });
@@ -59,8 +59,6 @@ $app->post('/dict/test', function() {
         ->map(function($answer) use ($dict) {
             return $dict->result($answer);
         });
-    $dict->save();
-
     $ok = $a->filter(function(Result $item) {
         return $item->ok();
     })->get();
@@ -82,6 +80,6 @@ $app->post('/dict/entries/{\d+}', function($id) {
     $entry = $dict->entry($id);
     $entry->q = request::post('q');
     $entry->a = request::post('a');
-    $dict->save();
+    $entry->save();
     return response::redirect('/dict/entries/'.$id);
 });
