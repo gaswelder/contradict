@@ -23,10 +23,17 @@ body {
 	top: 0;
 	padding: 0 1em;
 }
+
+#stats a {
+	display: inline-block;
+	float: left;
+	margin: 1em 1em 0 0;
+}
 </style>
 </head>
 <body>
 <aside id="stats">
 	<?php $stats = stats(); ?>
+	<a href="/dict">Home</a>
 	<p>Total: {{$stats['pairs']}}; progress: {{round($stats['progress'] * 100, 1)}} %</p>
 </aside>
