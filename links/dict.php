@@ -69,6 +69,9 @@ $app->post('/dict/test', function () {
         return !$item->ok();
     })->get();
 
+    $stats = new TestResult(count($ok), count($fail));
+    $stats->save();
+
     return tpl('dict/results', compact('ok', 'fail'));
 });
 
