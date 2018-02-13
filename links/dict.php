@@ -68,7 +68,9 @@ $app->post('/dict/test', function () {
         return !$item->ok();
     })->get();
 
-    $stats = new TestResult(count($ok), count($fail));
+    $stats = new TestResult();
+    $stats->right = count($ok);
+    $stats->wrong = count($fail);
     $stats->save();
 
     return tpl('dict/results', compact('ok', 'fail'));
@@ -86,4 +88,9 @@ $app->post('/dict/entries/{\d+}', function ($id) {
     $entry->a = request::post('a');
     $entry->save();
     return response::redirect('/dict/entries/' . $id);
+});
+
+$app->get('/dict/stats', function () {
+    $results = TestResult::find([], 't desc');
+    return tpl('dict/stats', compact('results'));
 });

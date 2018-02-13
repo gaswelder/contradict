@@ -10,10 +10,8 @@ class TestResult extends dbobject
     public $right;
     public $wrong;
 
-    function __construct($right, $wrong)
+    function __construct()
     {
-        $this->right = $right;
-        $this->wrong = $wrong;
         $this->t = time();
     }
 }
