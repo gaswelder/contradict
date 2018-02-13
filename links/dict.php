@@ -38,9 +38,8 @@ $app->post('/dict/add', function () {
 });
 
 $app->get('/dict/test', function () {
-    $d = Dict::load();
-    $tuples1 = $d->pick(10, 0);
-    $tuples2 = $d->pick(10, 1);
+    $tuples1 = Entry::pick(10, 0);
+    $tuples2 = Entry::pick(10, 1);
     return tpl('dict/test', compact('tuples1', 'tuples2'));
 });
 

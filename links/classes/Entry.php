@@ -1,5 +1,4 @@
 <?php
-
 use havana\dbobject;
 
 class Entry extends dbobject
@@ -24,6 +23,13 @@ class Entry extends dbobject
         ];
     }
 
+    /**
+     * Returns a given number of random questions.
+     *
+     * @param int $n Number of questions
+     * @param int $dir Translation direction: 0 for direct, 1 for reverse
+     * @return array
+     */
     static function pick($n, $dir)
     {
         $f = $dir == 0 ? 'answers1' : 'answers2';
@@ -31,11 +37,7 @@ class Entry extends dbobject
         $goal = Dict::GOAL;
 
         $rows = self::db()->getRows("select * from words where $f < $goal order by random() limit $n");
-        return Arr::make(self::fromRows($rows))
-            ->map(function(Entry $row) {
-                return [$row->q, $row->a];
-            })
-            ->get();
+        return self::fromRows($rows);
     }
 
     function toRow()
