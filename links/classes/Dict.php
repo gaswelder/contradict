@@ -1,14 +1,15 @@
 <?php
-
 class Dict
 {
     const GOAL = 10;
 
-    static function load() {
+    static function load()
+    {
         return new self();
     }
 
-    function entry($id) {
+    function entry($id)
+    {
         return Entry::get($id);
     }
 
@@ -58,7 +59,7 @@ class Dict
         $entries = $this->entries($dir, $q);
 
         // Find one that matches.
-        $match = array_reduce($entries, function($prev, Entry $entry) use ($dir, $a) {
+        $match = array_reduce($entries, function ($prev, Entry $entry) use ($dir, $a) {
             if ($prev) return $prev;
             if ($entry->match($dir, $a)) return $entry;
             return null;
