@@ -32,11 +32,6 @@ class Dict
         return Entry::db()->getValue("select count(*) from words where q = ? and a = ?", $e->q, $e->a) > 0;
     }
 
-    function stats()
-    {
-        return Entry::stats();
-    }
-
     // Returns list of entries matching the given question for the given direction.
     private function entries($dir, $q)
     {

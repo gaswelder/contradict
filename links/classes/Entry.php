@@ -14,12 +14,16 @@ class Entry extends dbobject
 
     static function stats()
     {
+        $goal = Dict::GOAL;
         $r = self::db()->getRow('select count(*) as n, sum(answers1+answers2) as ok from words');
         $n = $r['n'];
         $ok = $r['ok'];
+
+        $goaled = self::db()->getValue("select sum(a1 + a2) from (select answers1 >= $goal as a1, answers2 >= $goal as a2 from words) a");
         return [
             'pairs' => $n,
-            'progress' => $ok / Dict::GOAL / $n
+            'progress' => $ok / $goal / $n,
+            'goaled' => $goaled
         ];
     }
 

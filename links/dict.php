@@ -9,11 +9,6 @@ class Answer
     public $a;
 }
 
-function stats()
-{
-    return Dict::load()->stats();
-}
-
 $app->get('/dict', function () {
     return tpl('dict/home');
 });
