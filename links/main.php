@@ -1,6 +1,5 @@
 <?php
-
-require __DIR__.'/hl/main.php';
+require __DIR__ . '/hl/main.php';
 
 use havana\App;
 use havana\user;
@@ -69,16 +68,16 @@ $app->post('/links', function () {
     Arr::make(explode("\n", request::post('url')))
         ->map('trim')->filter()
         ->each(function ($url) use ($cat) {
-            $link = new Link();
-            $link->url = $url;
-            $link->category = $cat;
-            try {
-                $link->title = getPageTitle($url);
-            } catch (Exception $e) {
-                $link->title = '';
-            }
-            $link->save();
-        });
+        $link = new Link();
+        $link->url = $url;
+        $link->category = $cat;
+        try {
+            $link->title = getPageTitle($url);
+        } catch (Exception $e) {
+            $link->title = '';
+        }
+        $link->save();
+    });
     return response::redirect('/links');
 });
 
@@ -157,7 +156,7 @@ $app->post('/links/import', function () {
     $upload = request::files('file')[0];
     $fields = ['created_at', 'updated_at', 'category', 'url', 'archive', 'title'];
     $f = $upload->stream();
-    for (;;) {
+    for (;; ) {
         $row = fgetcsv($f);
         if ($row === false) {
             break;
@@ -186,7 +185,7 @@ $app->post('/pages/{.+}', function ($name) {
     $page = new Page($name);
     $page->content = Request::post('content');
     $page->save();
-    return response::redirect('/pages/'.$name);
+    return response::redirect('/pages/' . $name);
 });
 
 require __DIR__ . '/dict.php';
