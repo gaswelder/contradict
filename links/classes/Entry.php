@@ -22,8 +22,8 @@ class Entry extends dbobject
         $goaled = self::db()->getValue("select sum(a1 + a2) from (select answers1 >= $goal as a1, answers2 >= $goal as a2 from words) a");
         return [
             'pairs' => $n,
-            'progress' => $ok / $goal / $n,
-            'goaled' => $goaled
+            'progress' => $ok / $goal / $n / 2,
+            'goaled' => $goaled / 2
         ];
     }
 
