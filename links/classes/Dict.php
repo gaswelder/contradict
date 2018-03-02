@@ -8,11 +8,6 @@ class Dict
         return new self();
     }
 
-    function entry($id)
-    {
-        return Entry::get($id);
-    }
-
     function append($tuples)
     {
         foreach ($tuples as $t) {

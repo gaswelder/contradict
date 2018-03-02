@@ -73,13 +73,12 @@ $app->post('/dict/test', function () {
 });
 
 $app->get('/dict/entries/{\d+}', function ($id) {
-    $entry = Dict::load()->entry($id);
+    $entry = Entry::get($id);
     return tpl('dict/entry', compact('entry'));
 });
 
 $app->post('/dict/entries/{\d+}', function ($id) {
-    $dict = Dict::load();
-    $entry = $dict->entry($id);
+    $entry = Entry::get($id);
     $entry->q = request::post('q');
     $entry->a = request::post('a');
     $entry->save();
