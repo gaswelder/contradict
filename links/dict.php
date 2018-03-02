@@ -20,12 +20,12 @@ $app->get('/dict/add', function () {
 $app->post('/dict/add', function () {
     $lines = Arr::make(explode("\n", request::post('words')))
         ->map(function ($line) {
-        return trim($line);
-    })
+            return trim($line);
+        })
         ->filter()
         ->map(function ($line) {
-        return preg_split('/\s+-\s+/', $line, 2);
-    });
+            return preg_split('/\s+-\s+/', $line, 2);
+        });
 
     Dict::load()->append($lines->get());
 
@@ -47,15 +47,15 @@ $app->post('/dict/test', function () {
 
     $a = Arr::make(request::post('q'))
         ->map(function ($q, $i) use ($A, $dir) {
-        $a = new Answer;
-        $a->dir = $dir[$i];
-        $a->q = $q;
-        $a->a = $A[$i];
-        return $a;
-    })
+            $a = new Answer;
+            $a->dir = $dir[$i];
+            $a->q = $q;
+            $a->a = $A[$i];
+            return $a;
+        })
         ->map(function ($answer) use ($dict) {
-        return $dict->result($answer);
-    });
+            return $dict->result($answer);
+        });
     $ok = $a->filter(function (Result $item) {
         return $item->ok();
     })->get();
