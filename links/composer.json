@@ -1,0 +1,13 @@
+{
+	"name": "gas/links",
+	"type": "project",
+	"repositories": [
+		{
+			"type": "git",
+			"url": "https://github.com/gaswelder/havana"
+		}
+	],
+	"require": {
+		"gaswelder/havana": "dev-master"
+	}
+}

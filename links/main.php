@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/hl/main.php';
+require 'vendor/autoload.php';
 
 use havana\App;
 use havana\user;
@@ -68,16 +68,16 @@ $app->post('/links', function () {
     Arr::make(explode("\n", request::post('url')))
         ->map('trim')->filter()
         ->each(function ($url) use ($cat) {
-        $link = new Link();
-        $link->url = $url;
-        $link->category = $cat;
-        try {
-            $link->title = getPageTitle($url);
-        } catch (Exception $e) {
-            $link->title = '';
-        }
-        $link->save();
-    });
+            $link = new Link();
+            $link->url = $url;
+            $link->category = $cat;
+            try {
+                $link->title = getPageTitle($url);
+            } catch (Exception $e) {
+                $link->title = '';
+            }
+            $link->save();
+        });
     return response::redirect('/links');
 });
 
