@@ -19,11 +19,13 @@ class Entry extends dbobject
         $n = $r['n'];
         $ok = $r['ok'];
 
-        $goaled = self::db()->getValue("select sum(a1 + a2) from (select answers1 >= $goal as a1, answers2 >= $goal as a2 from words) a");
+        $finished = self::db()->getValue("select sum(a1 + a2) from (select answers1 >= $goal as a1, answers2 >= $goal as a2 from words) a");
+        $started = self::db()->getValue("select count(*) from words where answers1 + answers2 between 1 and 2 * $goal - 1");
         return [
             'pairs' => $n,
             'progress' => $ok / $goal / $n / 2,
-            'goaled' => $goaled / 2
+            'finished' => $finished / 2,
+            'started' => $started
         ];
     }
 

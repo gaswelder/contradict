@@ -35,5 +35,6 @@ body {
 <aside id="stats">
 	<?php $stats = Entry::stats(); ?>
 	<a href="/dict">Home</a>
-	<p>Total: {{$stats['pairs']}}; progress: {{round($stats['progress'] * 100, 1)}} % (goaled {{$stats['goaled']}})</p>
+	<p>Total: {{$stats['pairs']}}; progress: {{round($stats['progress'] * 100, 1)}} %
+		(finished {{$stats['finished']}}, started {{$stats['started']}})</p>
 </aside>
