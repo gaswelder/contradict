@@ -2,13 +2,6 @@
 use havana\request;
 use havana\response;
 
-class Answer
-{
-    public $dir;
-    public $q;
-    public $a;
-}
-
 $app->get('/dict', function () {
     return tpl('dict/home');
 });
@@ -40,28 +33,30 @@ $app->get('/dict/test', function () {
 });
 
 $app->post('/dict/test', function () {
-    $Q = request::post('q');
     $A = request::post('a');
     $dir = request::post('dir');
     $dict = Dict::load();
 
-    $a = Arr::make(request::post('q'))
-        ->map(function ($q, $i) use ($A, $dir) {
-            $a = new Answer;
-            $a->dir = $dir[$i];
-            $a->q = $q;
-            $a->a = $A[$i];
-            return $a;
-        })
-        ->map(function ($answer) use ($dict) {
-            return $dict->result($answer);
-        });
-    $ok = $a->filter(function (Result $item) {
-        return $item->ok();
-    })->get();
+    $entries = Entry::getMultiple(request::post('q'));
 
-    $fail = $a->filter(function (Result $item) {
-        return !$item->ok();
+    $results = Arr::make($entries)->zip(request::post('dir'))
+        ->map(function ($list) {
+            list($entry, $dir) = $list;
+            return new Question($entry, $dir == 1);
+        })
+        ->zip(request::post('a'))
+        ->map(function ($list) {
+            list($question, $answer) = $list;
+            $correct = $question->checkAnswer($answer);
+            if ($correct) $question->save();
+            return compact('question', 'answer', 'correct');
+        });
+
+    $ok = $results->filter(function ($item) {
+        return $item['correct'];
+    })->get();
+    $fail = $results->filter(function ($item) {
+        return !$item['correct'];
     })->get();
 
     $stats = new TestResult();

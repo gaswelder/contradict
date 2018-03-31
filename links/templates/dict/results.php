@@ -12,24 +12,15 @@
 	<th>Expected</th>
 	<th>A</th>
 </tr>
-<?php foreach ($fail as $r): ?>
+<?php foreach ($fail as $r) : ?>
 	<tr class="nope">
-		<td>{{$r->question()}}</td>
+		<td>{{ $r['question']->q() }}</td>
 		<td>
-			<?php foreach ($r->entries() as $i => $entry): ?>
-				<?php if ($i > 0): ?>||<?php endif; ?>
-				<?php
-					$exp = $entry->expected($r->dir());
-					$wiki = array_reduce(explode(' ', $exp), function($prev, $next) {
-						if (mb_strlen($next) > mb_strlen($prev)) return $next;
-						return $prev;
-					}, '');
-				?>
-				<a href="/dict/entries/{{$entry->id}}">{{ $exp }}</a>
-				(<small><a href="{{ 'https://de.wiktionary.org/w/index.php?search='.urlencode($wiki).'&title=Spezial%3ASuche&go=Seite' }}">wiki</a></small>)
-			<?php endforeach; ?>
+			<a href="/dict/entries/{{$r['question']->id()}}">{{ $r['question']->a() }}</a>
+			<?php /*
+				(<small><a href="{{ 'https://de.wiktionary.org/w/index.php?search='.urlencode($wiki).'&title=Spezial%3ASuche&go=Seite' }}">wiki</a></small>) */ ?>
 		</td>
-		<td>{{$r->answer()}}</td>
+		<td>{{ $r['answer'] }}</td>
 	</tr>
 <?php endforeach; ?>
 </table>
@@ -40,10 +31,10 @@
 	<th>A</th>
 	<th></th>
 </tr>
-<?php foreach ($ok as $r): ?>
+<?php foreach ($ok as $r) : ?>
 	<tr>
-	<td>{{$r->question()}}</td>
-		<td>{{$r->match()->expected($r->dir())}}</td>
+		<td>{{ $r['question']->q() }}</td>
+		<td>{{ $r['question']->a() }}</td>
 		<td>ok</td>
 	</tr>
 <?php endforeach; ?>

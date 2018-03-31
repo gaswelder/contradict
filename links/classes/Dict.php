@@ -26,39 +26,4 @@ class Dict
     {
         return Entry::db()->getValue("select count(*) from words where q = ? and a = ?", $e->q, $e->a) > 0;
     }
-
-    /**
-     * Checks a given answer, returns a result.
-     *
-     * @param Answer $answer
-     * @return Result
-     */
-    function result(Answer $answer)
-    {
-        $dir = $answer->dir;
-        $q = $answer->q;
-        $a = $answer->a;
-
-        // Find all rows with this question
-        $questionField = $dir == 0 ? 'q' : 'a';
-        $timesAnsweredField = $dir == 0 ? 'answers1' : 'answers2';
-        $entries = Entry::fromRows(Entry::db()->getRows("
-            select * from words
-            where lower($questionField) = ?
-            and $timesAnsweredField < ?", mb_strtolower($q), self::GOAL));
-
-        // Find one that matches.
-        $match = array_reduce($entries, function ($prev, Entry $entry) use ($dir, $a) {
-            if ($prev) return $prev;
-            if ($entry->match($dir, $a)) return $entry;
-            return null;
-        });
-
-        if ($match) {
-            $match->addScore($dir);
-            $match->save();
-        }
-
-        return new Result($answer, $entries, $match);
-    }
 }

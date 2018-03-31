@@ -9,23 +9,23 @@ form > section {
 </style>
 <form method="post">
 	<section>
-	<?php foreach ($tuples1 as $t) : ?>
+	<?php foreach ($tuples1 as $question) : ?>
 	<div>
-		<input type="hidden" name="q[]" value="{{$t->q}}">
+		<input type="hidden" name="q[]" value="{{$question->id()}}">
 		<input type="hidden" name="dir[]" value="0">
-		<label>{{$t->q}} <small>({{$t->answers1}})</small></label>
-		<input name="a[]" value="" autocomplete="off">
+		<label>{{$question->q()}} <small>({{$question->times()}})</small></label>
+		<input name="a[]" value="" autocomplete="off" placeholder="{{$question->hint()}}">
 	</div>
 	<?php endforeach; ?>
 	</section>
 
 	<section>
-	<?php foreach ($tuples2 as $t) : ?>
+	<?php foreach ($tuples2 as $question) : ?>
 	<div>
-		<input type="hidden" name="q[]" value="{{$t->a}}">
+		<input type="hidden" name="q[]" value="{{$question->id()}}">
 		<input type="hidden" name="dir[]" value="1">
-		<label>{{$t->a}} <small>({{$t->answers2}})</small></label>
-		<input name="a[]" value="" autocomplete="off">
+		<label>{{$question->q()}} <small>({{$question->times()}})</small></label>
+		<input name="a[]" value="" autocomplete="off" placeholder="{{$question->hint()}}">
 	</div>
 	<?php endforeach; ?>
 	</section>
