@@ -17,8 +17,9 @@
 		<td>{{ $r['question']->q() }}</td>
 		<td>
 			<a href="/dict/entries/{{$r['question']->id()}}">{{ $r['question']->a() }}</a>
-			<?php /*
-				(<small><a href="{{ 'https://de.wiktionary.org/w/index.php?search='.urlencode($wiki).'&title=Spezial%3ASuche&go=Seite' }}">wiki</a></small>) */ ?>
+			<?php if ($wiki = $r['question']->wikiURL()) : ?>
+				<small>(<a href="{{ $wiki }}">wiki</a>)</small>
+			<?php endif; ?>
 		</td>
 		<td>{{ $r['answer'] }}</td>
 	</tr>

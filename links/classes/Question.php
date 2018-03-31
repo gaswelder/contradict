@@ -81,4 +81,17 @@ class Question
 		$replace = $first[0] == ' ' ? ' ' : '*';
 		return $replace . self::h($rest($word), array_map($rest, $others));
 	}
+
+	function wikiURL()
+	{
+		$words = explode(' ', $this->e->q);
+		if (empty($words)) return null;
+		if (in_array(strtolower($words[0]), ['das', 'die', 'der'])) {
+			array_shift($words);
+		}
+		if (count($words) != 1) return null;
+
+		$wiki = $words[0];
+		return 'https://de.wiktionary.org/w/index.php?search=' . urlencode($wiki);
+	}
 }
