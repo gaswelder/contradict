@@ -1,4 +1,4 @@
-<?= tpl('dict/header') ?>
+<?= tpl('header') ?>
 
 <table>
 	<?php foreach ($results as $r) : ?>

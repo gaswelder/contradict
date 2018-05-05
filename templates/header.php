@@ -30,11 +30,26 @@ body {
 	margin: 1em 1em 0 0;
 }
 </style>
+<?php
+
+use havana\user;
+
+function Stats()
+{
+	if (!user::getRole('user')) {
+		return;
+	}
+	$stats = Entry::stats();
+	?>
+	<a href="/">Home</a>
+	<p>Total: {{$stats['pairs']}}; progress: {{round($stats['progress'] * 100, 1)}} %
+		(finished {{$stats['finished']}}, started {{$stats['started']}})</p>
+	<?php
+
+}
+?>
 </head>
 <body>
 <aside id="stats">
-	<?php $stats = Entry::stats(); ?>
-	<a href="/dict">Home</a>
-	<p>Total: {{$stats['pairs']}}; progress: {{round($stats['progress'] * 100, 1)}} %
-		(finished {{$stats['finished']}}, started {{$stats['started']}})</p>
+	<?php Stats(); ?>
 </aside>

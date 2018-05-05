@@ -1,16 +1,52 @@
 <?php
+require 'vendor/autoload.php';
+
+use havana\App;
+use havana\user;
 use havana\request;
 use havana\response;
 
-$app->get('/dict', function () {
-    return tpl('dict/home');
+$app = new App(__DIR__);
+
+$app->middleware(function ($next) {
+    if (!user::getRole('user') && request::url()->path != '/login') {
+        return response::redirect('/login');
+    }
+    return $next();
 });
 
-$app->get('/dict/add', function () {
-    return tpl('dict/add');
+$app->get('/login', function () {
+    return tpl('login');
 });
 
-$app->post('/dict/add', function () {
+$app->post('/login', function () {
+    $pass = request::post('password');
+    if ($pass == '123') {
+        user::addRole('user');
+        return response::redirect('/');
+    }
+    return tpl('login');
+});
+
+$app->post('/logout', function () {
+    user::removeRole('user');
+    return response::redirect('/');
+});
+
+$app->get('/logout', function () {
+    user::removeRole('user');
+    return response::redirect('/');
+});
+
+$app->get('/', function () {
+    return tpl('home');
+});
+
+$app->get('/add', function () {
+    return tpl('add');
+});
+
+$app->post('/add', function () {
     $lines = Arr::make(explode("\n", request::post('words')))
         ->map(function ($line) {
             return trim($line);
@@ -22,17 +58,17 @@ $app->post('/dict/add', function () {
 
     Dict::load()->append($lines->get());
 
-    return response::redirect('/dict');
+    return response::redirect('/');
 });
 
-$app->get('/dict/test', function () {
+$app->get('/test', function () {
     $size = 20;
     $tuples1 = Entry::pick($size, 0);
     $tuples2 = Entry::pick($size, 1);
-    return tpl('dict/test', compact('tuples1', 'tuples2'));
+    return tpl('test', compact('tuples1', 'tuples2'));
 });
 
-$app->post('/dict/test', function () {
+$app->post('/test', function () {
     $A = request::post('a');
     $dir = request::post('dir');
     $dict = Dict::load();
@@ -64,23 +100,25 @@ $app->post('/dict/test', function () {
     $stats->wrong = count($fail);
     $stats->save();
 
-    return tpl('dict/results', compact('ok', 'fail'));
+    return tpl('results', compact('ok', 'fail'));
 });
 
-$app->get('/dict/entries/{\d+}', function ($id) {
+$app->get('/entries/{\d+}', function ($id) {
     $entry = Entry::get($id);
-    return tpl('dict/entry', compact('entry'));
+    return tpl('entry', compact('entry'));
 });
 
-$app->post('/dict/entries/{\d+}', function ($id) {
+$app->post('/entries/{\d+}', function ($id) {
     $entry = Entry::get($id);
     $entry->q = request::post('q');
     $entry->a = request::post('a');
     $entry->save();
-    return response::redirect('/dict/entries/' . $id);
+    return response::redirect('/entries/' . $id);
 });
 
-$app->get('/dict/stats', function () {
+$app->get('/stats', function () {
     $results = TestResult::find([], 't desc');
-    return tpl('dict/stats', compact('results'));
+    return tpl('stats', compact('results'));
 });
+
+$app->run();

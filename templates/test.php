@@ -1,4 +1,4 @@
-<?= tpl('dict/header') ?>
+<?= tpl('header') ?>
 <style>
 form > section {
 	display: inline-block;

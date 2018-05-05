@@ -1,4 +1,4 @@
-<?= tpl('dict/header') ?>
+<?= tpl('header') ?>
 
 <form method="post">
 	<input name="q" value="{{$entry->q}}" required>

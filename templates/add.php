@@ -1,4 +1,4 @@
-<?= tpl('dict/header') ?>
+<?= tpl('header') ?>
 <form method="post">
 	<div>
 		<textarea name="words" id="" cols="30" rows="10"></textarea>

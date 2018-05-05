@@ -1,4 +1,4 @@
-<?= tpl('dict/header') ?>
+<?= tpl('header') ?>
 
 <style>
 .nope td:nth-child(3) {
@@ -16,7 +16,7 @@
 	<tr class="nope">
 		<td>{{ $r['question']->q() }}</td>
 		<td>
-			<a href="/dict/entries/{{$r['question']->id()}}">{{ $r['question']->a() }}</a>
+			<a href="/entries/{{$r['question']->id()}}">{{ $r['question']->a() }}</a>
 			<?php if ($wiki = $r['question']->wikiURL()) : ?>
 				<small>(<a href="{{ $wiki }}">wiki</a>)</small>
 			<?php endif; ?>
@@ -42,6 +42,6 @@
 </table>
 
 <nav>
-	<a class="btn" href="/dict/test">New test</a>
-	<a class="btn" href="/dict">Home</a>
+	<a class="btn" href="/test">New test</a>
+	<a class="btn" href="/">Home</a>
 </nav>
