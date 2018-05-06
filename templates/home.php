@@ -1,7 +1,5 @@
 <?= tpl('header') ?>
 
-<a href="/stats">Stats</a>
-
 <style>
 .dict-entry {
 	display: inline-block;

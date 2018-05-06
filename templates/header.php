@@ -15,7 +15,7 @@ body {
 	}
 }
 
-#stats {
+#header {
 	background-color: #aae;
 	position: fixed;
 	left: 0;
@@ -24,32 +24,16 @@ body {
 	padding: 0 1em;
 }
 
-#stats a {
+#header a {
 	display: inline-block;
 	float: left;
 	margin: 1em 1em 0 0;
 }
 </style>
-<?php
 
-use havana\user;
-
-function Stats1()
-{
-	if (!user::getRole('user')) {
-		return;
-	}
-	$stats = Entry::stats();
-	?>
-	<a href="/">Home</a>
-	<p>Total: {{$stats['pairs']}}; progress: {{round($stats['progress'] * 100, 1)}} %
-		(finished {{$stats['finished']}}, started {{$stats['started']}})</p>
-	<?php
-
-}
-?>
 </head>
 <body>
-<aside id="stats">
-	<?php Stats1(); ?>
-</aside>
+<header id="header">
+	<a href="/">Home</a>
+	<a href="/stats">Stats</a>
+</header>
