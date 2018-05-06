@@ -34,7 +34,7 @@ body {
 
 use havana\user;
 
-function Stats()
+function Stats1()
 {
 	if (!user::getRole('user')) {
 		return;
@@ -51,5 +51,5 @@ function Stats()
 </head>
 <body>
 <aside id="stats">
-	<?php Stats(); ?>
+	<?php Stats1(); ?>
 </aside>

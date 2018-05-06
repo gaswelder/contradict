@@ -4,13 +4,13 @@ use havana\dbobject;
 class Entry extends dbobject
 {
     const TABLE_NAME = 'words';
-    const DATABASE = 'sqlite://dict.sqlite';
 
     public $q;
     public $a;
     public $answers1 = 0;
     public $answers2 = 0;
     public $id;
+    public $dict_id;
 
     static function stats()
     {
@@ -32,17 +32,24 @@ class Entry extends dbobject
     /**
      * Returns a given number of random questions.
      *
+     * @param int $dict_id Identifier of the dictionary to get questions from
      * @param int $n Number of questions
      * @param int $dir Translation direction: 0 for direct, 1 for reverse
      * @return array
      */
-    static function pick($n, $dir)
+    static function pick($dict_id, $n, $dir)
     {
         $f = $dir == 0 ? 'answers1' : 'answers2';
         $n = intval($n);
         $goal = Dict::GOAL;
 
-        $rows = self::db()->getRows("select * from words where $f < $goal order by random() limit $n");
+        $rows = self::db()->getRows("
+            select * from words
+            where dict_id = ?
+                and $f < $goal
+            order by random()
+            limit $n", $dict_id);
+
         return array_map(function (Entry $e) use ($dir) {
             return new Question($e, $dir == 1);
         }, self::fromRows($rows));

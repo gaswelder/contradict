@@ -39,14 +39,17 @@ $app->get('/logout', function () {
 });
 
 $app->get('/', function () {
-    return tpl('home');
+    $dicts = Dict::find([]);
+    return tpl('home', compact('dicts'));
 });
 
-$app->get('/add', function () {
-    return tpl('add');
+$app->get('/{\d+}/add', function ($dict_id) {
+    return tpl('add', compact('dict_id'));
 });
 
-$app->post('/add', function () {
+$app->post('/{\d+}/add', function ($dict_id) {
+    $dict = Dict::load($dict_id);
+
     $lines = Arr::make(explode("\n", request::post('words')))
         ->map(function ($line) {
             return trim($line);
@@ -56,22 +59,22 @@ $app->post('/add', function () {
             return preg_split('/\s+-\s+/', $line, 2);
         });
 
-    Dict::load()->append($lines->get());
-
+    $dict->append($lines->get());
     return response::redirect('/');
 });
 
-$app->get('/test', function () {
+$app->get('/{\d+}/test', function ($dict_id) {
     $size = 20;
-    $tuples1 = Entry::pick($size, 0);
-    $tuples2 = Entry::pick($size, 1);
+    $dict = Dict::load($dict_id);
+    $tuples1 = $dict->pick($size, 0);
+    $tuples2 = $dict->pick($size, 1);
     return tpl('test', compact('tuples1', 'tuples2'));
 });
 
-$app->post('/test', function () {
+$app->post('/{\d+}/test', function ($dict_id) {
     $A = request::post('a');
     $dir = request::post('dir');
-    $dict = Dict::load();
+    $dict = Dict::load($dict_id);
 
     $entries = Entry::getMultiple(request::post('q'));
 
