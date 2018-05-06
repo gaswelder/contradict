@@ -35,5 +35,4 @@ body {
 <body>
 <header id="header">
 	<a href="/">Home</a>
-	<a href="/stats">Stats</a>
 </header>
