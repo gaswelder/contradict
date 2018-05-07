@@ -6,6 +6,9 @@
 	text-decoration: line-through;
 }
 </style>
+<section class="test-stats">
+<p>{{ round($stats->right / ($stats->right + $stats->wrong) * 100) }} %</p>
+</section>
 <table>
 <tr>
 	<th>Q</th>
