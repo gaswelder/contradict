@@ -110,7 +110,7 @@ $app->post('/{\d+}/test', function ($dict_id) {
     $stats->wrong = count($fail);
     $stats->save();
 
-    return tpl('results', compact('ok', 'fail'));
+    return tpl('results', compact('ok', 'fail', 'dict_id'));
 });
 
 $app->get('/entries/{\d+}', function ($id) {

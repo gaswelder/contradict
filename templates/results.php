@@ -42,6 +42,6 @@
 </table>
 
 <nav>
-	<a class="btn" href="/test">New test</a>
+	<a class="btn" href="/{{ $dict_id }}/test">New test</a>
 	<a class="btn" href="/">Home</a>
 </nav>
