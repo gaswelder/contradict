@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width">
-<link rel="stylesheet" href="/res/style.css">
+<link rel="stylesheet" href="/res/style.css?wtf-chrome">
 <title>Dict</title>
 </head>
 <body>
