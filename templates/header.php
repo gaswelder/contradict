@@ -19,6 +19,8 @@ body {
 
 </head>
 <body>
+<?php if (havana\user::getRole('user')) : ?>
 <header id="header">
 	<a href="/">Home</a>
 </header>
+<?php endif; ?>
