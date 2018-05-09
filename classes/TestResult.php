@@ -9,6 +9,7 @@ class TestResult extends dbobject
     public $t;
     public $right;
     public $wrong;
+    public $dict_id;
 
     function __construct()
     {

@@ -106,6 +106,7 @@ $app->post('/{\d+}/test', function ($dict_id) {
     })->get();
 
     $stats = new TestResult();
+    $stats->dict_id = $dict_id;
     $stats->right = count($ok);
     $stats->wrong = count($fail);
     $stats->save();
