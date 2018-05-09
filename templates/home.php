@@ -17,9 +17,9 @@ function Stats($dict)
 
 <?php foreach ($dicts as $dict) : ?>
 	<section class="dict-preview">
-		{{ $dict->name }}
+		<b>{{ $dict->name }}</b>
+		<a href="/{{ $dict->id }}/add">Add words</a>
 		<?php Stats($dict); ?>
-		<a href="/{{ $dict->id }}/add">Add</a>
-		<a href="/{{ $dict->id }}/test">Test</a>
+		<a class="btn test-button" href="/{{ $dict->id }}/test">Test</a>
 	</section>
 <?php endforeach; ?>
