@@ -1,14 +1,5 @@
 <?= tpl('header') ?>
 
-<style>
-.dict-entry {
-	display: inline-block;
-	border-radius: 4px;
-	border: 1px solid #ccf;
-	padding: 1em;
-}
-</style>
-
 <?php
 function Stats($dict)
 {
@@ -25,7 +16,7 @@ function Stats($dict)
 ?>
 
 <?php foreach ($dicts as $dict) : ?>
-	<section class="dict-entry">
+	<section class="dict-preview">
 		{{ $dict->name }}
 		<?php Stats($dict); ?>
 		<a href="/{{ $dict->id }}/add">Add</a>

@@ -1,13 +1,6 @@
 <?= tpl('header') ?>
-<style>
-form > section {
-	display: inline-block;
-	vertical-align: top;
-	margin-bottom: 1em;
-	margin-right: 1em;
-}
-</style>
-<form method="post">
+
+<form method="post" class="test-form">
 	<section>
 	<?php foreach ($tuples1 as $question) : ?>
 	<div>

@@ -1,11 +1,5 @@
 <?= tpl('header') ?>
 
-<style>
-.nope td:nth-child(3) {
-	color: red;
-	text-decoration: line-through;
-}
-</style>
 <section class="test-stats">
 <p>{{ round($stats->right / ($stats->right + $stats->wrong) * 100) }} %</p>
 </section>
