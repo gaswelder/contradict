@@ -45,9 +45,22 @@ $app->get('/logout', function () {
     return response::redirect('/');
 });
 
+function format($tplName, $data)
+{
+    $data = json_decode(json_encode($data), true);
+    return tpl($tplName, $data);
+    //return $data;
+}
+
 $app->get('/', function () {
-    $dicts = Dict::find([]);
-    return tpl('home', compact('dicts'));
+    $dicts = array_map(function (Dict $dict) {
+        return [
+            'id' => $dict->id,
+            'name' => $dict->name,
+            'stats' => $dict->stats()
+        ];
+    }, Dict::find([]));
+    return format('home', compact('dicts'));
 });
 
 $app->get('/{\d+}/add', function ($dict_id) {
@@ -71,11 +84,16 @@ $app->post('/{\d+}/add', function ($dict_id) {
 });
 
 $app->get('/{\d+}/test', function ($dict_id) {
+    $ft = function ($tuples) {
+        return array_map(function (Question $tuple) {
+            return $tuple->format();
+        }, $tuples);
+    };
     $size = 20;
     $dict = Dict::load($dict_id);
-    $tuples1 = $dict->pick($size, 0);
-    $tuples2 = $dict->pick($size, 1);
-    return tpl('test', compact('tuples1', 'tuples2'));
+    $tuples1 = $ft($dict->pick($size, 0));
+    $tuples2 = $ft($dict->pick($size, 1));
+    return format('test', compact('tuples1', 'tuples2'));
 });
 
 $app->post('/{\d+}/test', function ($dict_id) {
@@ -92,9 +110,12 @@ $app->post('/{\d+}/test', function ($dict_id) {
         })
         ->zip(request::post('a'))
         ->map(function ($list) {
-            list($question, $answer) = $list;
-            $correct = $question->checkAnswer($answer);
-            if ($correct) $question->save();
+            list($questionObj, $answer) = $list;
+            $correct = $questionObj->checkAnswer($answer);
+            if ($correct) $questionObj->save();
+            $question = $questionObj->format();
+            $question['a'] = $questionObj->a();
+            $question['wikiURL'] = $questionObj->wikiURL();
             return compact('question', 'answer', 'correct');
         });
 
@@ -111,12 +132,12 @@ $app->post('/{\d+}/test', function ($dict_id) {
     $stats->wrong = count($fail);
     $stats->save();
 
-    return tpl('results', compact('ok', 'fail', 'dict_id', 'stats'));
+    return format('results', compact('ok', 'fail', 'dict_id', 'stats'));
 });
 
 $app->get('/entries/{\d+}', function ($id) {
     $entry = Entry::get($id);
-    return tpl('entry', compact('entry'));
+    return format('entry', compact('entry'));
 });
 
 $app->post('/entries/{\d+}', function ($id) {

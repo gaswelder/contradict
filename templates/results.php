@@ -1,7 +1,7 @@
 <?= tpl('header') ?>
 
 <section class="test-stats">
-<p>{{ round($stats->right / ($stats->right + $stats->wrong) * 100) }} %</p>
+<p>{{ round($stats['right'] / ($stats['right'] + $stats['wrong']) * 100) }} %</p>
 </section>
 <table>
 <tr>
@@ -11,10 +11,10 @@
 </tr>
 <?php foreach ($fail as $r) : ?>
 	<tr class="nope">
-		<td>{{ $r['question']->q() }}</td>
+		<td>{{ $r['question']['q'] }}</td>
 		<td>
-			<a href="/entries/{{$r['question']->id()}}">{{ $r['question']->a() }}</a>
-			<?php if ($wiki = $r['question']->wikiURL()) : ?>
+			<a href="/entries/{{$r['question']['id']}}">{{ $r['question']['a'] }}</a>
+			<?php if ($wiki = $r['question']['wikiURL']) : ?>
 				<small>(<a href="{{ $wiki }}">wiki</a>)</small>
 			<?php endif; ?>
 		</td>
@@ -31,8 +31,8 @@
 </tr>
 <?php foreach ($ok as $r) : ?>
 	<tr>
-		<td>{{ $r['question']->q() }}</td>
-		<td>{{ $r['question']->a() }}</td>
+		<td>{{ $r['question']['q'] }}</td>
+		<td>{{ $r['question']['a'] }}</td>
 		<td>ok</td>
 	</tr>
 <?php endforeach; ?>

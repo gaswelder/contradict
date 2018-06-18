@@ -11,12 +11,12 @@ class Question
 		$this->e = $e;
 	}
 
-	function id()
+	private function id()
 	{
 		return $this->e->id;
 	}
 
-	function q()
+	private function q()
 	{
 		return $this->reverse ? $this->e->a : $this->e->q;
 	}
@@ -26,18 +26,28 @@ class Question
 		return $this->reverse ? $this->e->q : $this->e->a;
 	}
 
-	function times()
+	private function times()
 	{
 		return $this->reverse ? $this->e->answers2 : $this->e->answers1;
 	}
 
-	function hint()
+	private function hint()
 	{
 		$sim = $this->similars();
 		if ($sim->len() == 0) return null;
 		$field = $this->reverse ? 'q' : 'a';
 		$hint = self::h($this->e->$field, $sim->pluck($field)->get());
 		return preg_replace('/\*+/', '...', $hint);
+	}
+
+	function format()
+	{
+		return [
+			'id' => $this->id(),
+			'q' => $this->q(),
+			'times' => $this->times(),
+			'hint' => $this->hint()
+		];
 	}
 
 	function checkAnswer($answer)
