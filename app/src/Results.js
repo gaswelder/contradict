@@ -22,7 +22,7 @@ function Results(props) {
           <tr className="nope" key={r.question.id}>
             <td>{r["question"]["q"]}</td>
             <td>
-              <a href="/entries/{{r['question']['id']}}">
+              <a href={`/entries/${r["question"]["id"]}`}>
                 {r["question"]["a"]}
               </a>
               {r["question"]["wikiURL"] && (
