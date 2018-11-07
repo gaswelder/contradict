@@ -22,6 +22,12 @@ $app->middleware(function ($next) {
     return $next();
 });
 
+$app->middleware((function ($next) {
+    $r = $next();
+    $r->setHeader('Access-Control-Allow-Origin', '*');
+    return $r;
+}));
+
 $app->get('/login', function () {
     return tpl('login');
 });
