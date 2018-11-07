@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "dev": "parcel index.html"
+  },
   "dependencies": {
     "babel-eslint": "^10.0.1",
     "eslint": "^5.8.0",
