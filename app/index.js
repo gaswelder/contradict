@@ -15,6 +15,7 @@ class App extends React.Component {
     return (
       <BrowserRouter>
         <div>
+          <a href="/">Home</a>
           <Route exact path="/" component={MenuPage} />
           <Route path="/:id/test" component={TestPage} />
           <Route path="/entries/:id" component={EntryPage} />
