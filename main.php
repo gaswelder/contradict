@@ -54,8 +54,8 @@ $app->get('/logout', function () {
 function format($tplName, $data)
 {
     $data = json_decode(json_encode($data), true);
+    return $data;
     return tpl($tplName, $data);
-    //return $data;
 }
 
 $app->get('/', function () {
