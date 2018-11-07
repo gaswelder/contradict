@@ -19,7 +19,7 @@ function Results(props) {
           <th>A</th>
         </tr>
         {fail.map(r => (
-          <tr className="nope" key={r.question.id}>
+          <tr className="nope" key={r.question.id + "|" + r.question.dir}>
             <td>{r["question"]["q"]}</td>
             <td>
               <a href={`/entries/${r["question"]["id"]}`}>

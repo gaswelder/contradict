@@ -112,16 +112,18 @@ $app->post('/{\d+}/test', function ($dict_id) {
     $results = Arr::make($entries)->zip(request::post('dir'))
         ->map(function ($list) {
             list($entry, $dir) = $list;
-            return new Question($entry, $dir == 1);
+            return [new Question($entry, $dir == 1), $dir];
         })
         ->zip(request::post('a'))
         ->map(function ($list) {
-            list($questionObj, $answer) = $list;
+            [$qd, $answer] = $list;
+            [$questionObj, $dir] = $qd;
             $correct = $questionObj->checkAnswer($answer);
             if ($correct) $questionObj->save();
             $question = $questionObj->format();
             $question['a'] = $questionObj->a();
             $question['wikiURL'] = $questionObj->wikiURL();
+            $question['dir'] = $dir;
             return compact('question', 'answer', 'correct');
         });
 
