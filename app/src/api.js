@@ -19,5 +19,19 @@ export default {
       },
       body: data
     }).then(r => r.json());
+  },
+
+  entry(id) {
+    return getJSON(`http://localhost:8080/entries/${id}?token=${token}`);
+  },
+
+  updateEntry(id, entry) {
+    return fetch(`http://localhost:8080/entries/${id}?token=${token}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: `q=${entry.q}&a=${entry.a}`
+    });
   }
 };
