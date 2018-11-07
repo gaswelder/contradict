@@ -12,5 +12,5 @@
     "es6": true
   },
   "plugins": ["react"],
-  "extends": "plugin:react/recommended"
+  "extends": ["eslint:recommended", "plugin:react/recommended"]
 }

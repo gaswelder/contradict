@@ -20,10 +20,8 @@ class TestPage extends React.Component {
   }
 
   async submit(entries) {
-    const results = await api.submitAnswers(
-      this.props.match.params.id,
-      entries
-    );
+    const id = this.props.match.params.id;
+    const results = await api.submitAnswers(id, entries);
     this.setState({ results });
   }
 
