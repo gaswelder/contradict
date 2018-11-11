@@ -10,7 +10,7 @@ function DictEntry(props) {
   return (
     <section className="dict-preview">
       <b>{dict.name}</b>
-      <a href="/{ dict.id }/add">Add words</a>
+      <a href={`/${dict.id}/add`}>Add words</a>
       <Stats stats={dict.stats} />
       <a className="btn test-button" href={`/${dict.id}/test`}>
         Test

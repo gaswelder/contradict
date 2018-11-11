@@ -33,5 +33,15 @@ export default {
       },
       body: `q=${entry.q}&a=${entry.a}`
     });
+  },
+
+  addEntries(dictID, string) {
+    return fetch(`http://localhost:8080/${dictID}/add?token=${token}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: `words=${encodeURIComponent(string)}`
+    });
   }
 };
