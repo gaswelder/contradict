@@ -218,3 +218,21 @@ hr {
   flex-direction: column;
   margin-bottom: 0.5em;
 }
+
+.fail-card {
+  padding: 1em;
+}
+
+.fail-card h3,
+.fail-card p {
+  margin: 0;
+  padding: 0;
+}
+
+.fail-card .strike {
+  text-decoration: line-through;
+}
+
+.fail-card small {
+  float: right;
+}

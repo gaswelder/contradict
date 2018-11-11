@@ -1,5 +1,23 @@
 import React from "react";
 
+function Fail(props) {
+  const { question, answer } = props;
+  return (
+    <article className="fail-card">
+      <h3>{question.q}</h3>
+      {question.wikiURL && (
+        <small>
+          <a href={question.wikiURL}>wiki</a>
+        </small>
+      )}
+      <p>
+        <a href={`/entries/${question.id}`}>{question.a}</a>{" "}
+        <span className="strike">{answer}</span>
+      </p>
+    </article>
+  );
+}
+
 function Results(props) {
   const { stats, ok, fail, dict_id: dictID } = props.data;
   return (
@@ -12,29 +30,10 @@ function Results(props) {
           %
         </p>
       </section>
-      <table>
-        <tr>
-          <th>Q</th>
-          <th>Expected</th>
-          <th>A</th>
-        </tr>
-        {fail.map(r => (
-          <tr className="nope" key={r.question.id + "|" + r.question.dir}>
-            <td>{r["question"]["q"]}</td>
-            <td>
-              <a href={`/entries/${r["question"]["id"]}`}>
-                {r["question"]["a"]}
-              </a>
-              {r["question"]["wikiURL"] && (
-                <small>
-                  (<a href={r["question"]["wikiURL"]}>wiki</a>)
-                </small>
-              )}
-            </td>
-            <td>{r["answer"]}</td>
-          </tr>
-        ))}
-      </table>
+
+      {fail.map((r, i) => (
+        <Fail question={r.question} answer={r.answer} key={i} />
+      ))}
 
       <table>
         <tr>
