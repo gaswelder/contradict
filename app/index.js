@@ -4,11 +4,11 @@ import { BrowserRouter, Route } from "react-router-dom";
 import "regenerator-runtime/runtime";
 import api from "./src/api";
 import EntryPage from "./src/EntryPage";
-import Menu from "./src/menu";
+import DictsList from "./src/DictsList";
 import TestPage from "./src/TestPage";
 import withData from "./src/with-data";
 
-const MenuPage = withData(() => api.dicts())(Menu);
+const MenuPage = withData(() => api.dicts())(DictsList);
 
 class App extends React.Component {
   render() {
