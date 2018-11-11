@@ -2,18 +2,21 @@ import React from "react";
 
 function DictsList(props) {
   const dicts = props.data.dicts;
-  return dicts.map(function(dict) {
-    return (
-      <section className="dict-preview" key={dict.id}>
-        <b>{dict.name}</b>
-        <a href="/{ dict.id }/add">Add words</a>
-        <Stats stats={dict.stats} />
-        <a className="btn test-button" href={`/${dict.id}/test`}>
-          Test
-        </a>
-      </section>
-    );
-  });
+  return dicts.map(d => <DictEntry key={d.id} dict={d} />);
+}
+
+function DictEntry(props) {
+  const { dict } = props;
+  return (
+    <section className="dict-preview">
+      <b>{dict.name}</b>
+      <a href="/{ dict.id }/add">Add words</a>
+      <Stats stats={dict.stats} />
+      <a className="btn test-button" href={`/${dict.id}/test`}>
+        Test
+      </a>
+    </section>
+  );
 }
 
 function Stats(props) {
