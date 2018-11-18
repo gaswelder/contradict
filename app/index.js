@@ -4,13 +4,10 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import "regenerator-runtime/runtime";
 import AddEntriesPage from "./src/AddEntriesPage";
 import api from "./src/api";
-import DictsList from "./src/DictsList";
 import EntryPage from "./src/EntryPage";
 import TestPage from "./src/TestPage";
-import withData from "./src/with-data";
 import LoginPage from "./src/LoginPage";
-
-const MenuPage = withData(() => api.dicts())(DictsList);
+import MenuPage from "./src/MenuPage";
 
 async function logout() {
   await api.logout();

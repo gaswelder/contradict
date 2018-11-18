@@ -5,15 +5,17 @@ function Fail(props) {
   return (
     <article className="fail-card">
       <h3>{question.q}</h3>
-      {question.wikiURL && (
-        <small>
-          <a href={question.wikiURL}>wiki</a>
-        </small>
-      )}
       <p>
-        <a href={`/entries/${question.id}`}>{question.a}</a>{" "}
+        {question.a}
+        <br />
         <span className="strike">{answer}</span>
       </p>
+      <a href={`/entries/${question.id}`}>Edit</a>{" "}
+      {question.wikiURL && (
+        <a href={question.wikiURL} target="_blank" rel="noopener noreferrer">
+          Open on wiki
+        </a>
+      )}
     </article>
   );
 }
