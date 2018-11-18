@@ -25,12 +25,13 @@ function Test(props) {
 }
 
 function TestSection(props) {
+  const { dir, tuples } = props;
   return (
     <section>
-      {props.tuples.map(question => (
-        <div>
+      {tuples.map(question => (
+        <div key={`${dir}-${question.id}`}>
           <input type="hidden" name="q[]" value={question.id} />
-          <input type="hidden" name="dir[]" value={props.dir} />
+          <input type="hidden" name="dir[]" value={dir} />
           <label>
             {question.q} <small>({question.times})</small>
           </label>
