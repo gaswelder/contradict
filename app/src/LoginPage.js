@@ -12,7 +12,7 @@ class LoginPage extends React.Component {
     const password = e.target.querySelector("input").value;
     try {
       await api.login(password);
-      history.pushState({}, "", "/");
+      location.href = "/";
     } catch (e) {
       alert(e.toString());
     }

@@ -11,7 +11,6 @@ $app = new App(__DIR__);
 $app->middleware(function ($next) {
     if (!user::getRole('user') && request::url()->path != '/login') {
         return 401;
-        // return response::redirect('/login');
     }
     return $next();
 });
@@ -23,15 +22,6 @@ $app->middleware((function ($next) {
     return $r;
 }));
 
-// $app->middleware(function ($next) {
-//     if (request::get('token') == 'bed04814f428bf40ef0e') {
-//         user::addRole('user');
-//     }
-//     return $next();
-// });
-
-
-
 $app->get('/login', function () {
     return tpl('login');
 });
@@ -42,14 +32,13 @@ $app->post('/login', function () {
     if ($pass == '123') {
         user::addRole('user');
         return 'ok';
-        // return response::redirect('/');
     }
     return response::make(tpl('login'))->setStatus(403);
 });
 
 $app->post('/logout', function () {
     user::removeRole('user');
-    return response::redirect('/');
+    return 'ok';
 });
 
 $app->get('/logout', function () {

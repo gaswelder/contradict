@@ -1,15 +1,15 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import AddEntriesPage from "./AddEntriesPage";
-import api from "./api";
 import EntryPage from "./EntryPage";
 import TestPage from "./TestPage";
 import LoginPage from "./LoginPage";
 import MenuPage from "./MenuPage";
+import api from "./api";
 
 async function logout() {
   await api.logout();
-  history.pushState({}, "", "/login");
+  location.href = "/login";
 }
 
 class Main extends React.Component {

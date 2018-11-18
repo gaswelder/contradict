@@ -1,7 +1,7 @@
 import React from "react";
 import Results from "./Results";
 import Test from "./test";
-import api from "./api";
+import withAPI from "./withAPI";
 
 class TestPage extends React.Component {
   constructor(props) {
@@ -15,19 +15,19 @@ class TestPage extends React.Component {
   }
 
   async componentDidMount() {
-    const questions = await api.test(this.props.match.params.id);
+    const questions = await this.props.api.test(this.props.match.params.id);
     this.setState({ questions });
   }
 
   async submit(entries) {
     const id = this.props.match.params.id;
-    const results = await api.submitAnswers(id, entries);
+    const results = await this.props.api.submitAnswers(id, entries);
     this.setState({ results });
   }
 
   async reset() {
     this.setState({ questions: null, results: null });
-    const questions = await api.test(this.props.match.params.id);
+    const questions = await this.props.api.test(this.props.match.params.id);
     this.setState({ questions });
   }
 
@@ -44,4 +44,4 @@ class TestPage extends React.Component {
   }
 }
 
-export default TestPage;
+export default withAPI(TestPage);

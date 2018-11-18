@@ -1,5 +1,5 @@
 import React from "react";
-import api from "./api";
+import withAPI from "./withAPI";
 
 class EntryPage extends React.Component {
   constructor(props) {
@@ -13,7 +13,7 @@ class EntryPage extends React.Component {
 
   async componentDidMount() {
     const id = this.props.match.params.id;
-    const entry = (await api.entry(id)).entry;
+    const entry = (await this.props.api.entry(id)).entry;
     this.setState({ entry });
   }
 
@@ -24,7 +24,7 @@ class EntryPage extends React.Component {
     const a = f.querySelector("[name=a]").value;
     this.setState({ saving: true });
     const id = this.props.match.params.id;
-    await api.updateEntry(id, { q, a });
+    await this.props.api.updateEntry(id, { q, a });
     this.setState({ saving: false });
   }
 
@@ -41,4 +41,4 @@ class EntryPage extends React.Component {
   }
 }
 
-export default EntryPage;
+export default withAPI(EntryPage);

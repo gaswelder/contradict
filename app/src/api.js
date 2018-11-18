@@ -41,11 +41,14 @@ async function post(url, data) {
 
 export default {
   async login(password) {
-    await post("/login", { password }).then(r => r.text());
+    const r = await post("/login", { password }).then(r => r.text());
+    if (r != "ok") {
+      throw new Error("auth failed");
+    }
   },
 
   logout() {
-    return post("/logout", {});
+    return post("/logout", {}).then(r => r.text());
   },
 
   dicts() {

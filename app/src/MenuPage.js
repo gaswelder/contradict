@@ -1,34 +1,23 @@
 import React from "react";
-import api from "./api";
 import DictsList from "./DictsList";
-
+import withAPI from "./withAPI";
 class MenuPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      result: null,
-      error: null
+      result: null
     };
   }
 
   async componentDidMount() {
-    try {
-      const result = await api.dicts();
-      this.setState({ result });
-    } catch (error) {
-      if (error.unauthorized) {
-        history.pushState({}, "", "/login");
-        return;
-      }
-      this.setState({ error });
-    }
+    const result = await this.props.api.dicts();
+    this.setState({ result });
   }
 
   render() {
-    if (this.state.error) return "Error";
     if (this.state.result) return <DictsList data={this.state.result} />;
     return "Loading";
   }
 }
 
-export default MenuPage;
+export default withAPI(MenuPage);

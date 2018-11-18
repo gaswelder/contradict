@@ -1,5 +1,5 @@
 import React from "react";
-import api from "./api";
+import withAPI from "./withAPI";
 
 class AddEntriesPage extends React.Component {
   constructor(props) {
@@ -13,7 +13,7 @@ class AddEntriesPage extends React.Component {
     e.preventDefault();
     const value = e.target.querySelector("textarea").value;
     this.setState({ loading: true });
-    await api.addEntries(dictID, value);
+    await this.props.api.addEntries(dictID, value);
     this.setState({ loading: false });
   }
 
@@ -35,4 +35,4 @@ class AddEntriesPage extends React.Component {
   }
 }
 
-export default AddEntriesPage;
+export default withAPI(AddEntriesPage);
