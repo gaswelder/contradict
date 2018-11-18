@@ -10,23 +10,27 @@ $app = new App(__DIR__);
 
 $app->middleware(function ($next) {
     if (!user::getRole('user') && request::url()->path != '/login') {
-        return response::redirect('/login');
-    }
-    return $next();
-});
-
-$app->middleware(function ($next) {
-    if (request::get('token') == 'bed04814f428bf40ef0e') {
-        user::addRole('user');
+        return 401;
+        // return response::redirect('/login');
     }
     return $next();
 });
 
 $app->middleware((function ($next) {
     $r = $next();
-    $r->setHeader('Access-Control-Allow-Origin', '*');
+    $r->setHeader('Access-Control-Allow-Origin', 'http://localhost:1234');
+    $r->setHeader('Access-Control-Allow-Credentials', 'true');
     return $r;
 }));
+
+// $app->middleware(function ($next) {
+//     if (request::get('token') == 'bed04814f428bf40ef0e') {
+//         user::addRole('user');
+//     }
+//     return $next();
+// });
+
+
 
 $app->get('/login', function () {
     return tpl('login');
@@ -34,11 +38,13 @@ $app->get('/login', function () {
 
 $app->post('/login', function () {
     $pass = request::post('password');
+    error_log($pass);
     if ($pass == '123') {
         user::addRole('user');
-        return response::redirect('/');
+        return 'ok';
+        // return response::redirect('/');
     }
-    return tpl('login');
+    return response::make(tpl('login'))->setStatus(403);
 });
 
 $app->post('/logout', function () {

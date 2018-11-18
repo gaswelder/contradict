@@ -1,7 +1,40 @@
-const getJSON = url => fetch(url).then(r => r.json());
 const token = "bed04814f428bf40ef0e";
 
+function authFetch(url, options = {}) {
+  return fetch(url, { credentials: "include", ...options });
+}
+
+async function getJSON(url) {
+  const r = await authFetch(url);
+  if (r.status == 401) {
+    const e = new Error("unauthorized");
+    e.unauthorized = true;
+    throw e;
+  }
+  return r.json();
+}
+
 export default {
+  async login(password) {
+    const r = await authFetch(`http://localhost:8080/login`, {
+      method: "post",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: "password=" + password
+    });
+    if (r.status != 200) {
+      throw new Error("login failed");
+    }
+    await r.text();
+  },
+
+  logout() {
+    return authFetch("http://localhost:8080/logout", {
+      method: "post"
+    });
+  },
+
   dicts() {
     return getJSON(`http://localhost:8080?token=${token}`);
   },
@@ -12,7 +45,7 @@ export default {
 
   submitAnswers(dictID, entries) {
     const data = entries.map(([k, v]) => `${k}=${v}`).join("&");
-    return fetch(`http://localhost:8080/${dictID}/test?token=${token}`, {
+    return authFetch(`http://localhost:8080/${dictID}/test?token=${token}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -26,7 +59,7 @@ export default {
   },
 
   updateEntry(id, entry) {
-    return fetch(`http://localhost:8080/entries/${id}?token=${token}`, {
+    return authFetch(`http://localhost:8080/entries/${id}?token=${token}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
@@ -36,7 +69,7 @@ export default {
   },
 
   addEntries(dictID, string) {
-    return fetch(`http://localhost:8080/${dictID}/add?token=${token}`, {
+    return authFetch(`http://localhost:8080/${dictID}/add?token=${token}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
