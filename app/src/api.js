@@ -1,80 +1,83 @@
-const token = "bed04814f428bf40ef0e";
+const backend = "http://localhost:8080";
 
-function authFetch(url, options = {}) {
-  return fetch(url, { credentials: "include", ...options });
-}
-
-async function getJSON(url) {
-  const r = await authFetch(url);
+async function authFetch(url, options = {}) {
+  const r = await fetch(backend + url, {
+    credentials: "include",
+    ...options
+  });
   if (r.status == 401) {
     const e = new Error("unauthorized");
     e.unauthorized = true;
     throw e;
   }
+  return r;
+}
+
+async function getJSON(url) {
+  const r = await authFetch(url);
   return r.json();
+}
+
+function postData(val) {
+  if (Array.isArray(val)) {
+    return val.map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join("&");
+  }
+  if (typeof val == "object") {
+    return postData(Object.entries(val));
+  }
+  throw new Error("unknown POST payload type: " + typeof val);
+}
+
+async function post(url, data) {
+  const r = await authFetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: postData(data)
+  });
+  return r;
 }
 
 export default {
   async login(password) {
-    const r = await authFetch(`http://localhost:8080/login`, {
-      method: "post",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: "password=" + password
-    });
-    if (r.status != 200) {
-      throw new Error("login failed");
-    }
-    await r.text();
+    await post("/login", { password }).then(r => r.text());
   },
 
   logout() {
-    return authFetch("http://localhost:8080/logout", {
-      method: "post"
-    });
+    return post("/logout", {});
   },
 
   dicts() {
-    return getJSON(`http://localhost:8080?token=${token}`);
+    return getJSON("/");
   },
 
   test(dictID) {
-    return getJSON(`http://localhost:8080/${dictID}/test?token=${token}`);
+    return getJSON(`/${dictID}/test`);
   },
 
   submitAnswers(dictID, entries) {
-    const data = entries.map(([k, v]) => `${k}=${v}`).join("&");
-    return authFetch(`http://localhost:8080/${dictID}/test?token=${token}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: data
-    }).then(r => r.json());
+    // console.log(entries);
+    // [
+    //   ["q[]", "69"],
+    //   ["dir[]", "0"],
+    //   ["a[]", "hand"],
+    //   ["q[]", "496"],
+    //   ["dir[]", "0"],
+    //   ["a[]", ""]
+    // ];
+    return post(`/${dictID}/test`, entries).then(r => r.json());
   },
 
   entry(id) {
-    return getJSON(`http://localhost:8080/entries/${id}?token=${token}`);
+    return getJSON(`/entries/${id}`);
   },
 
   updateEntry(id, entry) {
-    return authFetch(`http://localhost:8080/entries/${id}?token=${token}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: `q=${entry.q}&a=${entry.a}`
-    });
+    return post(`/entries/${id}`, { q: entry.q, a: entry.a });
   },
 
   addEntries(dictID, string) {
-    return authFetch(`http://localhost:8080/${dictID}/add?token=${token}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: `words=${encodeURIComponent(string)}`
-    });
+    return post(`/${dictID}/add`, { words: string });
   }
 };
