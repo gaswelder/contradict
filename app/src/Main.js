@@ -12,22 +12,38 @@ async function logout() {
   location.href = "/login";
 }
 
+function Header() {
+  return (
+    <header>
+      <a href="/">Home</a>
+      <button onClick={logout}>Logout</button>
+    </header>
+  );
+}
+
+function page(Component, header = true) {
+  return function page(props) {
+    return (
+      <main className="page">
+        {header && <Header />}
+        <Component {...props} />
+      </main>
+    );
+  };
+}
+
 class Main extends React.Component {
   render() {
     return (
       <BrowserRouter>
-        <div>
-          <a href="/">Home</a>
-          <button onClick={logout}>Logout</button>
-          <Switch>
-            <Route exact path="/" component={MenuPage} />
-            <Route path="/:id/test" component={TestPage} />
-            <Route path="/:id/add" component={AddEntriesPage} />
-            <Route path="/entries/:id" component={EntryPage} />
-            <Route path="/login" component={LoginPage} />
-            <Route component={() => "Not Found"} />
-          </Switch>
-        </div>
+        <Switch>
+          <Route exact path="/" component={page(MenuPage)} />
+          <Route path="/:id/test" component={page(TestPage)} />
+          <Route path="/:id/add" component={page(AddEntriesPage)} />
+          <Route path="/entries/:id" component={page(EntryPage)} />
+          <Route path="/login" component={page(LoginPage, false)} />
+          <Route component={page(() => "Not Found")} />
+        </Switch>
       </BrowserRouter>
     );
   }
