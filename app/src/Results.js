@@ -13,9 +13,9 @@ function Fail(props) {
       </p>
       <Link to={`/entries/${question.id}`}>Edit</Link>{" "}
       {question.wikiURL && (
-        <Link to={question.wikiURL} target="_blank" rel="noopener noreferrer">
+        <a href={question.wikiURL} target="_blank" rel="noopener noreferrer">
           Open on wiki
-        </Link>
+        </a>
       )}
     </article>
   );
