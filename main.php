@@ -9,7 +9,7 @@ use havana\response;
 $app = new App(__DIR__);
 
 $app->middleware(function ($next) {
-    if (!user::getRole('user') && request::url()->path != '/login') {
+    if (!user::getRole('user') && request::url()->isUnder('/api') && request::url()->path != '/api/login') {
         return 401;
     }
     return $next();
@@ -22,11 +22,15 @@ $app->middleware((function ($next) {
     return $r;
 }));
 
-$app->get('/login', function () {
+$app->get('/', function () {
+    return file_get_contents(__DIR__ . '/public/index.html');
+});
+
+$app->get('/api/login', function () {
     return tpl('login');
 });
 
-$app->post('/login', function () {
+$app->post('/api/login', function () {
     $pass = request::post('password');
     error_log($pass);
     if ($pass == '123') {
@@ -36,15 +40,15 @@ $app->post('/login', function () {
     return response::make(tpl('login'))->setStatus(403);
 });
 
-$app->post('/logout', function () {
+$app->post('/api/logout', function () {
     user::removeRole('user');
     return 'ok';
 });
 
-$app->get('/logout', function () {
-    user::removeRole('user');
-    return response::redirect('/');
-});
+// $app->get('/api/logout', function () {
+//     user::removeRole('user');
+//     return response::redirect('/api/');
+// });
 
 function format($tplName, $data)
 {
@@ -53,7 +57,7 @@ function format($tplName, $data)
     return tpl($tplName, $data);
 }
 
-$app->get('/', function () {
+$app->get('/api/', function () {
     $dicts = array_map(function (Dict $dict) {
         return [
             'id' => $dict->id,
@@ -64,11 +68,11 @@ $app->get('/', function () {
     return format('home', compact('dicts'));
 });
 
-$app->get('/{\d+}/add', function ($dict_id) {
+$app->get('/api/{\d+}/add', function ($dict_id) {
     return tpl('add', compact('dict_id'));
 });
 
-$app->post('/{\d+}/add', function ($dict_id) {
+$app->post('/api/{\d+}/add', function ($dict_id) {
     $dict = Dict::load($dict_id);
 
     $lines = Arr::make(explode("\n", request::post('words')))
@@ -81,10 +85,11 @@ $app->post('/{\d+}/add', function ($dict_id) {
         });
 
     $dict->append($lines->get());
-    return response::redirect('/');
+    return 'ok';
+    // return response::redirect('/');
 });
 
-$app->get('/{\d+}/test', function ($dict_id) {
+$app->get('/api/{\d+}/test', function ($dict_id) {
     $ft = function ($tuples) {
         return array_map(function (Question $tuple) {
             return $tuple->format();
@@ -97,7 +102,7 @@ $app->get('/{\d+}/test', function ($dict_id) {
     return format('test', compact('tuples1', 'tuples2'));
 });
 
-$app->post('/{\d+}/test', function ($dict_id) {
+$app->post('/api/{\d+}/test', function ($dict_id) {
     $A = request::post('a');
     $dir = request::post('dir');
     $dict = Dict::load($dict_id);
@@ -111,8 +116,8 @@ $app->post('/{\d+}/test', function ($dict_id) {
         })
         ->zip(request::post('a'))
         ->map(function ($list) {
-            [$qd, $answer] = $list;
-            [$questionObj, $dir] = $qd;
+            list($qd, $answer) = $list;
+            list($questionObj, $dir) = $qd;
             $correct = $questionObj->checkAnswer($answer);
             if ($correct) $questionObj->save();
             $question = $questionObj->format();
@@ -138,20 +143,21 @@ $app->post('/{\d+}/test', function ($dict_id) {
     return format('results', compact('ok', 'fail', 'dict_id', 'stats'));
 });
 
-$app->get('/entries/{\d+}', function ($id) {
+$app->get('/api/entries/{\d+}', function ($id) {
     $entry = Entry::get($id);
     return format('entry', compact('entry'));
 });
 
-$app->post('/entries/{\d+}', function ($id) {
+$app->post('/api/entries/{\d+}', function ($id) {
     $entry = Entry::get($id);
     $entry->q = request::post('q');
     $entry->a = request::post('a');
     $entry->save();
-    return response::redirect('/entries/' . $id);
+    return 'ok';
+    // return response::redirect('/api/entries/' . $id);
 });
 
-$app->get('/stats', function () {
+$app->get('/api/stats', function () {
     $results = TestResult::find([], 't desc');
     return tpl('stats', compact('results'));
 });

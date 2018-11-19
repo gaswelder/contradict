@@ -1,5 +1,6 @@
 import React from "react";
 import api from "./api";
+import { withRouter } from "react-router";
 
 class LoginPage extends React.Component {
   constructor(props) {
@@ -12,7 +13,7 @@ class LoginPage extends React.Component {
     const password = e.target.querySelector("input").value;
     try {
       await api.login(password);
-      location.href = "/";
+      this.props.history.push("/");
     } catch (e) {
       alert(e.toString());
     }
@@ -30,4 +31,4 @@ class LoginPage extends React.Component {
   }
 }
 
-export default LoginPage;
+export default withRouter(LoginPage);

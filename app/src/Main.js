@@ -6,13 +6,13 @@ import TestPage from "./TestPage";
 import LoginPage from "./LoginPage";
 import MenuPage from "./MenuPage";
 import api from "./api";
+import { withRouter } from "react-router";
 
-async function logout() {
-  await api.logout();
-  location.href = "/login";
-}
-
-function Header() {
+const Header = withRouter(function Header(props) {
+  async function logout() {
+    await api.logout();
+    props.history.push("/login");
+  }
   return (
     <header>
       <Link to="/">Dict</Link>
@@ -21,7 +21,7 @@ function Header() {
       </button>
     </header>
   );
-}
+});
 
 function page(Component, header = true) {
   return function page(props) {
