@@ -2,9 +2,42 @@ body {
   /* font-family: Arial, sans-serif; */
   font-size: 16px;
   padding: 0;
-  margin: 1em;
+  margin: 1em 1em 4em;
   line-height: 20px;
+  background-color: #f9f9fd;
 }
+
+header {
+  background-color: #204c72;
+  color: white;
+  padding: 1em;
+  margin: -1em -1em 1em -1em;
+  display: flex;
+  align-items: center;
+}
+
+header a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  margin-right: 1em;
+}
+
+header .logout {
+  margin-left: auto;
+}
+
+/* #app {
+  border: thin solid gold;
+  height: 100%;
+}
+
+main.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+} */
 
 h3 {
   font-size: 16px;
@@ -162,21 +195,6 @@ hr {
 
 .error {
   color: #e42;
-}
-
-#header {
-  /* background-color: #eef; */
-  background-color: #79d818;
-  padding: 1em;
-  margin: -1em -1em 1em -1em;
-  color: white;
-}
-
-#header a {
-  text-decoration: none;
-  color: white;
-  font-weight: bold;
-  margin-right: 1em;
 }
 
 #login-form {

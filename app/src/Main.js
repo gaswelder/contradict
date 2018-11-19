@@ -15,8 +15,10 @@ async function logout() {
 function Header() {
   return (
     <header>
-      <a href="/">Home</a>
-      <button onClick={logout}>Logout</button>
+      <a href="/">Dict</a>
+      <button className="logout" onClick={logout}>
+        Logout
+      </button>
     </header>
   );
 }
