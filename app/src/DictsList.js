@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function DictsList(props) {
   const dicts = props.data.dicts;
@@ -11,8 +12,8 @@ function DictEntry(props) {
     <section className="dict-preview">
       <h3>{dict.name}</h3>
       <Stats stats={dict.stats} />
-      <a href={`/${dict.id}/test`}>Do a test</a>{" "}
-      <a href={`/${dict.id}/add`}>Add words</a>
+      <Link to={`/${dict.id}/test`}>Do a test</Link>{" "}
+      <Link to={`/${dict.id}/add`}>Add words</Link>
     </section>
   );
 }

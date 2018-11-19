@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Switch, Link } from "react-router-dom";
 import AddEntriesPage from "./AddEntriesPage";
 import EntryPage from "./EntryPage";
 import TestPage from "./TestPage";
@@ -15,7 +15,7 @@ async function logout() {
 function Header() {
   return (
     <header>
-      <a href="/">Dict</a>
+      <Link to="/">Dict</Link>
       <button className="logout" onClick={logout}>
         Logout
       </button>

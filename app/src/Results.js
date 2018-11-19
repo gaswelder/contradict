@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Fail(props) {
   const { question, answer } = props;
@@ -10,11 +11,11 @@ function Fail(props) {
         <br />
         <span className="strike">{answer}</span>
       </p>
-      <a href={`/entries/${question.id}`}>Edit</a>{" "}
+      <Link to={`/entries/${question.id}`}>Edit</Link>{" "}
       {question.wikiURL && (
-        <a href={question.wikiURL} target="_blank" rel="noopener noreferrer">
+        <Link to={question.wikiURL} target="_blank" rel="noopener noreferrer">
           Open on wiki
-        </a>
+        </Link>
       )}
     </article>
   );
