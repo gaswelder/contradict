@@ -2,7 +2,7 @@ import React from "react";
 
 function Test(props) {
   const { tuples1, tuples2 } = props.data;
-  const { onSubmit } = props;
+  const { onSubmit, busy } = props;
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -18,7 +18,9 @@ function Test(props) {
       <TestSection tuples={tuples1} dir="0" />
       <TestSection tuples={tuples2} dir="1" />
       <div>
-        <button type="submit">Submit</button>
+        <button type="submit" disabled={busy}>
+          Submit
+        </button>
       </div>
     </form>
   );

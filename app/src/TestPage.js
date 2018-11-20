@@ -38,7 +38,9 @@ class TestPage extends React.Component {
       return <Results data={results} onReset={this.reset} />;
     }
     if (questions) {
-      return <Test data={questions} onSubmit={this.submit} />;
+      return (
+        <Test data={questions} onSubmit={this.submit} busy={this.props.busy} />
+      );
     }
     return "Loading...";
   }
