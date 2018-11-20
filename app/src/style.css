@@ -4,7 +4,6 @@ body {
   padding: 0;
   margin: 1em 1em 4em;
   line-height: 20px;
-  background-color: #f9f9fd;
 }
 
 header {
@@ -68,6 +67,7 @@ select {
   color: #555;
   border: 1px solid #e0e0e0;
   border-radius: 3px;
+  background-color: #f9f9fd;
 }
 
 input:focus,
