@@ -22,10 +22,6 @@ $app->middleware((function ($next) {
     return $r;
 }));
 
-$app->get('/', function () {
-    return file_get_contents(__DIR__ . '/public/index.html');
-});
-
 $app->get('/api/login', function () {
     return tpl('login');
 });
@@ -164,6 +160,10 @@ $app->get('/api/stats', function () {
 
 $app->get('/backup', function () {
     return response::staticFile(__DIR__ . '/dict.sqlite')->downloadAs('dict.sqlite');
+});
+
+$app->get('*', function () {
+    return file_get_contents(__DIR__ . '/public/index.html');
 });
 
 $app->run();
