@@ -23,6 +23,7 @@ class Dict extends dbobject
 
     function append($tuples)
     {
+        $n = 0;
         foreach ($tuples as $t) {
             $entry = new Entry;
             $entry->dict_id = $this->id;
@@ -32,8 +33,9 @@ class Dict extends dbobject
                 continue;
             }
             $entry->save();
+            $n++;
         }
-        return $this;
+        return $n;
     }
 
     private function has(Entry $e)

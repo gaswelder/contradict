@@ -80,9 +80,10 @@ $app->post('/api/{\d+}/add', function ($dict_id) {
             return preg_split('/\s+-\s+/', $line, 2);
         });
 
-    $dict->append($lines->get());
-    return 'ok';
-    // return response::redirect('/');
+    $n = $dict->append($lines->get());
+    return [
+        'n' => $n
+    ];
 });
 
 $app->get('/api/{\d+}/test', function ($dict_id) {

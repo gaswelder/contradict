@@ -82,6 +82,6 @@ export default {
 
   addEntries(dictID, entries) {
     const string = entries.map(e => `${e.q} - ${e.a}`).join("\n");
-    return post(`/${dictID}/add`, { words: string }).then(r => r.text());
+    return post(`/${dictID}/add`, { words: string }).then(r => r.json());
   }
 };
