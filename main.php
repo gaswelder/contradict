@@ -22,9 +22,9 @@ $app->middleware((function ($next) {
     return $r;
 }));
 
-$app->get('/api/login', function () {
-    return tpl('login');
-});
+// $app->get('/api/login', function () {
+//     return tpl('login');
+// });
 
 $app->post('/api/login', function () {
     $pass = request::post('password');
@@ -50,7 +50,7 @@ function format($tplName, $data)
 {
     $data = json_decode(json_encode($data), true);
     return $data;
-    return tpl($tplName, $data);
+    // return tpl($tplName, $data);
 }
 
 $app->get('/api/', function () {
@@ -64,9 +64,9 @@ $app->get('/api/', function () {
     return format('home', compact('dicts'));
 });
 
-$app->get('/api/{\d+}/add', function ($dict_id) {
-    return tpl('add', compact('dict_id'));
-});
+// $app->get('/api/{\d+}/add', function ($dict_id) {
+//     return tpl('add', compact('dict_id'));
+// });
 
 $app->post('/api/{\d+}/add', function ($dict_id) {
     $dict = Dict::load($dict_id);
