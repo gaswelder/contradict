@@ -80,7 +80,8 @@ export default {
     return post(`/entries/${id}`, { q: entry.q, a: entry.a });
   },
 
-  addEntries(dictID, string) {
-    return post(`/${dictID}/add`, { words: string });
+  addEntries(dictID, entries) {
+    const string = entries.map(e => `${e.q} - ${e.a}`).join("\n");
+    return post(`/${dictID}/add`, { words: string }).then(r => r.text());
   }
 };
