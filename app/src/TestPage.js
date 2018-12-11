@@ -19,6 +19,12 @@ class TestPage extends React.Component {
     this.setState({ questions });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (!prevState.results && this.state.results) {
+      document.body.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
   async submit(entries) {
     const id = this.props.match.params.id;
     const results = await this.props.api.submitAnswers(id, entries);
