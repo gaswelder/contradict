@@ -1,5 +1,5 @@
 import React from "react";
-import withAPI from "./withAPI";
+import withAPI from "./components/withAPI";
 
 class EntryPage extends React.Component {
   constructor(props) {
