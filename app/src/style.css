@@ -207,17 +207,19 @@ hr {
 }
 
 .dict-preview {
-  /* display: flex;
-  flex-direction: column;
-  border-radius: 4px;
-  border: 1px solid #b6d09b; */
+  display: inline-block;
   padding: 1em;
   margin-bottom: 0.5em;
 }
 
-/* .dict-preview .test-button {
-  align-self: flex-end;
-} */
+.dict-preview dl {
+  display: grid;
+  grid-template-columns: max-content max-content;
+}
+
+.dict-preview dd {
+  text-align: right;
+}
 
 .nope td:nth-child(3) {
   color: red;
