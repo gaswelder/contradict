@@ -1,6 +1,7 @@
 import React from "react";
-import DictsList from "./DictsList";
-import withAPI from "./withAPI";
+import withAPI from "./components/withAPI";
+import Dictionary from "./components/Dictionary";
+
 class MenuPage extends React.Component {
   constructor(props) {
     super(props);
@@ -15,8 +16,11 @@ class MenuPage extends React.Component {
   }
 
   render() {
-    if (this.state.result) return <DictsList data={this.state.result} />;
-    return "Loading";
+    if (!this.state.result) {
+      return "Loading";
+    }
+    const dicts = this.state.result.dicts;
+    return dicts.map(d => <Dictionary key={d.id} dict={d} />);
   }
 }
 

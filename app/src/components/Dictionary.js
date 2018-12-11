@@ -1,12 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function DictsList(props) {
-  const dicts = props.data.dicts;
-  return dicts.map(d => <DictEntry key={d.id} dict={d} />);
-}
-
-function DictEntry(props) {
+function Dictionary(props) {
   const { dict } = props;
   return (
     <section className="dict-preview">
@@ -40,4 +35,4 @@ function Stats(props) {
   );
 }
 
-export default DictsList;
+export default Dictionary;

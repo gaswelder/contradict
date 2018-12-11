@@ -1,5 +1,5 @@
 import React from "react";
-import api from "./api";
+import api from "../api";
 import { withRouter } from "react-router";
 
 function withAPI(Component) {

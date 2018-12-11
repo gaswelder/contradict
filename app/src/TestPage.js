@@ -1,7 +1,7 @@
 import React from "react";
-import Results from "./Results";
-import Test from "./test";
-import withAPI from "./withAPI";
+import Results from "./components/Results";
+import Test from "./components/Test";
+import withAPI from "./components/withAPI";
 
 class TestPage extends React.Component {
   constructor(props) {
