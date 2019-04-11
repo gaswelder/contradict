@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import CorrectTable from "./CorrectTable";
 
 function Fail(props) {
   const { question, answer } = props;
@@ -42,20 +43,7 @@ function Results(props) {
         <Fail question={r.question} answer={r.answer} key={i} />
       ))}
 
-      <table>
-        <tr>
-          <th>Q</th>
-          <th>A</th>
-          <th />
-        </tr>
-        {ok.map(r => (
-          <tr key={r.question.id}>
-            <td>{r["question"]["q"]}</td>
-            <td>{r["question"]["a"]}</td>
-            <td>ok</td>
-          </tr>
-        ))}
-      </table>
+      <CorrectTable results={ok} />
 
       <nav>
         <a className="btn" href={`/${dictID}/test`}>
