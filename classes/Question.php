@@ -45,8 +45,11 @@ class Question
 		return [
 			'id' => $this->id(),
 			'q' => $this->q(),
+			'a' => $this->a(),
 			'times' => $this->times(),
-			'hint' => $this->hint()
+			'hint' => $this->hint(),
+			'wikiURL' => $this->wikiURL(),
+			'dir' => $this->reverse ? 1 : 0
 		];
 	}
 

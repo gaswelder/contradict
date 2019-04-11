@@ -99,37 +99,54 @@ $app->get('/api/{\d+}/test', function ($dict_id) {
     return format('test', compact('tuples1', 'tuples2'));
 });
 
-$app->post('/api/{\d+}/test', function ($dict_id) {
-    $A = request::post('a');
-    $dir = request::post('dir');
-    $dict = Dict::load($dict_id);
+function verifyTest($questions, $answers)
+{
+    $results = [];
 
+    foreach ($questions as $i => $question) {
+        $answer = $answers[$i];
+        $correct = $question->checkAnswer($answer);
+        if ($correct) {
+            $question->save();
+        }
+
+        $result = [
+            'question' => $question->format(),
+            'answer' => $answer,
+            'correct' => $correct
+        ];
+        $results[] = $result;
+    }
+    return $results;
+}
+
+function parseQuestions()
+{
     $entries = Entry::getMultiple(request::post('q'));
+    $directions = request::post('dir');
+    $questions = [];
+    foreach ($entries as $i => $entry) {
+        $dir = $directions[$i];
+        $questions[] = new Question($entry, $dir == 1);
+    }
+    return $questions;
+}
 
-    $results = Arr::make($entries)->zip(request::post('dir'))
-        ->map(function ($list) {
-            list($entry, $dir) = $list;
-            return [new Question($entry, $dir == 1), $dir];
-        })
-        ->zip(request::post('a'))
-        ->map(function ($list) {
-            list($qd, $answer) = $list;
-            list($questionObj, $dir) = $qd;
-            $correct = $questionObj->checkAnswer($answer);
-            if ($correct) $questionObj->save();
-            $question = $questionObj->format();
-            $question['a'] = $questionObj->a();
-            $question['wikiURL'] = $questionObj->wikiURL();
-            $question['dir'] = $dir;
-            return compact('question', 'answer', 'correct');
-        });
+$app->post('/api/{\d+}/test', function ($dict_id) {
+    $answers = request::post('a');
+    $questions = parseQuestions();
 
-    $ok = $results->filter(function ($item) {
-        return $item['correct'];
-    })->get();
-    $fail = $results->filter(function ($item) {
-        return !$item['correct'];
-    })->get();
+    $results = verifyTest($questions, $answers);
+
+    $ok = [];
+    $fail = [];
+    foreach ($results as $result) {
+        if ($result['correct']) {
+            $ok[] = $result;
+        } else {
+            $fail[] = $result;
+        }
+    }
 
     $stats = new TestResult();
     $stats->dict_id = $dict_id;
