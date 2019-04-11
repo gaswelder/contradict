@@ -39,16 +39,29 @@ class Entry extends dbobject
      */
     static function pick($dict_id, $n, $dir)
     {
-        $f = $dir == 0 ? 'answers1' : 'answers2';
+        $correctAnswers = $dir == 0 ? 'answers1' : 'answers2';
         $n = intval($n);
         $goal = Dict::GOAL;
+        $windowSize = Dict::WINDOW;
 
         $rows = self::db()->getRows("
-            select * from words
-            where dict_id = ?
-                and $f < $goal
+            select * from 
+                (select * from words
+                    where dict_id = ?
+                    and $correctAnswers < $goal
+                    order by touched desc, id
+                    limit $windowSize) a
             order by random()
             limit $n", $dict_id);
+
+        $entries = self::fromRows($rows);
+
+        $ids = array_map(function (Entry $e) {
+            return $e->id;
+        }, $entries);
+
+        $set = '(' . implode(', ', $ids) . ')';
+        self::db()->exec("update words set touched = 1 where id in $set");
 
         return array_map(function (Entry $e) use ($dir) {
             return new Question($e, $dir == 1);

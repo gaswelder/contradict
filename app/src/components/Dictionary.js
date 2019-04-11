@@ -29,8 +29,8 @@ function Stats(props) {
       <dt>Finished</dt>
       <dd>{stats.finished}</dd>
 
-      <dt>Started</dt>
-      <dd>{stats.started}</dd>
+      <dt>Touched</dt>
+      <dd>{stats.touched}</dd>
     </dl>
   );
 }

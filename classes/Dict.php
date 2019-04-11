@@ -4,9 +4,19 @@ use havana\dbobject;
 
 class Dict extends dbobject
 {
+    /**
+     * How many correct answers needed for an entry to be "finished".
+     */
     const GOAL = 10;
-    const TABLE_NAME = 'dicts';
 
+    /**
+     * How many entries are in the "learning pool".
+     * This limit is applied separately to both directions,
+     * so the actual pool limit is twice this value.
+     */
+    const WINDOW = 200;
+
+    const TABLE_NAME = 'dicts';
     public $name;
 
     static function load($id)
@@ -53,34 +63,38 @@ class Dict extends dbobject
     function stats()
     {
         $goal = self::GOAL;
+
         $r = self::db()->getRow(
             'select count(*) as n, sum(answers1+answers2) as ok
             from words
             where dict_id = ?',
             $this->id
         );
-        $n = $r['n'];
-        $ok = $r['ok'];
+        $totalEntries = $r['n'];
+        $correctAnswers = $r['ok'];
 
+        // Number of entries that have enough correct answers in both directions.
         $finished = self::db()->getValue(
             "select sum(a1 + a2)
             from (select answers1 >= $goal as a1, answers2 >= $goal as a2
                 from words where dict_id = ?) a",
             $this->id
         );
-        $started = self::db()->getValue(
-            "select count(*)
-            from words
-            where dict_id = ?
-                and answers1 + answers2 between 1 and 2 * $goal - 1",
+
+        // Number of entries that are "in progress".
+        $touched = self::db()->getValue(
+            "select count(*) from words
+                where dict_id = ?
+                and touched = 1
+                and (answers1 < $goal or answers2 < $goal)",
             $this->id
         );
 
         return [
-            'pairs' => $n,
-            'progress' => $ok / $goal / $n / 2,
+            'pairs' => $totalEntries,
+            'progress' => $correctAnswers / $goal / $totalEntries / 2,
             'finished' => $finished / 2,
-            'started' => $started,
+            'touched' => $touched,
             'successRate' => $this->successRate()
         ];
     }
