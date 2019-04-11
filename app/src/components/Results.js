@@ -22,7 +22,11 @@ function Fail(props) {
 }
 
 function Results(props) {
-  const { stats, ok, fail, dict_id: dictID } = props.data;
+  const { stats, results, dict_id: dictID } = props.data;
+
+  const ok = results.filter(e => e.correct);
+  const fail = results.filter(e => !e.correct);
+
   return (
     <React.Fragment>
       <section className="test-stats">

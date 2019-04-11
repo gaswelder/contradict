@@ -154,7 +154,7 @@ $app->post('/api/{\d+}/test', function ($dict_id) {
     $stats->wrong = count($fail);
     $stats->save();
 
-    return format('results', compact('ok', 'fail', 'dict_id', 'stats'));
+    return format('results', compact('results', 'dict_id', 'stats'));
 });
 
 $app->get('/api/entries/{\d+}', function ($id) {
