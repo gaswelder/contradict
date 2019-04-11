@@ -22,13 +22,8 @@ $app->middleware((function ($next) {
     return $r;
 }));
 
-// $app->get('/api/login', function () {
-//     return tpl('login');
-// });
-
 $app->post('/api/login', function () {
     $pass = request::post('password');
-    error_log($pass);
     if ($pass == '123') {
         user::addRole('user');
         return 'ok';
@@ -41,16 +36,9 @@ $app->post('/api/logout', function () {
     return 'ok';
 });
 
-// $app->get('/api/logout', function () {
-//     user::removeRole('user');
-//     return response::redirect('/api/');
-// });
-
-function format($tplName, $data)
+function format($data)
 {
-    $data = json_decode(json_encode($data), true);
-    return $data;
-    // return tpl($tplName, $data);
+    return json_decode(json_encode($data), true);
 }
 
 $app->get('/api/', function () {
@@ -61,12 +49,8 @@ $app->get('/api/', function () {
             'stats' => $dict->stats()
         ];
     }, Dict::find([]));
-    return format('home', compact('dicts'));
+    return format(compact('dicts'));
 });
-
-// $app->get('/api/{\d+}/add', function ($dict_id) {
-//     return tpl('add', compact('dict_id'));
-// });
 
 $app->post('/api/{\d+}/add', function ($dict_id) {
     $dict = Dict::load($dict_id);
@@ -96,7 +80,7 @@ $app->get('/api/{\d+}/test', function ($dict_id) {
     $dict = Dict::load($dict_id);
     $tuples1 = $ft($dict->pick($size, 0));
     $tuples2 = $ft($dict->pick($size, 1));
-    return format('test', compact('tuples1', 'tuples2'));
+    return format(compact('tuples1', 'tuples2'));
 });
 
 function verifyTest($questions, $answers)
@@ -154,12 +138,12 @@ $app->post('/api/{\d+}/test', function ($dict_id) {
     $stats->wrong = count($fail);
     $stats->save();
 
-    return format('results', compact('results', 'dict_id', 'stats'));
+    return format(compact('results', 'dict_id', 'stats'));
 });
 
 $app->get('/api/entries/{\d+}', function ($id) {
     $entry = Entry::get($id);
-    return format('entry', compact('entry'));
+    return format(compact('entry'));
 });
 
 $app->post('/api/entries/{\d+}', function ($id) {
@@ -168,7 +152,6 @@ $app->post('/api/entries/{\d+}', function ($id) {
     $entry->a = request::post('a');
     $entry->save();
     return 'ok';
-    // return response::redirect('/api/entries/' . $id);
 });
 
 $app->get('/api/stats', function () {
