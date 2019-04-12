@@ -91,10 +91,10 @@ class Dict extends dbobject
         );
 
         return [
-            'pairs' => $totalEntries,
+            'pairs' => floatval($totalEntries),
             'progress' => $correctAnswers / $goal / $totalEntries / 2,
             'finished' => $finished / 2,
-            'touched' => $touched,
+            'touched' => floatval($touched),
             'successRate' => $this->successRate()
         ];
     }

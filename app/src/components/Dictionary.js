@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import ColumnMeter from "./ColumnMeter";
 
 function Dictionary(props) {
   const { dict } = props;
@@ -15,23 +16,32 @@ function Dictionary(props) {
 
 function Stats(props) {
   const { stats } = props;
+  const { pairs, touched, finished } = stats;
+
   return (
-    <dl>
-      <dt>Number of entries</dt>
-      <dd>{stats.pairs}</dd>
+    <div>
+      <dl>
+        <dt>Number of entries</dt>
+        <dd>{pairs}</dd>
 
-      <dt>Progress</dt>
-      <dd>{(stats.progress * 100).toFixed(1)} %</dd>
+        <dt>Progress</dt>
+        <dd>{(stats.progress * 100).toFixed(1)} %</dd>
 
-      <dt>Success rate</dt>
-      <dd>{(stats.successRate * 100).toFixed(1)} %</dd>
+        <dt>Success rate</dt>
+        <dd>{(stats.successRate * 100).toFixed(1)} %</dd>
 
-      <dt>Finished</dt>
-      <dd>{stats.finished}</dd>
+        <dt>Finished</dt>
+        <dd>{finished}</dd>
 
-      <dt>Touched</dt>
-      <dd>{stats.touched}</dd>
-    </dl>
+        <dt>Touched</dt>
+        <dd>{touched}</dd>
+      </dl>
+      <ColumnMeter
+        inQueue={pairs - touched}
+        inProgress={touched}
+        finished={finished}
+      />
+    </div>
   );
 }
 
