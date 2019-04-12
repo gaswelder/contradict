@@ -64,14 +64,7 @@ class Dict extends dbobject
     {
         $goal = self::GOAL;
 
-        $r = self::db()->getRow(
-            'select count(*) as n, sum(answers1+answers2) as ok
-            from words
-            where dict_id = ?',
-            $this->id
-        );
-        $totalEntries = $r['n'];
-        $correctAnswers = $r['ok'];
+        $totalEntries = self::db()->getValue('select count(*) from words where dict_id = ?', $this->id);
 
         // Number of entries that have enough correct answers in both directions.
         $finished = self::db()->getValue(
@@ -92,7 +85,6 @@ class Dict extends dbobject
 
         return [
             'pairs' => floatval($totalEntries),
-            'progress' => $correctAnswers / $goal / $totalEntries / 2,
             'finished' => $finished / 2,
             'touched' => floatval($touched),
             'successRate' => $this->successRate()

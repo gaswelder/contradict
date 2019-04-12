@@ -24,17 +24,14 @@ function Stats(props) {
         <dt>Number of entries</dt>
         <dd>{pairs}</dd>
 
-        <dt>Progress</dt>
-        <dd>{(stats.progress * 100).toFixed(1)} %</dd>
-
-        <dt>Success rate</dt>
-        <dd>{(stats.successRate * 100).toFixed(1)} %</dd>
-
         <dt>Finished</dt>
         <dd>{finished}</dd>
 
         <dt>Touched</dt>
         <dd>{touched}</dd>
+
+        <dt>Success rate</dt>
+        <dd>{(stats.successRate * 100).toFixed(1)} %</dd>
       </dl>
       <ColumnMeter
         inQueue={pairs - touched}
