@@ -11,15 +11,12 @@ use havana\response;
  */
 function parseLines(string $str): array
 {
-    $lines = Arr::make(explode("\n", $str))
-        ->map(function ($line) {
-            return trim($line);
-        })
-        ->filter()
-        ->map(function ($line) {
-            return preg_split('/\s+-\s+/', $line, 2);
-        });
-    return $lines->get();
+    $lines = array_map('trim', explode("\n", $str));
+    $lines = array_filter($lines, 'strlen');
+    $lines = array_map(function ($line) {
+        return preg_split('/\s+-\s+/', $line, 2);
+    }, $lines);
+    return $lines;
 }
 
 function makeWebRoutes(Storage $storage)
