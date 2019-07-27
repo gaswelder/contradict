@@ -1,2 +1,2 @@
 <?php
-require '../main.php';
+require '../backend/main.php';
