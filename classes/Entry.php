@@ -15,7 +15,7 @@ class Entry extends dbobject
 
     static function stats()
     {
-        $goal = Dict::GOAL;
+        $goal = Storage::GOAL;
         $r = self::db()->getRow('select count(*) as n, sum(answers1+answers2) as ok from words');
         $n = $r['n'];
         $ok = $r['ok'];
@@ -42,8 +42,8 @@ class Entry extends dbobject
     {
         $correctAnswers = $dir == 0 ? 'answers1' : 'answers2';
         $n = intval($n);
-        $goal = Dict::GOAL;
-        $windowSize = Dict::WINDOW;
+        $goal = Storage::GOAL;
+        $windowSize = Storage::WINDOW;
 
         $rows = self::db()->getRows("
             select * from 
