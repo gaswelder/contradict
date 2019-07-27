@@ -1,8 +1,6 @@
 <?php
 
-use havana\dbobject;
-
-class Entry extends dbobject
+class Entry
 {
     const TABLE_NAME = 'words';
 

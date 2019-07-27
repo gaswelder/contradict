@@ -18,17 +18,51 @@ function clg(...$var)
     }
 }
 
+function hint(Storage $s, Question $q)
+{
+    $sim = $s->similars($q);
+    if (count($sim) == 0) {
+        return null;
+    }
+    $field = $q->reverse ? 'q' : 'a';
+    $values = [];
+    foreach ($sim as $entry) {
+        $values[] = $entry->$field;
+    }
+    $hint = h($q->entry()->$field, $values);
+    return preg_replace('/\*+/', '...', $hint);
+}
+
+function h($word, $others)
+{
+    $list = array_unique(array_merge([$word], $others));
+    if (count($list) < 2) return null;
+
+    $first = array_map(function ($str) {
+        return mb_substr($str, 0, 1);
+    }, $list);
+
+    if (count(array_unique($first)) == count($first)) {
+        return $first[0] . (mb_strlen($word) > 1 ? '*' : '');
+    }
+    $rest = function ($str) {
+        return mb_substr($str, 1);
+    };
+    $replace = $first[0] == ' ' ? ' ' : '*';
+    return $replace . h($rest($word), array_map($rest, $others));
+}
+
 function checkAnswer(Question $q, $answer)
 {
     $realAnswer = $q->reverse ? $q->entry()->q : $q->entry()->a;
     return mb_strtolower($realAnswer) == mb_strtolower($answer);
 }
 
-function verifyTest(string $dict_id, array $questions, array $answers): TestResults
+function verifyTest(string $dict_id, array $qa, Storage $s): TestResults
 {
     $results = [];
-    foreach ($questions as $i => $question) {
-        $answer = $answers[$i];
+    foreach ($qa as $i => $tuple) {
+        [$question, $answer] = $tuple;
         $result = [
             'question' => $question->format(),
             'answer' => $answer,
@@ -39,8 +73,8 @@ function verifyTest(string $dict_id, array $questions, array $answers): TestResu
 
     // Update correct answer counters
     // For all questions that are correct, increment the corresponding counter (dir 0/1) and save.
-    foreach ($questions as $i => $question) {
-        $answer = $answers[$i];
+    foreach ($qa as $i => $tuple) {
+        [$question, $answer] = $tuple;
         if (!checkAnswer($question, $answer)) {
             continue;
         }
@@ -49,7 +83,7 @@ function verifyTest(string $dict_id, array $questions, array $answers): TestResu
         } else {
             $question->entry()->answers1++;
         }
-        $question->entry()->save();
+        $s->saveEntry($question->entry());
     }
 
     return new TestResults($dict_id, $results);

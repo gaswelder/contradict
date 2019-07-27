@@ -98,7 +98,7 @@ class Storage
             if ($this->hasEntry($dict_id, $entry)) {
                 continue;
             }
-            $entry->save();
+            $this->saveEntry($entry);
             $n++;
         }
         return $n;
@@ -106,7 +106,7 @@ class Storage
 
     private function hasEntry($dict_id, $entry)
     {
-        return Entry::db()->getValue(
+        return SQL::db()->getValue(
             "select count(*)
             from words
             where dict_id = ? and q = ? and a = ?",
@@ -122,7 +122,6 @@ class Storage
     function test(string $dict_id): Test
     {
         $size = 20;
-        $dict = $this->dict($dict_id);
         return new Test($this->pick($dict_id, $size, 0), $this->pick($dict_id, $size, 1));
     }
 
@@ -175,9 +174,24 @@ class Storage
         return $questions;
     }
 
-    function entry(string $id): Entry
+    function similars(Question $q)
     {
-        $row = SQL::db()->getRow("select id, q, a, answers1, answers2, dict_id from 'words' where id = ?", $id);
+        $filter = $q->reverse ? ['a' => $q->entry()->a] : ['q' => $q->entry()->q];
+        $rows = SQL::db()->select('words', ['q', 'a', 'answers1', 'answers2', 'dict_id'], $filter, 'id');
+
+        $entries = [];
+        foreach ($rows as $row) {
+            $e = $this->makeEntry($row);
+            if ($e->id == $q->entry()->id) {
+                continue;
+            }
+            $entries[] = $e;
+        }
+        return $entries;
+    }
+
+    private function makeEntry($row)
+    {
         $e = new Entry;
         foreach ($row as $k => $v) {
             $e->$k = $v;
@@ -185,10 +199,31 @@ class Storage
         return $e;
     }
 
+    function entry(string $id): Entry
+    {
+        $row = SQL::db()->getRow("select id, q, a, answers1, answers2, dict_id from 'words' where id = ?", $id);
+        return $this->makeEntry($row);
+    }
+
     function saveEntry(Entry $e)
     {
-
-        $e->save();
+        if ($e->id) {
+            SQL::db()->update('words', [
+                'q' => $e->q,
+                'a' => $e->a,
+                'answers1' => $e->answers1,
+                'answers2' => $e->answers2,
+                'dict_id' => $e->dict_id,
+            ], ['id' => $e->id]);
+        } else {
+            $e->id = SQL::db()->insert('words', [
+                'q' => $e->q,
+                'a' => $e->a,
+                'answers1' => $e->answers1,
+                'answers2' => $e->answers2,
+                'dict_id' => $e->dict_id,
+            ]);
+        }
     }
 
     function entries(array $ids): array

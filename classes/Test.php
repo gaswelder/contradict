@@ -2,8 +2,8 @@
 
 class Test
 {
-    private $tuples1;
-    private $tuples2;
+    public $tuples1;
+    public $tuples2;
 
     function __construct($tuples1, $tuples2)
     {

@@ -86,7 +86,24 @@ function makeWebRoutes(Storage $storage)
      */
     $app->get('/api/{\d+}/test', function ($dict_id) use ($storage) {
         $test = $storage->test($dict_id);
-        return $test->format();
+
+        $hints1 = [];
+        $hints2 = [];
+        foreach ($test->tuples1 as $q) {
+            $hints1[] = hint($storage, $q);
+        }
+        foreach ($test->tuples2 as $q) {
+            $hints2[] = hint($storage, $q);
+        }
+
+        $f = $test->format();
+        foreach ($f['tuples1'] as $k => $tuple) {
+            $f['tuples1'][$k]['hint'] = $hints1[$k];
+        }
+        foreach ($f['tuples2'] as $k => $tuple) {
+            $f['tuples2'][$k]['hint'] = $hints2[$k];
+        }
+        return $f;
     });
 
     /**
@@ -97,13 +114,13 @@ function makeWebRoutes(Storage $storage)
         $directions = request::post('dir');
         $entries = $storage->entries(request::post('q'));
 
-        $questions = [];
+        $qa = [];
         foreach ($entries as $i => $entry) {
             $dir = $directions[$i];
-            $questions[] = new Question($entry, $dir == 1);
+            $qa[] = [new Question($entry, $dir == 1), $answers[$i]];
         }
 
-        $testresults = verifyTest($dict_id, $questions, $answers);
+        $testresults = verifyTest($dict_id, $qa, $storage);
         return $testresults->format();
     });
 
