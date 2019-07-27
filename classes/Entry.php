@@ -1,4 +1,5 @@
 <?php
+
 use havana\dbobject;
 
 class Entry extends dbobject
@@ -71,5 +72,14 @@ class Entry extends dbobject
     function toRow()
     {
         return [$this->q, $this->a, $this->answers1, $this->answers2];
+    }
+
+    function format()
+    {
+        return [
+            'q' => $this->q,
+            'a' => $this->a,
+            'id' => $this->id
+        ];
     }
 }

@@ -1,5 +1,6 @@
 <?php
 require 'vendor/autoload.php';
+require __DIR__ . '/storage.php';
 
 use havana\App;
 use havana\user;
@@ -7,6 +8,77 @@ use havana\request;
 use havana\response;
 
 $app = new App(__DIR__);
+$storage = new Storage();
+
+/**
+ * Parses words posted as text file,
+ * returns array of [word, translation] pairs.
+ */
+function parseLines(string $str): array
+{
+    $lines = Arr::make(explode("\n", $str))
+        ->map(function ($line) {
+            return trim($line);
+        })
+        ->filter()
+        ->map(function ($line) {
+            return preg_split('/\s+-\s+/', $line, 2);
+        });
+    return $lines->get();
+}
+
+function varfmt($var)
+{
+    ob_start();
+    var_dump($var);
+    $s = ob_get_clean();
+    return $s;
+}
+
+function clg(...$var)
+{
+    foreach ($var as $i => $var) {
+        error_log("$i ---> " . varfmt($var));
+    }
+}
+
+function verifyTest(string $dict_id, array $questions, array $answers): TestResults
+{
+    $results = [];
+
+    foreach ($questions as $i => $question) {
+        $answer = $answers[$i];
+        $correct = $question->checkAnswer($answer);
+        if ($correct) {
+            $question->save();
+        }
+
+        $result = [
+            'question' => $question->format(),
+            'answer' => $answer,
+            'correct' => $correct
+        ];
+        $results[] = $result;
+    }
+
+    $ok = [];
+    $fail = [];
+    foreach ($results as $result) {
+        if ($result['correct']) {
+            $ok[] = $result;
+        } else {
+            $fail[] = $result;
+        }
+    }
+
+    $stats = new TestResult();
+    $stats->dict_id = $dict_id;
+    $stats->right = count($ok);
+    $stats->wrong = count($fail);
+    $stats->save();
+
+    return new TestResults($dict_id, $stats, $results);
+}
 
 $app->middleware(function ($next) {
     if (!user::getRole('user') && request::url()->isUnder('/api') && request::url()->path != '/api/login') {
@@ -41,112 +113,70 @@ function format($data)
     return json_decode(json_encode($data), true);
 }
 
-$app->get('/api/', function () {
-    $dicts = array_map(function (Dict $dict) {
-        return $dict->format();;
-    }, Dict::find([]));
-    return format(compact('dicts'));
+/**
+ * Returns the list of dicts.
+ */
+$app->get('/api/', function () use ($storage) {
+    $r = ['dicts' => []];
+    foreach ($storage->dicts() as $dict) {
+        $r['dicts'][] = $dict->format();
+    }
+    return $r;
 });
 
-$app->post('/api/{\d+}/add', function ($dict_id) {
-    $dict = Dict::load($dict_id);
-
-    $lines = Arr::make(explode("\n", request::post('words')))
-        ->map(function ($line) {
-            return trim($line);
-        })
-        ->filter()
-        ->map(function ($line) {
-            return preg_split('/\s+-\s+/', $line, 2);
-        });
-
-    $n = $dict->append($lines->get());
+/**
+ * Adds words to a dictionary.
+ */
+$app->post('/api/{\d+}/add', function ($dict_id) use ($storage) {
+    $lines = parseLines(request::post('words'));
+    $n = $storage->appendWords($dict_id, $lines);
     return [
         'n' => $n
     ];
 });
 
-$app->get('/api/{\d+}/test', function ($dict_id) {
-    $ft = function ($tuples) {
-        return array_map(function (Question $tuple) {
-            return $tuple->format();
-        }, $tuples);
-    };
-    $size = 20;
-    $dict = Dict::load($dict_id);
-    $tuples1 = $ft($dict->pick($size, 0));
-    $tuples2 = $ft($dict->pick($size, 1));
-    return format(compact('tuples1', 'tuples2'));
+/**
+ * Returns a new test.
+ */
+$app->get('/api/{\d+}/test', function ($dict_id) use ($storage) {
+    $test = $storage->test($dict_id);
+    return $test->format();
 });
 
-function verifyTest($questions, $answers)
-{
-    $results = [];
-
-    foreach ($questions as $i => $question) {
-        $answer = $answers[$i];
-        $correct = $question->checkAnswer($answer);
-        if ($correct) {
-            $question->save();
-        }
-
-        $result = [
-            'question' => $question->format(),
-            'answer' => $answer,
-            'correct' => $correct
-        ];
-        $results[] = $result;
-    }
-    return $results;
-}
-
-function parseQuestions()
-{
-    $entries = Entry::getMultiple(request::post('q'));
+/**
+ * Parses test answers and returns results.
+ */
+$app->post('/api/{\d+}/test', function ($dict_id) use ($storage) {
+    $answers = request::post('a');
     $directions = request::post('dir');
+    $entries = $storage->entries(request::post('q'));
+
     $questions = [];
     foreach ($entries as $i => $entry) {
         $dir = $directions[$i];
         $questions[] = new Question($entry, $dir == 1);
     }
-    return $questions;
-}
 
-$app->post('/api/{\d+}/test', function ($dict_id) {
-    $answers = request::post('a');
-    $questions = parseQuestions();
-
-    $results = verifyTest($questions, $answers);
-
-    $ok = [];
-    $fail = [];
-    foreach ($results as $result) {
-        if ($result['correct']) {
-            $ok[] = $result;
-        } else {
-            $fail[] = $result;
-        }
-    }
-
-    $stats = new TestResult();
-    $stats->dict_id = $dict_id;
-    $stats->right = count($ok);
-    $stats->wrong = count($fail);
-    $stats->save();
-
-    return format(compact('results', 'dict_id', 'stats'));
+    $testresults = verifyTest($dict_id, $questions, $answers);
+    return $testresults->format();
 });
 
-$app->get('/api/entries/{\d+}', function ($id) {
-    $entry = Entry::get($id);
-    return format(compact('entry'));
+/**
+ * Returns a single entry by ID.
+ */
+$app->get('/api/entries/{\d+}', function ($id) use ($storage) {
+    $entry = $storage->entry($id);;
+    return ['entry' => $entry->format()];
 });
 
-$app->post('/api/entries/{\d+}', function ($id) {
-    $entry = Entry::get($id);
+/**
+ * Updates an entry.
+ */
+$app->post('/api/entries/{\d+}', function ($id) use ($storage) {
+    $entry = $storage->entry($id);
     $entry->q = request::post('q');
     $entry->a = request::post('a');
-    $entry->save();
+    $storage->saveEntry($entry);
     return 'ok';
 });
 
