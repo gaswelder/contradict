@@ -20,13 +20,9 @@ function clg(...$var)
 
 function checkAnswer(Question $q, $answer)
 {
-    $correct = $q->checkAnswer($answer);
-    if ($correct) {
-        $q->save();
-    }
-    return $correct;
+    $realAnswer = $q->reverse ? $q->entry()->q : $q->entry()->a;
+    return mb_strtolower($realAnswer) == mb_strtolower($answer);
 }
-
 
 function verifyTest(string $dict_id, array $questions, array $answers): TestResults
 {
@@ -40,6 +36,22 @@ function verifyTest(string $dict_id, array $questions, array $answers): TestResu
         ];
         $results[] = $result;
     }
+
+    // Update correct answer counters
+    // For all questions that are correct, increment the corresponding counter (dir 0/1) and save.
+    foreach ($questions as $i => $question) {
+        $answer = $answers[$i];
+        if (!checkAnswer($question, $answer)) {
+            continue;
+        }
+        if ($question->reverse) {
+            $question->entry()->answers2++;
+        } else {
+            $question->entry()->answers1++;
+        }
+        $question->entry()->save();
+    }
+
     return new TestResults($dict_id, $results);
 }
 
