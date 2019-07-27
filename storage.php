@@ -126,23 +126,77 @@ class Storage
         return new Test($this->pick($dict_id, $size, 0), $this->pick($dict_id, $size, 1));
     }
 
+    /**
+     * Returns a given number of random questions.
+     *
+     * @param int $dict_id Identifier of the dictionary to get questions from
+     * @param int $size Number of questions
+     * @param int $dir Translation direction: 0 for direct, 1 for reverse
+     * @return array
+     */
     private function pick($dict_id, $size, $dir)
     {
-        return Entry::pick($dict_id, $size, $dir);
+        $correctAnswers = $dir == 0 ? 'answers1' : 'answers2';
+        $size = intval($size);
+        $goal = Storage::GOAL;
+        $windowSize = Storage::WINDOW;
+
+        $rows = SQL::db()->getRows("
+            select * from 
+                (select * from words
+                    where dict_id = ?
+                    and $correctAnswers < $goal
+                    order by touched desc, id
+                    limit $windowSize) a
+            order by random()
+            limit $size", $dict_id);
+
+        $entries = [];
+        $ids = [];
+        foreach ($rows as $row) {
+            $ids[] = $row['id'];
+            $e = new Entry($row['id']);
+            $e->q = $row['q'];
+            $e->a = $row['a'];
+            $e->answers1 = $row['answers1'];
+            $e->answers2 = $row['answers2'];
+            $e->id = $row['id'];
+            $e->dict_id = $row['dict_id'];
+            $entries[] = $e;
+        }
+
+        $set = '(' . implode(', ', $ids) . ')';
+        SQL::db()->exec("update words set touched = 1 where id in $set");
+
+        $questions = [];
+        foreach ($entries as $entry) {
+            $questions[] = new Question($entry, $dir == 1);
+        }
+        return $questions;
     }
 
     function entry(string $id): Entry
     {
-        return Entry::get($id);
+        $row = SQL::db()->getRow("select id, q, a, answers1, answers2, dict_id from 'words' where id = ?", $id);
+        $e = new Entry;
+        foreach ($row as $k => $v) {
+            $e->$k = $v;
+        }
+        return $e;
     }
 
     function saveEntry(Entry $e)
     {
+
         $e->save();
     }
 
     function entries(array $ids): array
     {
-        return Entry::getMultiple($ids);
+        $entries = [];
+        foreach ($ids as $id) {
+            $entries[] = $this->entry($id);
+        }
+        return $entries;
     }
 }
