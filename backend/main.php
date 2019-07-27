@@ -1,7 +1,18 @@
 <?php
 require 'vendor/autoload.php';
-require __DIR__ . '/storage.php';
 require __DIR__ . '/routes.php';
+
+function registerClasses($dir)
+{
+    spl_autoload_register(function ($className) use ($dir) {
+        $path = "$dir/$className.php";
+        if (file_exists($path)) {
+            require_once($path);
+        }
+    });
+}
+
+registerClasses(__DIR__ . '/storage');
 
 function varfmt($var)
 {
@@ -89,6 +100,6 @@ function verifyTest(string $dict_id, array $qa, Storage $s): TestResults
     return new TestResults($dict_id, $results);
 }
 
-$storage = new Storage();
+$storage = new SQLStorage();
 $app = makeWebRoutes($storage);
 $app->run();
