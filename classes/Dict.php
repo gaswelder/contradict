@@ -105,4 +105,13 @@ class Dict extends dbobject
         if ($n == 0) return 1;
         return array_sum($scores) / $n;
     }
+
+    function format()
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'stats' => $this->stats()
+        ];
+    }
 }

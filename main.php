@@ -43,11 +43,7 @@ function format($data)
 
 $app->get('/api/', function () {
     $dicts = array_map(function (Dict $dict) {
-        return [
-            'id' => $dict->id,
-            'name' => $dict->name,
-            'stats' => $dict->stats()
-        ];
+        return $dict->format();;
     }, Dict::find([]));
     return format(compact('dicts'));
 });
