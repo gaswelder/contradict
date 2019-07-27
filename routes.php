@@ -126,11 +126,6 @@ function makeWebRoutes(Storage $storage)
         return 'ok';
     });
 
-    $app->get('/api/stats', function () {
-        $results = TestResult::find([], 't desc');
-        return tpl('stats', compact('results'));
-    });
-
     $app->get('/backup', function () {
         return response::staticFile(__DIR__ . '/dict.sqlite')->downloadAs('dict.sqlite');
     });

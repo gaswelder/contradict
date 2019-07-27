@@ -18,43 +18,29 @@ function clg(...$var)
     }
 }
 
+function checkAnswer(Question $q, $answer)
+{
+    $correct = $q->checkAnswer($answer);
+    if ($correct) {
+        $q->save();
+    }
+    return $correct;
+}
+
 
 function verifyTest(string $dict_id, array $questions, array $answers): TestResults
 {
     $results = [];
-
     foreach ($questions as $i => $question) {
         $answer = $answers[$i];
-        $correct = $question->checkAnswer($answer);
-        if ($correct) {
-            $question->save();
-        }
-
         $result = [
             'question' => $question->format(),
             'answer' => $answer,
-            'correct' => $correct
+            'correct' => checkAnswer($question, $answer)
         ];
         $results[] = $result;
     }
-
-    $ok = [];
-    $fail = [];
-    foreach ($results as $result) {
-        if ($result['correct']) {
-            $ok[] = $result;
-        } else {
-            $fail[] = $result;
-        }
-    }
-
-    $stats = new TestResult();
-    $stats->dict_id = $dict_id;
-    $stats->right = count($ok);
-    $stats->wrong = count($fail);
-    $stats->save();
-
-    return new TestResults($dict_id, $stats, $results);
+    return new TestResults($dict_id, $results);
 }
 
 $storage = new Storage();
