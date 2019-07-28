@@ -77,15 +77,6 @@ class SQLStorage implements Storage
     }
 
     /**
-     * Generates a test for a given dictionary.
-     */
-    function test(string $dict_id): Test
-    {
-        $size = 20;
-        return new Test($this->pick($dict_id, $size, 0), $this->pick($dict_id, $size, 1));
-    }
-
-    /**
      * Returns a given number of random questions.
      *
      * @param int $dict_id Identifier of the dictionary to get questions from
@@ -93,7 +84,7 @@ class SQLStorage implements Storage
      * @param int $dir Translation direction: 0 for direct, 1 for reverse
      * @return array
      */
-    private function pick($dict_id, $size, $dir)
+    function pick($dict_id, $size, $dir)
     {
         $correctAnswers = $dir == 0 ? 'answers1' : 'answers2';
         $size = intval($size);
@@ -114,14 +105,7 @@ class SQLStorage implements Storage
         $ids = [];
         foreach ($rows as $row) {
             $ids[] = $row['id'];
-            $e = new Entry($row['id']);
-            $e->q = $row['q'];
-            $e->a = $row['a'];
-            $e->answers1 = $row['answers1'];
-            $e->answers2 = $row['answers2'];
-            $e->id = $row['id'];
-            $e->dict_id = $row['dict_id'];
-            $entries[] = $e;
+            $entries[] = Entry::parse($row);
         }
 
         $set = '(' . implode(', ', $ids) . ')';
@@ -137,7 +121,7 @@ class SQLStorage implements Storage
     function similars(Question $q)
     {
         $filter = $q->reverse ? ['a' => $q->entry()->a] : ['q' => $q->entry()->q];
-        $rows = $this->db->select('words', ['q', 'a', 'answers1', 'answers2', 'dict_id'], $filter, 'id');
+        $rows = $this->db->select('words', ['id', 'q', 'a', 'answers1', 'answers2', 'dict_id', 'touched'], $filter, 'id');
 
         $entries = [];
         foreach ($rows as $row) {

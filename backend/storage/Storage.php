@@ -20,10 +20,6 @@ interface Storage
 
     function lastScores(string $dict_id): array;
 
-    /**
-     * Generates a test for a given dictionary.
-     */
-    function test(string $dict_id): Test;
     function entry(string $id): Entry;
     function saveEntry(Entry $e);
     function entries(array $ids): array;
