@@ -100,6 +100,12 @@ function verifyTest(string $dict_id, array $qa, Storage $s): TestResults
     return new TestResults($dict_id, $results);
 }
 
-$storage = new SQLStorage();
+
+$dotenv = Dotenv\Dotenv::create(__DIR__);
+$dotenv->load();
+
+// __APPDIR is a hack to let dbclient know where to look for the sqlite file.
+$GLOBALS['__APPDIR'] = __DIR__;
+$storage = new SQLStorage(getenv('DATABASE'));
 $app = makeWebRoutes($storage);
 $app->run();

@@ -1,15 +1,15 @@
 <?php
 
-use havana\dbobject;
-
-class SQL extends dbobject
-{ }
-
 class SQLStorage implements Storage
 {
+    function __construct($url)
+    {
+        $this->db = db($url);
+    }
+
     function dicts(): array
     {
-        $rows = SQL::db()->getRows("select id, name from 'dicts'");
+        $rows = $this->db->getRows("select id, name from 'dicts'");
         return array_map(function ($row) {
             return new Dict($row['id'], $row['name']);
         }, $rows);
@@ -17,7 +17,7 @@ class SQLStorage implements Storage
 
     function dict(string $id): Dict
     {
-        $row = SQL::db()->getRow("select id, name from 'dicts' where id = ?", $id);
+        $row = $this->db->getRow("select id, name from 'dicts' where id = ?", $id);
         $d = new Dict($row['id'], $row['name']);
         return $d;
     }
@@ -26,10 +26,10 @@ class SQLStorage implements Storage
     {
         $goal = self::GOAL;
 
-        $totalEntries = SQL::db()->getValue('select count(*) from words where dict_id = ?', $dict_id);
+        $totalEntries = $this->db->getValue('select count(*) from words where dict_id = ?', $dict_id);
 
         // Number of entries that have enough correct answers in both directions.
-        $finished = SQL::db()->getValue(
+        $finished = $this->db->getValue(
             "select sum(a1 + a2)
             from (select answers1 >= $goal as a1, answers2 >= $goal as a2
                 from words where dict_id = ?) a",
@@ -37,7 +37,7 @@ class SQLStorage implements Storage
         );
 
         // Number of entries that are "in progress".
-        $touched = SQL::db()->getValue(
+        $touched = $this->db->getValue(
             "select count(*) from words
                 where dict_id = ?
                 and touched = 1
@@ -50,7 +50,7 @@ class SQLStorage implements Storage
 
     private function successRate($dict_id)
     {
-        $scores = SQL::db()->getValues(
+        $scores = $this->db->getValues(
             'select 1.0 * right / (right + wrong)
             from results
             where dict_id = ?
@@ -82,7 +82,7 @@ class SQLStorage implements Storage
 
     private function hasEntry($dict_id, $entry)
     {
-        return SQL::db()->getValue(
+        return $this->db->getValue(
             "select count(*)
             from words
             where dict_id = ? and q = ? and a = ?",
@@ -116,7 +116,7 @@ class SQLStorage implements Storage
         $goal = Storage::GOAL;
         $windowSize = Storage::WINDOW;
 
-        $rows = SQL::db()->getRows("
+        $rows = $this->db->getRows("
             select * from 
                 (select * from words
                     where dict_id = ?
@@ -141,7 +141,7 @@ class SQLStorage implements Storage
         }
 
         $set = '(' . implode(', ', $ids) . ')';
-        SQL::db()->exec("update words set touched = 1 where id in $set");
+        $this->db->exec("update words set touched = 1 where id in $set");
 
         $questions = [];
         foreach ($entries as $entry) {
@@ -153,7 +153,7 @@ class SQLStorage implements Storage
     function similars(Question $q)
     {
         $filter = $q->reverse ? ['a' => $q->entry()->a] : ['q' => $q->entry()->q];
-        $rows = SQL::db()->select('words', ['q', 'a', 'answers1', 'answers2', 'dict_id'], $filter, 'id');
+        $rows = $this->db->select('words', ['q', 'a', 'answers1', 'answers2', 'dict_id'], $filter, 'id');
 
         $entries = [];
         foreach ($rows as $row) {
@@ -177,14 +177,14 @@ class SQLStorage implements Storage
 
     function entry(string $id): Entry
     {
-        $row = SQL::db()->getRow("select id, q, a, answers1, answers2, dict_id from 'words' where id = ?", $id);
+        $row = $this->db->getRow("select id, q, a, answers1, answers2, dict_id from 'words' where id = ?", $id);
         return $this->makeEntry($row);
     }
 
     function saveEntry(Entry $e)
     {
         if ($e->id) {
-            SQL::db()->update('words', [
+            $this->db->update('words', [
                 'q' => $e->q,
                 'a' => $e->a,
                 'answers1' => $e->answers1,
@@ -192,7 +192,7 @@ class SQLStorage implements Storage
                 'dict_id' => $e->dict_id,
             ], ['id' => $e->id]);
         } else {
-            $e->id = SQL::db()->insert('words', [
+            $e->id = $this->db->insert('words', [
                 'q' => $e->q,
                 'a' => $e->a,
                 'answers1' => $e->answers1,

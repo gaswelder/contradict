@@ -2,7 +2,7 @@
   "name": "gas/links",
   "type": "project",
   "scripts": {
-    "test": "phpunit *.test.php"
+    "test": "phpunit */*.test.php"
   },
   "repositories": [
     {
@@ -11,7 +11,8 @@
     }
   ],
   "require": {
-    "gaswelder/havana": "dev-master"
+    "gaswelder/havana": "dev-master",
+    "vlucas/phpdotenv": "^3.4"
   },
   "require-dev": {
     "phpunit/phpunit": "^8.2"
