@@ -2,7 +2,7 @@
   "name": "gas/links",
   "type": "project",
   "scripts": {
-    "test": "phpunit */*.test.php"
+    "test": "phpunit backend/*/*.test.php"
   },
   "repositories": [
     {

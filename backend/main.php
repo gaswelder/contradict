@@ -1,5 +1,5 @@
 <?php
-require 'vendor/autoload.php';
+require '../vendor/autoload.php';
 require __DIR__ . '/routes.php';
 require __DIR__ . '/App.php';
 
