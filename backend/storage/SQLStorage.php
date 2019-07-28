@@ -1,18 +1,15 @@
 <?php
 
-// __APPDIR is a hack to let dbclient know where to look for the sqlite file.
-$GLOBALS['__APPDIR'] = __DIR__ . '/..';
-
 class SQLStorage implements Storage
 {
     /**
-     * @var havana\dbclient
+     * @var \DB\Client
      */
     private $db;
 
-    function __construct($url)
+    function __construct($path)
     {
-        $this->db = db($url);
+        $this->db = \DB\Client::sqlite($path);
     }
 
     function saveDict(Dict $d)

@@ -3,16 +3,6 @@ require 'vendor/autoload.php';
 require __DIR__ . '/routes.php';
 require __DIR__ . '/App.php';
 
-function registerClasses($dir)
-{
-    spl_autoload_register(function ($className) use ($dir) {
-        $path = "$dir/$className.php";
-        if (file_exists($path)) {
-            require_once($path);
-        }
-    });
-}
-
 registerClasses(__DIR__ . '/storage');
 
 function varfmt($var)
@@ -30,10 +20,10 @@ function clg(...$var)
     }
 }
 
-$dotenv = Dotenv\Dotenv::create(__DIR__);
-$dotenv->load();
+Appget\Env::parse(__DIR__ . '/.env');
+$path = getenv('DATABASE');
 
-$storage = new SQLStorage(getenv('DATABASE'));
+$storage = new SQLStorage(__DIR__ . '/' . $path);
 $theApp = new App($storage);
 $app = makeWebRoutes($theApp);
 $app->run();

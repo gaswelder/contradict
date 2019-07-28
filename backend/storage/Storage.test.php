@@ -1,16 +1,6 @@
 <?php
 require 'vendor/autoload.php';
 
-function registerClasses($dir)
-{
-    spl_autoload_register(function ($className) use ($dir) {
-        $path = "$dir/$className.php";
-        if (file_exists($path)) {
-            require_once($path);
-        }
-    });
-}
-
 registerClasses(__DIR__);
 registerClasses(__DIR__ . '/../classes');
 
@@ -48,7 +38,7 @@ class StorageTest extends TestCase
 {
     function storages()
     {
-        $sql = new SQLStorage('sqlite://dict.sqlite');
+        $sql = new SQLStorage(__DIR__ . '/../dict.sqlite');
         $blob = new BlobStorage(function () {
             return json_encode([
                 'dicts' => [
@@ -115,14 +105,14 @@ class StorageTest extends TestCase
 
     function testImport()
     {
-        $sql = new SQLStorage('sqlite://dict.sqlite');
+        $sql = new SQLStorage(__DIR__ . '/../dict.sqlite');
         $blob = new BlobStorage(function () {
             return json_encode([
                 'dicts' => [],
                 'words' => [],
             ]);
         }, function ($data) {
-            var_dump($data);
+            // var_dump($data);
             // $this->assertArrayHasKey('dicts', $data);
             // $this->assertArrayHasKey('words', $data);
         });
