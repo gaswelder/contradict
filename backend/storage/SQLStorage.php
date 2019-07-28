@@ -48,22 +48,20 @@ class SQLStorage implements Storage
             $dict_id
         );
 
-        return new Stats($totalEntries, $finished, $touched, $this->successRate($dict_id));
+        return new Stats($totalEntries, $finished, $touched);
     }
 
-    private function successRate($dict_id)
+    function lastScores(string $dict_id): array
     {
-        $scores = $this->db->getValues(
-            'select 1.0 * right / (right + wrong)
+        $rows = $this->db->getRows(
+            'select id, right, wrong, dict_id
             from results
             where dict_id = ?
             order by id desc
             limit 10',
             $dict_id
         );
-        $n = count($scores);
-        if ($n == 0) return 1;
-        return array_sum($scores) / $n;
+        return array_map([Score::class, 'parse'], $rows);
     }
 
     function hasEntry($dict_id, $entry)

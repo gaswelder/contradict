@@ -16,6 +16,9 @@ interface Storage
 
     function dicts(): array;
     function dict(string $id): Dict;
+    function dictStats(string $dict_id): Stats;
+
+    function lastScores(string $dict_id): array;
 
     /**
      * Generates a test for a given dictionary.

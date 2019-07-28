@@ -43,12 +43,10 @@ function makeWebRoutes(Storage $storage)
     $app->get('/api/', function () use ($storage) {
         $r = ['dicts' => []];
         foreach ($storage->dicts() as $dict) {
-            $r['dicts'][] = array_merge(
-                $dict->format(),
-                [
-                    'stats' => $storage->dictStats($dict->id)->format()
-                ]
-            );
+            $d = $dict->format();
+            $d['stats'] = $storage->dictStats($dict->id)->format();
+            $d['stats']['successRate'] = successRate($storage, $dict->id);
+            $r['dicts'][] = $d;
         }
         return $r;
     });

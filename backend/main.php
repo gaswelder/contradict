@@ -113,6 +113,18 @@ function appendWords(Storage $s, string $dict_id, array $entries): int
     return $n;
 }
 
+function successRate(Storage $s, string $dict_id): float
+{
+    $scores = $s->lastScores($dict_id);
+    $total = 0;
+    $n = 0;
+    foreach ($scores as $score) {
+        $n++;
+        $total += $score->right / ($score->right + $score->wrong);
+    }
+    return $n > 0 ? $total / $n : 1;
+}
+
 
 $dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();
