@@ -96,10 +96,6 @@ class StorageTest extends TestCase
         $this->assertEquals($d->id, $dict->id);
         $this->assertEquals($d->name, $dict->name);
 
-        $stats = $s->dictStats($dict->id);
-        $this->assertInstanceOf(Stats::class, $stats);
-        $this->assertGreaterThan(0, $stats->totalEntries, 'total entries');
-
         $scores = $s->lastScores($dict->id);
 
         $ee = $s->allEntries($dict->id);

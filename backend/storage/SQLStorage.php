@@ -36,32 +36,6 @@ class SQLStorage implements Storage
         return Dict::parse($row);
     }
 
-    function dictStats(string $dict_id): Stats
-    {
-        $goal = self::GOAL;
-
-        $totalEntries = $this->db->getValue('select count(*) from words where dict_id = ?', $dict_id);
-
-        // Number of entries that have enough correct answers in both directions.
-        $finished = $this->db->getValue(
-            "select sum(a1 + a2)
-            from (select answers1 >= $goal as a1, answers2 >= $goal as a2
-                from words where dict_id = ?) a",
-            $dict_id
-        );
-
-        // Number of entries that are "in progress".
-        $touched = $this->db->getValue(
-            "select count(*) from words
-                where dict_id = ?
-                and touched = 1
-                and (answers1 < $goal or answers2 < $goal)",
-            $dict_id
-        );
-
-        return new Stats($totalEntries, $finished, $touched);
-    }
-
     function lastScores(string $dict_id): array
     {
         $rows = $this->db->getRows(

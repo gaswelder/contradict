@@ -114,6 +114,28 @@ function appendWords(Storage $s, string $dict_id, array $entries): int
     return $n;
 }
 
+function dictStats(Storage $s, string $dict_id): Stats
+{
+    $entries = $s->allEntries($dict_id);
+
+    $stats = new Stats;
+    $stats->totalEntries = count($entries);
+
+    foreach ($entries as $e) {
+        $isfinished = $e->answers1 >= Storage::GOAL && $e->answers2 >= Storage::GOAL;
+        if ($isfinished) {
+            $stats->finished++;
+            continue;
+        }
+        if ($e->touched) {
+            $stats->touched++;
+        }
+    }
+
+    $stats->successRate = successRate($s, $dict_id);
+    return $stats;
+}
+
 function successRate(Storage $s, string $dict_id): float
 {
     $scores = $s->lastScores($dict_id);

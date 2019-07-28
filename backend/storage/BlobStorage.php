@@ -35,28 +35,6 @@ class BlobStorage implements Storage
         return Dict::parse($this->data['dicts'][$id]);
     }
 
-    function dictStats(string $dict_id): Stats
-    {
-        $entries = $this->allEntries($dict_id);
-        $totalEntries = count($entries);
-
-        // Number of entries that have enough correct answers in both directions.
-        $finished = 0;
-        // Number of entries that are "in progress".
-        $touched = 0;
-        foreach ($entries as $e) {
-            $isfinished = $e->answers1 >= Storage::GOAL && $e->answers2 >= Storage::GOAL;
-            if ($isfinished) {
-                $finished++;
-                continue;
-            }
-            if ($e->touched) {
-                $touched++;
-            }
-        }
-        return new Stats($totalEntries, $finished, $touched);
-    }
-
     function lastScores(string $dict_id): array
     {
         return [];

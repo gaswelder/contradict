@@ -2,23 +2,18 @@
 
 class Stats
 {
-    public $totalEntries;
-    public $finished;
-    public $touched;
-
-    function __construct($totalEntries, $finished, $touched)
-    {
-        $this->totalEntries = $totalEntries;
-        $this->finished = $finished;
-        $this->touched = $touched;
-    }
+    public $totalEntries = 0;
+    public $finished = 0;
+    public $touched = 0;
+    public $successRate = 0;
 
     function format()
     {
         return [
             'pairs' => floatval($this->totalEntries),
-            'finished' => $this->finished / 2,
+            'finished' => $this->finished,
             'touched' => floatval($this->touched),
+            'successRate' => $this->successRate
         ];
     }
 }

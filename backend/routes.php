@@ -44,8 +44,7 @@ function makeWebRoutes(Storage $storage)
         $r = ['dicts' => []];
         foreach ($storage->dicts() as $dict) {
             $d = $dict->format();
-            $d['stats'] = $storage->dictStats($dict->id)->format();
-            $d['stats']['successRate'] = successRate($storage, $dict->id);
+            $d['stats'] = dictStats($storage, $dict->id)->format();
             $r['dicts'][] = $d;
         }
         return $r;
