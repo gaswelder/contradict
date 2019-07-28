@@ -83,15 +83,15 @@ class SQLStorage implements Storage
         return array_map([Entry::class, 'parse'], $rows);
     }
 
-    function similars(Question $q)
+    function similars(Entry $e, bool $reverse): array
     {
-        $filter = $q->reverse ? ['a' => $q->entry()->a] : ['q' => $q->entry()->q];
+        $filter = $reverse ? ['a' => $e->a] : ['q' => $e->q];
         $rows = $this->db->select('words', ['id', 'q', 'a', 'answers1', 'answers2', 'dict_id', 'touched'], $filter, 'id');
 
         $entries = [];
         foreach ($rows as $row) {
             $e = Entry::parse($row);
-            if ($e->id == $q->entry()->id) {
+            if ($e->id == $e->id) {
                 continue;
             }
             $entries[] = $e;

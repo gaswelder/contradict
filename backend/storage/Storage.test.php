@@ -18,17 +18,42 @@ use PHPUnit\Framework\TestCase;
 
 class StorageTest extends TestCase
 {
-    function test()
+    function storages()
     {
-        $s = new SQLStorage('sqlite://dict.sqlite');
-        $this->checkStorage($s);
+        $sql = new SQLStorage('sqlite://dict.sqlite');
+        $blob = new BlobStorage(function () {
+            return json_encode([
+                'dicts' => [
+                    '1' => [
+                        'id' => '1',
+                        'name' => 'Sample dict'
+                    ]
+                ],
+                'words' => [
+                    '1' => [
+                        'id' => '1',
+                        'dict_id' => '1',
+                        'q' => 'q',
+                        'a' => 'a',
+                        'touched' => 0,
+                        'answers1' => 0,
+                        'answers2' => 0,
+                    ]
+                ],
+            ]);
+        }, function ($data) {
+            //
+        });
+        return [[$sql], [$blob]];
     }
 
-    function checkStorage(Storage $s)
+    /**
+     * @dataProvider storages
+     */
+    function testStorage(Storage $s)
     {
         $dicts = $s->dicts();
         $this->assertNotEmpty($dicts);
-
         foreach ($dicts as $dict) {
             $this->checkDict($s, $dict);
         }
@@ -45,16 +70,16 @@ class StorageTest extends TestCase
 
         $stats = $s->dictStats($dict->id);
         $this->assertInstanceOf(Stats::class, $stats);
+        $this->assertGreaterThan(0, $stats->totalEntries, 'total entries');
 
         $scores = $s->lastScores($dict->id);
 
         $ee = $s->allEntries($dict->id);
         $this->assertNotEmpty($ee);
 
-        $q = $t->tuples1[0];
-        $s->similars($q);
+        $s->similars($ee[0], false);
 
-        $entry = $q->entry();
+        $entry = $ee[0];
         $e = $s->entry($entry->id);
         $this->assertInstanceOf(Entry::class, $entry);
 

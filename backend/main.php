@@ -31,7 +31,8 @@ function clg(...$var)
 
 function hint(Storage $s, Question $q)
 {
-    $sim = $s->similars($q);
+    $entry = $q->entry();
+    $sim = $s->similars($entry, $q->reverse);
     if (count($sim) == 0) {
         return null;
     }
@@ -173,12 +174,6 @@ function pick(array $entries, int $size, $dir): array
     $entries = array_slice($unfinished, 0, $size);
     return $entries;
 }
-
-function finished(Entry $e): bool
-{
-    return $e->answers1 >= Storage::GOAL && $e->answers2 >= Storage::GOAL;
-}
-
 
 $dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();

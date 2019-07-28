@@ -2,9 +2,9 @@
 
 class Stats
 {
-    private $totalEntries;
-    private $finished;
-    private $touched;
+    public $totalEntries;
+    public $finished;
+    public $touched;
 
     function __construct($totalEntries, $finished, $touched)
     {
