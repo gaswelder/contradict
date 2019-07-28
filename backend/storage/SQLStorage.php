@@ -27,16 +27,13 @@ class SQLStorage implements Storage
     function dicts(): array
     {
         $rows = $this->db->getRows("select id, name from 'dicts'");
-        return array_map(function ($row) {
-            return new Dict($row['id'], $row['name']);
-        }, $rows);
+        return array_map([Dict::class, 'parse'], $rows);
     }
 
     function dict(string $id): Dict
     {
         $row = $this->db->getRow("select id, name from 'dicts' where id = ?", $id);
-        $d = new Dict($row['id'], $row['name']);
-        return $d;
+        return Dict::parse($row);
     }
 
     function dictStats(string $dict_id): Stats
