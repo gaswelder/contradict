@@ -101,17 +101,19 @@ class App
         return new TestResults($dict_id, $results);
     }
 
-    function appendWords(string $dict_id, array $entries): int
+    function appendWords(string $dict_id, array $entries): array
     {
-        $n = 0;
+        $added = 0;
+        $skipped = 0;
         foreach ($entries as $entry) {
-            if ($this->s->hasEntry($dict_id, $entry)) {
-                continue;
+            if (!$this->s->hasEntry($dict_id, $entry)) {
+                $this->s->saveEntry($entry);
+                $added++;
+            } else {
+                $skipped++;
             }
-            $this->s->saveEntry($entry);
-            $n++;
         }
-        return $n;
+        return compact('added', 'skipped');
     }
 
     function dicts(): array

@@ -71,10 +71,7 @@ function makeWebRoutes(\App $the)
             $entry->a = $tuple[1];
             $entries[] = $entry;
         }
-        $n = $the->appendWords($dict_id, $entries);
-        return [
-            'n' => $n
-        ];
+        return $the->appendWords($dict_id, $entries);
     });
 
     /**

@@ -23,8 +23,8 @@ class AddEntriesPage extends React.Component {
       .filter(e => !empty(e))
       .map(({ q, a }) => ({ q, a }));
     this.setState({ loading: true });
-    const { n } = await this.props.api.addEntries(dictID, data);
-    alert(`${n} added`);
+    const { added, skipped } = await this.props.api.addEntries(dictID, data);
+    alert(`${added} added, ${skipped} skipped`);
     this.setState({ loading: false });
     this.setState({
       entries: [{ number: 0, q: "", a: "" }],
