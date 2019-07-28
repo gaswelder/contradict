@@ -82,10 +82,7 @@ function makeWebRoutes(Storage $storage)
      * Returns a new test.
      */
     $app->get('/api/{\d+}/test', function ($dict_id) use ($storage) {
-        $size = 20;
-        $test = new Test($storage->pick($dict_id, $size, 0), $storage->pick($dict_id, $size, 1));
-
-
+        $test = generateTest($storage, $dict_id);
         $hints1 = [];
         $hints2 = [];
         foreach ($test->tuples1 as $q) {

@@ -76,46 +76,11 @@ class SQLStorage implements Storage
         ) > 0;
     }
 
-    /**
-     * Returns a given number of random questions.
-     *
-     * @param int $dict_id Identifier of the dictionary to get questions from
-     * @param int $size Number of questions
-     * @param int $dir Translation direction: 0 for direct, 1 for reverse
-     * @return array
-     */
-    function pick($dict_id, $size, $dir)
+    function allEntries(string $dict_id): array
     {
-        $correctAnswers = $dir == 0 ? 'answers1' : 'answers2';
-        $size = intval($size);
-        $goal = Storage::GOAL;
-        $windowSize = Storage::WINDOW;
-
         $rows = $this->db->getRows("
-            select * from 
-                (select * from words
-                    where dict_id = ?
-                    and $correctAnswers < $goal
-                    order by touched desc, id
-                    limit $windowSize) a
-            order by random()
-            limit $size", $dict_id);
-
-        $entries = [];
-        $ids = [];
-        foreach ($rows as $row) {
-            $ids[] = $row['id'];
-            $entries[] = Entry::parse($row);
-        }
-
-        $set = '(' . implode(', ', $ids) . ')';
-        $this->db->exec("update words set touched = 1 where id in $set");
-
-        $questions = [];
-        foreach ($entries as $entry) {
-            $questions[] = new Question($entry, $dir == 1);
-        }
-        return $questions;
+            select * from words where dict_id = ?", $dict_id);
+        return array_map([Entry::class, 'parse'], $rows);
     }
 
     function similars(Question $q)
@@ -136,7 +101,7 @@ class SQLStorage implements Storage
 
     function entry(string $id): Entry
     {
-        $row = $this->db->getRow("select id, q, a, answers1, answers2, dict_id from 'words' where id = ?", $id);
+        $row = $this->db->getRow("select id, q, a, answers1, answers2, dict_id, touched from 'words' where id = ?", $id);
         return Entry::parse($row);
     }
 

@@ -48,8 +48,8 @@ class StorageTest extends TestCase
 
         $scores = $s->lastScores($dict->id);
 
-        $t = $s->test($dict->id);
-        $this->assertInstanceOf(Test::class, $t);
+        $ee = $s->allEntries($dict->id);
+        $this->assertNotEmpty($ee);
 
         $q = $t->tuples1[0];
         $s->similars($q);
