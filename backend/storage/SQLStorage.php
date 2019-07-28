@@ -1,5 +1,8 @@
 <?php
 
+// __APPDIR is a hack to let dbclient know where to look for the sqlite file.
+$GLOBALS['__APPDIR'] = __DIR__ . '/..';
+
 class SQLStorage implements Storage
 {
     function __construct($url)

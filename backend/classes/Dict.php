@@ -3,7 +3,7 @@
 class Dict
 {
     public $id;
-    private $name;
+    public $name;
 
     function __construct(string $id, string $name)
     {
