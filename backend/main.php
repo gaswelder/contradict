@@ -1,6 +1,7 @@
 <?php
 require 'vendor/autoload.php';
 require __DIR__ . '/routes.php';
+require __DIR__ . '/App.php';
 
 function registerClasses($dir)
 {
@@ -70,50 +71,6 @@ function checkAnswer(Question $q, $answer)
     return mb_strtolower($realAnswer) == mb_strtolower($answer);
 }
 
-function verifyTest(string $dict_id, array $qa, Storage $s): TestResults
-{
-    $results = [];
-    foreach ($qa as $i => $tuple) {
-        [$question, $answer] = $tuple;
-        $result = [
-            'question' => $question->format(),
-            'answer' => $answer,
-            'correct' => checkAnswer($question, $answer)
-        ];
-        $results[] = $result;
-    }
-
-    // Update correct answer counters
-    // For all questions that are correct, increment the corresponding counter (dir 0/1) and save.
-    foreach ($qa as $i => $tuple) {
-        [$question, $answer] = $tuple;
-        if (!checkAnswer($question, $answer)) {
-            continue;
-        }
-        if ($question->reverse) {
-            $question->entry()->answers2++;
-        } else {
-            $question->entry()->answers1++;
-        }
-        $s->saveEntry($question->entry());
-    }
-
-    return new TestResults($dict_id, $results);
-}
-
-function appendWords(Storage $s, string $dict_id, array $entries): int
-{
-    $n = 0;
-    foreach ($entries as $entry) {
-        if ($s->hasEntry($dict_id, $entry)) {
-            continue;
-        }
-        $s->saveEntry($entry);
-        $n++;
-    }
-    return $n;
-}
-
 function dictStats(Storage $s, string $dict_id): Stats
 {
     $entries = $s->allEntries($dict_id);
@@ -148,58 +105,10 @@ function successRate(Storage $s, string $dict_id): float
     return $n > 0 ? $total / $n : 1;
 }
 
-function generateTest(Storage $s, $dict_id): Test
-{
-    $size = 20;
-    $entries = $s->allEntries($dict_id);
-    $pick1 = pick($entries, $size, 0);
-    $pick2 = pick($entries, $size, 1);
-
-    // Mark the entries as touched.
-    foreach (array_merge($pick1, $pick2) as $e) {
-        if (!$e->touched) {
-            $e->touched = 1;
-            $s->saveEntry($e);
-        }
-    }
-
-    $questions1 = [];
-    foreach ($pick1 as $entry) {
-        $questions1[] = new Question($entry, false);
-    }
-    $questions2 = [];
-    foreach ($pick2 as $entry) {
-        $questions2[] = new Question($entry, true);
-    }
-
-    $test = new Test($questions1, $questions2);
-    return $test;
-}
-
-function pick(array $entries, int $size, $dir): array
-{
-    $unfinished = [];
-    foreach ($entries as $e) {
-        if ($dir == 0 && $e->answers1 >= Storage::GOAL) {
-            continue;
-        }
-        if ($dir == 1 && $e->answers2 >= Storage::GOAL) {
-            continue;
-        }
-        $unfinished[] = $e;
-    }
-    usort($unfinished, function ($a, $b) {
-        return $b->touched <=> $a->touched;
-    });
-    $unfinished = array_slice($unfinished, 0, Storage::WINDOW);
-    shuffle($unfinished);
-    $entries = array_slice($unfinished, 0, $size);
-    return $entries;
-}
-
 $dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();
 
 $storage = new SQLStorage(getenv('DATABASE'));
-$app = makeWebRoutes($storage);
+$theApp = new App($storage);
+$app = makeWebRoutes($theApp);
 $app->run();

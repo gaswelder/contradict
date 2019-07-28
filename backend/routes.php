@@ -5,7 +5,7 @@ use havana\user;
 use havana\request;
 use havana\response;
 
-function makeWebRoutes(Storage $storage)
+function makeWebRoutes(\App $the)
 {
     $app = new App(__DIR__);
 
@@ -40,11 +40,11 @@ function makeWebRoutes(Storage $storage)
     /**
      * Returns the list of dicts.
      */
-    $app->get('/api/', function () use ($storage) {
+    $app->get('/api/', function () use ($the) {
         $r = ['dicts' => []];
-        foreach ($storage->dicts() as $dict) {
+        foreach ($the->dicts() as $dict) {
             $d = $dict->format();
-            $d['stats'] = dictStats($storage, $dict->id)->format();
+            $d['stats'] = $the->dictStats($dict->id)->format();
             $r['dicts'][] = $d;
         }
         return $r;
@@ -53,7 +53,7 @@ function makeWebRoutes(Storage $storage)
     /**
      * Adds words to a dictionary.
      */
-    $app->post('/api/{\d+}/add', function ($dict_id) use ($storage) {
+    $app->post('/api/{\d+}/add', function ($dict_id) use ($the) {
         // Parse words posted as text file
         // to array of [word, translation] pairs.
         $str = request::post('words');
@@ -71,7 +71,7 @@ function makeWebRoutes(Storage $storage)
             $entry->a = $tuple[1];
             $entries[] = $entry;
         }
-        $n = appendWords($storage, $dict_id, $entries);
+        $n = $the->appendWords($dict_id, $entries);
         return [
             'n' => $n
         ];
@@ -80,15 +80,15 @@ function makeWebRoutes(Storage $storage)
     /**
      * Returns a new test.
      */
-    $app->get('/api/{\d+}/test', function ($dict_id) use ($storage) {
-        $test = generateTest($storage, $dict_id);
+    $app->get('/api/{\d+}/test', function ($dict_id) use ($the) {
+        $test = $the->generateTest($dict_id);
         $hints1 = [];
         $hints2 = [];
         foreach ($test->tuples1 as $q) {
-            $hints1[] = hint($storage, $q);
+            $hints1[] = $the->hint($q);
         }
         foreach ($test->tuples2 as $q) {
-            $hints2[] = hint($storage, $q);
+            $hints2[] = $the->hint($q);
         }
 
         $f = $test->format();
@@ -104,37 +104,40 @@ function makeWebRoutes(Storage $storage)
     /**
      * Parses test answers and returns results.
      */
-    $app->post('/api/{\d+}/test', function ($dict_id) use ($storage) {
-        $answers = request::post('a');
+    $app->post('/api/{\d+}/test', function ($dict_id) use ($the) {
         $directions = request::post('dir');
-        $entries = $storage->entries(request::post('q'));
-
-        $qa = [];
-        foreach ($entries as $i => $entry) {
-            $dir = $directions[$i];
-            $qa[] = [new Question($entry, $dir == 1), $answers[$i]];
+        $ids = request::post('q');
+        $answers = [];
+        foreach (request::post('a') as $i => $answer) {
+            $a = new Answer;
+            $a->answer = $answer;
+            $a->entryID = $ids[$i];
+            $a->reverse = $directions[$i] == 1;
+            $answers[] = $a;
         }
 
-        $testresults = verifyTest($dict_id, $qa, $storage);
-        return $testresults->format();
+        $results = $the->verifyTest($dict_id, $answers);
+        return $results->format();
     });
 
     /**
      * Returns a single entry by ID.
      */
-    $app->get('/api/entries/{\d+}', function ($id) use ($storage) {
-        $entry = $storage->entry($id);;
-        return ['entry' => $entry->format()];
+    $app->get('/api/entries/{\d+}', function ($id) use ($the) {
+        return [
+            'entry' => $the->entry($id)->format()
+        ];
     });
 
     /**
      * Updates an entry.
      */
-    $app->post('/api/entries/{\d+}', function ($id) use ($storage) {
-        $entry = $storage->entry($id);
+    $app->post('/api/entries/{\d+}', function ($id) use ($the) {
+        $entry = new Entry;
+        $entry->id = $id;
         $entry->q = request::post('q');
         $entry->a = request::post('a');
-        $storage->saveEntry($entry);
+        $the->updateEntry($entry);
         return 'ok';
     });
 
