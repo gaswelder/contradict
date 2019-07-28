@@ -12,11 +12,7 @@ class Entry
 
     function format()
     {
-        return [
-            'q' => $this->q,
-            'a' => $this->a,
-            'id' => $this->id
-        ];
+        return json_decode(json_encode($this), true);
     }
 
     static function parse($row)

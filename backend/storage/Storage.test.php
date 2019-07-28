@@ -16,6 +16,34 @@ registerClasses(__DIR__ . '/../classes');
 
 use PHPUnit\Framework\TestCase;
 
+function export(Storage $s)
+{
+    $data = [
+        'dicts' => [],
+        'entries' => [],
+        'scores' => []
+    ];
+    foreach ($s->dicts() as $dict) {
+        $data['dicts'][] = $dict->format();
+        foreach ($s->allEntries($dict->id) as $e) {
+            $data['entries'][] = $e->format();
+        }
+    }
+    return $data;
+}
+
+function import(Storage $s, $data)
+{
+    foreach ($data['dicts'] as $row) {
+        $d = Dict::parse($row);
+        $s->saveDict($d);
+    }
+    foreach ($data['entries'] as $row) {
+        $e = Entry::parse($row);
+        $s->saveEntry($e);
+    }
+}
+
 class StorageTest extends TestCase
 {
     function storages()
@@ -87,5 +115,22 @@ class StorageTest extends TestCase
         $this->assertCount(1, $ee);
 
         $s->saveEntry($e);
+    }
+
+    function testImport()
+    {
+        $sql = new SQLStorage('sqlite://dict.sqlite');
+        $blob = new BlobStorage(function () {
+            return json_encode([
+                'dicts' => [],
+                'words' => [],
+            ]);
+        }, function ($data) {
+            var_dump($data);
+            // $this->assertArrayHasKey('dicts', $data);
+            // $this->assertArrayHasKey('words', $data);
+        });
+        $data = export($sql);
+        import($blob, $data);
     }
 }

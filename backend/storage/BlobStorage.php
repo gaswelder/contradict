@@ -16,10 +16,15 @@ class BlobStorage implements Storage
         call_user_func($this->write, json_encode($this->data));
     }
 
+    function saveDict(Dict $d)
+    {
+        $this->data['dicts'][$d->id] = $d->format();
+    }
+
     function dicts(): array
     {
         $dicts = [];
-        foreach ($this->data['dicts'] as $id => $row) {
+        foreach ($this->data['dicts'] as $row) {
             $dicts[] = Dict::parse($row);
         }
         return $dicts;

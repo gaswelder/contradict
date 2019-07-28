@@ -5,9 +5,23 @@ $GLOBALS['__APPDIR'] = __DIR__ . '/..';
 
 class SQLStorage implements Storage
 {
+    /**
+     * @var havana\dbclient
+     */
+    private $db;
+
     function __construct($url)
     {
         $this->db = db($url);
+    }
+
+    function saveDict(Dict $d)
+    {
+        if ($d->id) {
+            $this->db->insert('dicts', $d->format());
+        } else {
+            $this->db->update('dicts', $d->format(), ['id' => $d->id]);
+        }
     }
 
     function dicts(): array
