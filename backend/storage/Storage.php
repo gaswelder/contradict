@@ -16,7 +16,6 @@ interface Storage
 
     function dicts(): array;
     function dict(string $id): Dict;
-    function appendWords(string $dict_id, array $pairs): int;
 
     /**
      * Generates a test for a given dictionary.

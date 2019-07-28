@@ -5,20 +5,6 @@ use havana\user;
 use havana\request;
 use havana\response;
 
-/**
- * Parses words posted as text file,
- * returns array of [word, translation] pairs.
- */
-function parseLines(string $str): array
-{
-    $lines = array_map('trim', explode("\n", $str));
-    $lines = array_filter($lines, 'strlen');
-    $lines = array_map(function ($line) {
-        return preg_split('/\s+-\s+/', $line, 2);
-    }, $lines);
-    return $lines;
-}
-
 function makeWebRoutes(Storage $storage)
 {
     $app = new App(__DIR__);
@@ -71,8 +57,24 @@ function makeWebRoutes(Storage $storage)
      * Adds words to a dictionary.
      */
     $app->post('/api/{\d+}/add', function ($dict_id) use ($storage) {
-        $lines = parseLines(request::post('words'));
-        $n = $storage->appendWords($dict_id, $lines);
+        // Parse words posted as text file
+        // to array of [word, translation] pairs.
+        $str = request::post('words');
+        $lines = array_map('trim', explode("\n", $str));
+        $lines = array_filter($lines, 'strlen');
+        $lines = array_map(function ($line) {
+            return preg_split('/\s+-\s+/', $line, 2);
+        }, $lines);
+
+        $entries = [];
+        foreach ($lines as $tuple) {
+            $entry = new Entry;
+            $entry->dict_id = $dict_id;
+            $entry->q = $tuple[0];
+            $entry->a = $tuple[1];
+            $entries[] = $entry;
+        }
+        $n = appendWords($storage, $dict_id, $entries);
         return [
             'n' => $n
         ];

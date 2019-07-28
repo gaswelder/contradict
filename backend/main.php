@@ -100,6 +100,19 @@ function verifyTest(string $dict_id, array $qa, Storage $s): TestResults
     return new TestResults($dict_id, $results);
 }
 
+function appendWords(Storage $s, string $dict_id, array $entries): int
+{
+    $n = 0;
+    foreach ($entries as $entry) {
+        if ($s->hasEntry($dict_id, $entry)) {
+            continue;
+        }
+        $s->saveEntry($entry);
+        $n++;
+    }
+    return $n;
+}
+
 
 $dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();

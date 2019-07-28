@@ -11,6 +11,11 @@ class Dict
         $this->name = $name;
     }
 
+    static function parse(array $arr): Dict
+    {
+        return new self($arr['id'], $arr['name']);
+    }
+
     function format(): array
     {
         return [

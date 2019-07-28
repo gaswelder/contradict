@@ -66,24 +66,7 @@ class SQLStorage implements Storage
         return array_sum($scores) / $n;
     }
 
-    function appendWords(string $dict_id, array $pairs): int
-    {
-        $n = 0;
-        foreach ($pairs as $t) {
-            $entry = new Entry;
-            $entry->dict_id = $dict_id;
-            $entry->q = $t[0];
-            $entry->a = $t[1];
-            if ($this->hasEntry($dict_id, $entry)) {
-                continue;
-            }
-            $this->saveEntry($entry);
-            $n++;
-        }
-        return $n;
-    }
-
-    private function hasEntry($dict_id, $entry)
+    function hasEntry($dict_id, $entry)
     {
         return $this->db->getValue(
             "select count(*)
@@ -160,7 +143,7 @@ class SQLStorage implements Storage
 
         $entries = [];
         foreach ($rows as $row) {
-            $e = $this->makeEntry($row);
+            $e = Entry::parse($row);
             if ($e->id == $q->entry()->id) {
                 continue;
             }
@@ -169,19 +152,10 @@ class SQLStorage implements Storage
         return $entries;
     }
 
-    private function makeEntry($row)
-    {
-        $e = new Entry;
-        foreach ($row as $k => $v) {
-            $e->$k = $v;
-        }
-        return $e;
-    }
-
     function entry(string $id): Entry
     {
         $row = $this->db->getRow("select id, q, a, answers1, answers2, dict_id from 'words' where id = ?", $id);
-        return $this->makeEntry($row);
+        return Entry::parse($row);
     }
 
     function saveEntry(Entry $e)

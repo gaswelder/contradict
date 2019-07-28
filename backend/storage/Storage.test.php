@@ -46,8 +46,6 @@ class StorageTest extends TestCase
         $stats = $s->dictStats($dict->id);
         $this->assertInstanceOf(Stats::class, $stats);
 
-        $s->appendWords($dict->id, [['a', 'b']]);
-
         $t = $s->test($dict->id);
         $this->assertInstanceOf(Test::class, $t);
 
