@@ -2,18 +2,6 @@
 
 interface Storage
 {
-    /**
-     * How many correct answers needed for an entry to be "finished".
-     */
-    const GOAL = 10;
-
-    /**
-     * How many entries are in the "learning pool".
-     * This limit is applied separately to both directions,
-     * so the actual pool limit is twice this value.
-     */
-    const WINDOW = 200;
-
     function dicts(): array;
     function dict(string $id): Dict;
     function saveDict(Dict $d);

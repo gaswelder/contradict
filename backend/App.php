@@ -2,6 +2,18 @@
 
 class App
 {
+    /**
+     * How many correct answers needed for an entry to be "finished".
+     */
+    const GOAL = 10;
+
+    /**
+     * How many entries are in the "learning pool".
+     * This limit is applied separately for both directions,
+     * so the actual pool limit is twice this value.
+     */
+    const WINDOW = 200;
+
     private $s;
 
     function __construct(Storage $s)
@@ -41,10 +53,10 @@ class App
     {
         $unfinished = [];
         foreach ($entries as $e) {
-            if ($dir == 0 && $e->answers1 >= Storage::GOAL) {
+            if ($dir == 0 && $e->answers1 >= self::GOAL) {
                 continue;
             }
-            if ($dir == 1 && $e->answers2 >= Storage::GOAL) {
+            if ($dir == 1 && $e->answers2 >= self::GOAL) {
                 continue;
             }
             $unfinished[] = $e;
@@ -52,7 +64,7 @@ class App
         usort($unfinished, function ($a, $b) {
             return $b->touched <=> $a->touched;
         });
-        $unfinished = array_slice($unfinished, 0, Storage::WINDOW);
+        $unfinished = array_slice($unfinished, 0, self::WINDOW);
         shuffle($unfinished);
         $entries = array_slice($unfinished, 0, $size);
         return $entries;
@@ -130,7 +142,7 @@ class App
         $stats->totalEntries = count($entries);
 
         foreach ($entries as $e) {
-            $isfinished = $e->answers1 >= Storage::GOAL && $e->answers2 >= Storage::GOAL;
+            $isfinished = $e->answers1 >= self::GOAL && $e->answers2 >= self::GOAL;
             if ($isfinished) {
                 $stats->finished++;
                 continue;
