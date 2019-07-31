@@ -12,7 +12,10 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/gaswelder/havana",
-                "reference": "1ab1632b01ec2794835756e68d765f9013541707"
+                "reference": "c3390603cb176724be28ef56562817bf49bf4d52"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.2"
             },
             "type": "library",
             "autoload": {
@@ -20,11 +23,16 @@
                     "main.php"
                 ]
             },
+            "scripts": {
+                "test": [
+                    "phpunit test/"
+                ]
+            },
             "license": [
                 "MIT"
             ],
             "description": "Nano-framework",
-            "time": "2019-07-28T18:54:03+00:00"
+            "time": "2019-07-31T23:14:44+00:00"
         }
     ],
     "packages-dev": [

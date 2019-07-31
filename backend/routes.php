@@ -36,7 +36,7 @@ function makeWebRoutes(\App $the)
 
         if (request::url()->path == '/api/login') {
             // Allow only posting to login.
-            if (strtolower($_SERVER['REQUEST_METHOD']) !== 'post') {
+            if (request::method() !== 'post') {
                 return 405;
             }
             $password = request::post('password');
