@@ -41,9 +41,10 @@ async function post(url, data) {
 
 export default {
   async login(password) {
-    const r = await post("/login", { password }).then(r => r.text());
-    if (r != "ok") {
-      throw new Error("auth failed");
+    const response = await post("/login", { password });
+    const body = await response.text();
+    if (response.status != 201) {
+      throw new Error("login failed: " + body);
     }
   },
 

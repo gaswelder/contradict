@@ -1,16 +1,56 @@
 <?php
 
-use havana\App;
-use havana\user;
+use Appget\App;
 use havana\request;
 use havana\response;
+
+class Auth
+{
+    function login(string $name, string $password): string
+    {
+        if ($password == '123') {
+            return 'token';
+        }
+        return '';
+    }
+
+    function checkToken(string $token): string
+    {
+        if ($token == 'token') {
+            return 'me';
+        }
+        return '';
+    }
+}
 
 function makeWebRoutes(\App $the)
 {
     $app = new App(__DIR__);
+    $auth = new Auth;
 
-    $app->middleware(function ($next) {
-        if (!user::getRole('user') && request::url()->isUnder('/api') && request::url()->path != '/api/login') {
+    $app->middleware(function ($next) use ($auth) {
+        // Require auth for /api/*.
+        if (!request::url()->isUnder('/api')) {
+            return $next();
+        }
+
+        if (request::url()->path == '/api/login') {
+            // Allow only posting to login.
+            if (strtolower($_SERVER['REQUEST_METHOD']) !== 'post') {
+                return 405;
+            }
+            $password = request::post('password');
+            $token = $auth->login('name', $password);
+            if ($token) {
+                setcookie('token', $token, time() + 3600 * 24);
+                return 201;
+            } else {
+                return response::make('Invalid login/password')->setStatus(403);
+            }
+        }
+
+        $token = $_COOKIE['token'] ?? '';
+        if (!$auth->checkToken($token)) {
             return 401;
         }
         return $next();
@@ -22,20 +62,6 @@ function makeWebRoutes(\App $the)
         $r->setHeader('Access-Control-Allow-Credentials', 'true');
         return $r;
     }));
-
-    $app->post('/api/login', function () {
-        $pass = request::post('password');
-        if ($pass == '123') {
-            user::addRole('user');
-            return 'ok';
-        }
-        return response::make(tpl('login'))->setStatus(403);
-    });
-
-    $app->post('/api/logout', function () {
-        user::removeRole('user');
-        return 'ok';
-    });
 
     /**
      * Returns the list of dicts.
