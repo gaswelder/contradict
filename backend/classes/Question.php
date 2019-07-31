@@ -43,21 +43,8 @@ class Question
 			'q' => $this->q(),
 			'a' => $this->a(),
 			'times' => $this->times(),
-			'wikiURL' => $this->wikiURL(),
+			'wikiURL' => $this->e->wikiURL(),
 			'dir' => $this->reverse ? 1 : 0
 		];
-	}
-
-	function wikiURL()
-	{
-		$words = explode(' ', $this->e->q);
-		if (empty($words)) return null;
-		if (in_array(strtolower($words[0]), ['das', 'die', 'der'])) {
-			array_shift($words);
-		}
-		if (count($words) != 1) return null;
-
-		$wiki = $words[0];
-		return 'https://de.wiktionary.org/w/index.php?search=' . urlencode($wiki);
 	}
 }
