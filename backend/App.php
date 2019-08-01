@@ -73,35 +73,20 @@ class App
     function verifyTest(string $dict_id, array $answers): TestResults
     {
         $storage = $this->s;
-
-        $ids = array_map(function (Answer $a) {
-            return $a->entryID;
-        }, $answers);
-        $entries = $storage->entries($ids);
-
-        $qa = [];
-        foreach ($entries as $i => $entry) {
-            $qa[] = [new Question($entry, $answers[$i]->reverse), $answers[$i]->answer];
-        }
-
-        $results = [];
-        foreach ($qa as $i => $tuple) {
-            [$question, $answer] = $tuple;
-            $result = [
-                'question' => $question->format(),
-                'answer' => $answer,
-                'correct' => checkAnswer($question, $answer)
-            ];
-            $results[] = $result;
-        }
-
-        // Update correct answer counters
-        // For all questions that are correct, increment the corresponding counter (dir 0/1) and save.
-        foreach ($qa as $i => $tuple) {
-            [$question, $answer] = $tuple;
-            if (!checkAnswer($question, $answer)) {
+        $questions = [];
+        $correct = [];
+        foreach ($answers as $a) {
+            $entry = $storage->entry($a->entryID);
+            $question = new Question($entry, $a->reverse);
+            $questions[] = $question;
+            $ok = checkAnswer($question, $a->answer);
+            $correct[] = $ok;
+            if (!$ok) {
                 continue;
             }
+
+            // Update correct answer counters
+            // For all questions that are correct, increment the corresponding counter (dir 0/1) and save.
             if ($question->reverse) {
                 $question->entry()->answers2++;
             } else {
@@ -110,7 +95,8 @@ class App
             $this->s->saveEntry($question->entry());
         }
 
-        return new TestResults($dict_id, $results);
+
+        return new TestResults($dict_id, $questions, $answers, $correct);
     }
 
     function appendWords(string $dict_id, array $entries): array

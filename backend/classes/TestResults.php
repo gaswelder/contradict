@@ -2,33 +2,47 @@
 
 class TestResults
 {
-    private $results;
     private $dict_id;
+    private $questions;
+    private $answers;
+    private $correct;
 
-    function __construct($dict_id, $results)
+    function __construct(string $dict_id, array $questions, array $answers, array $correct)
     {
-        $this->results = $results;
         $this->dict_id = $dict_id;
+        $this->questions = $questions;
+        $this->answers = $answers;
+        $this->correct = $correct;
     }
 
     function format()
     {
-        $ok = [];
-        $fail = [];
-        foreach ($this->results as $result) {
+        $results = [];
+        foreach ($this->questions as $i => $question) {
+            $answer = $this->answers[$i];
+            $results[] = [
+                "answer" => $answer->answer,
+                "question" => $question->format(),
+                "correct" => $this->correct[$i]
+            ];
+        }
+
+        $ok = 0;
+        $fail = 0;
+        foreach ($results as $result) {
             if ($result['correct']) {
-                $ok[] = $result;
+                $ok++;
             } else {
-                $fail[] = $result;
+                $fail++;
             }
         }
 
         return [
             'dict_id' => $this->dict_id,
-            'results' => $this->results,
+            'results' => $results,
             'stats' => [
-                'right' => count($ok),
-                'wrong' => count($fail)
+                'right' => $ok,
+                'wrong' => $fail
             ]
         ];
     }
