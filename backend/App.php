@@ -95,6 +95,18 @@ class App
             $this->s->saveEntry($question->entry());
         }
 
+        // Save a score record.
+        $right = 0;
+        $wrong = 0;
+        foreach ($correct as $ok) {
+            if ($ok) $right++;
+            else $wrong++;
+        }
+        $score = new Score;
+        $score->dict_id = $dict_id;
+        $score->right = $right;
+        $score->wrong = $wrong;
+        $storage->saveScore($score);
 
         return new TestResults($dict_id, $questions, $answers, $correct);
     }

@@ -16,4 +16,14 @@ class Score
         $s->wrong = $row['wrong'];
         return $s;
     }
+
+    function format()
+    {
+        return [
+            'id' => $this->id,
+            'dict_id' => $this->dict_id,
+            'right' => $this->right,
+            'wrong' => $this->wrong
+        ];
+    }
 }

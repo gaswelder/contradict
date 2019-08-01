@@ -9,6 +9,12 @@ class BlobStorage implements Storage
     {
         $this->write = $write;
         $this->data = json_decode($read(), true);
+        $keys = ['dicts', 'words', 'scores'];
+        foreach ($keys as $key) {
+            if (!isset($this->data[$key]) || !is_array(($this->data[$key]))) {
+                throw new Exception("missing key '$key' from storage data");
+            }
+        }
     }
 
     private function save()
@@ -37,7 +43,23 @@ class BlobStorage implements Storage
 
     function lastScores(string $dict_id): array
     {
-        return [];
+        $rows = [];
+        foreach ($this->data['scores'] as $score) {
+            if ($score['dict_id'] != $dict_id) {
+                continue;
+            }
+            $rows[] = Score::parse($score);
+        }
+        return $rows;
+    }
+
+    function saveScore(Score $score)
+    {
+        if (!$score->id) {
+            $score->id = uniqid();
+        }
+        $this->data['scores'][$score->id] = $score->format();
+        $this->save();
     }
 
     function entry(string $id): Entry

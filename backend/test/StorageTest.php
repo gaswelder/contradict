@@ -58,6 +58,7 @@ class StorageTest extends TestCase
                         'answers2' => 0,
                     ]
                 ],
+                'scores' => []
             ]);
         }, function ($data) {
             //
@@ -86,7 +87,16 @@ class StorageTest extends TestCase
         $this->assertEquals($d->id, $dict->id);
         $this->assertEquals($d->name, $dict->name);
 
-        $scores = $s->lastScores($dict->id);
+        $scores1 = $s->lastScores($dict->id);
+        $score = new Score;
+        $score->right = rand();
+        $score->wrong = rand();
+        $score->dict_id = $dict->id;
+        $s->saveScore($score);
+        $scores2 = $s->lastScores($dict->id);
+        $sc = $scores2[0];
+        $this->assertEquals($score->right, $sc->right);
+        $this->assertEquals($score->wrong, $sc->wrong);
 
         $ee = $s->allEntries($dict->id);
         $this->assertNotEmpty($ee);
@@ -110,6 +120,7 @@ class StorageTest extends TestCase
             return json_encode([
                 'dicts' => [],
                 'words' => [],
+                'scores' => [],
             ]);
         }, function ($data) {
             // var_dump($data);

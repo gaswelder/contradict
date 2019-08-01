@@ -46,6 +46,14 @@ class SQLStorage implements Storage
         return array_map([Score::class, 'parse'], $rows);
     }
 
+    function saveScore(Score $s)
+    {
+        if ($s->id) {
+            throw new Exception("trying to save score with ID already defined");
+        }
+        $this->db->insert('results', $s->format());
+    }
+
     function hasEntry($dict_id, $entry)
     {
         return $this->db->getValue(
