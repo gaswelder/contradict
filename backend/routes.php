@@ -4,7 +4,7 @@ use Appget\App;
 use havana\request;
 use havana\response;
 
-class Auth
+class DummyAuth implements Auth
 {
     function login(string $name, string $password): string
     {
@@ -26,7 +26,7 @@ class Auth
 function makeWebRoutes(\App $the)
 {
     $app = new App(__DIR__);
-    $auth = new Auth;
+    $auth = new CookieAuth(getenv('COOKIE_KEY'));
 
     $app->middleware(function ($next) use ($auth) {
         // Require auth for /api/*.
@@ -36,7 +36,7 @@ function makeWebRoutes(\App $the)
 
         if (request::url()->path == '/api/login') {
             // Allow only posting to login.
-            if (request::method() !== 'post') {
+            if (request::method() !== 'POST') {
                 return 405;
             }
             $password = request::post('password');
@@ -170,6 +170,10 @@ function makeWebRoutes(\App $the)
 
     $app->get('*', function () {
         return file_get_contents(__DIR__ . '/public/index.html');
+    });
+
+    $app->cmd('genkey', function () {
+        echo CookieAuth::generateKey(), "\n";
     });
 
     return $app;

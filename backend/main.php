@@ -1,9 +1,11 @@
 <?php
-require '../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
+registerClasses(__DIR__ . '/storage');
+registerClasses(__DIR__);
 require __DIR__ . '/routes.php';
 require __DIR__ . '/App.php';
 
-registerClasses(__DIR__ . '/storage');
+
 
 function varfmt($var)
 {
