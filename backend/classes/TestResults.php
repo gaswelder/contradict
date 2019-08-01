@@ -27,23 +27,9 @@ class TestResults
             ];
         }
 
-        $ok = 0;
-        $fail = 0;
-        foreach ($results as $result) {
-            if ($result['correct']) {
-                $ok++;
-            } else {
-                $fail++;
-            }
-        }
-
         return [
             'dict_id' => $this->dict_id,
             'results' => $results,
-            'stats' => [
-                'right' => $ok,
-                'wrong' => $fail
-            ]
         ];
     }
 }
