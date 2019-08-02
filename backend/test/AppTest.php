@@ -55,10 +55,9 @@ class AppTest extends TestCase
         $app = new App;
         $app->setStorage($storage);
         $app->verifyTest($dict_id, $answers);
-        $this->assertArraySubset([
-            'right' => 1,
-            'wrong' => 1,
-            'dict_id' => '1'
-        ], reset($data['scores']));
+        $first = reset($data['scores']);
+        $this->assertEquals(1, $first['right']);
+        $this->assertEquals(1, $first['wrong']);
+        $this->assertEquals(1, $first['dict_id']);
     }
 }
