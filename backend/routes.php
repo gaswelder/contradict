@@ -23,24 +23,21 @@ class DummyAuth implements Auth
     }
 }
 
-function makeWebRoutes(\App $the, $makeStorage)
+function makeAuthMiddleware(Auth $auth, $urlPrefix, $loginURL, $logoutURL, $onAuth)
 {
-    $app = new App(__DIR__);
-    $auth = new CookieAuth(getenv('COOKIE_KEY'));
-
-    $app->middleware(function ($next) use ($auth, $the, $makeStorage) {
-        // Require auth for /api/*.
-        if (!request::url()->isUnder('/api')) {
+    return function ($next) use ($auth, $urlPrefix, $loginURL, $logoutURL, $onAuth) {
+        if (!request::url()->isUnder($urlPrefix)) {
             return $next();
         }
 
-        if (request::url()->path == '/api/login') {
+        if (request::url()->path == $loginURL) {
             // Allow only posting to login.
             if (request::method() !== 'POST') {
                 return 405;
             }
             $password = request::post('password');
-            $token = $auth->login('gas', $password);
+            $name = 'gas';
+            $token = $auth->login($name, $password);
             if ($token) {
                 setcookie('token', $token, time() + 3600 * 24);
                 return 201;
@@ -49,14 +46,35 @@ function makeWebRoutes(\App $the, $makeStorage)
             }
         }
 
+        if (request::url()->path == $logoutURL) {
+            // Allow only posting to logout.
+            if (request::method() !== 'POST') {
+                return 405;
+            }
+            setcookie('token', '');
+            return 200;
+        }
+
         $token = $_COOKIE['token'] ?? '';
         $userID = $auth->checkToken($token);
         if (!$userID) {
             return 401;
         }
-        $the->setStorage($makeStorage($userID));
+        $onAuth($userID);
         return $next();
-    });
+    };
+}
+
+function makeWebRoutes(\App $the, $makeStorage)
+{
+    $app = new App(__DIR__);
+    $auth = new CookieAuth(getenv('COOKIE_KEY'));
+
+    $onAuth = function ($userID) use ($the, $makeStorage) {
+        $the->setStorage($makeStorage($userID));
+    };
+
+    $app->middleware(makeAuthMiddleware($auth, '/api', '/api/login', '/api/logout', $onAuth));
 
     $app->middleware((function ($next) {
         $r = $next();
@@ -64,11 +82,6 @@ function makeWebRoutes(\App $the, $makeStorage)
         $r->setHeader('Access-Control-Allow-Credentials', 'true');
         return $r;
     }));
-
-    $app->post('/api/logout', function () {
-        setcookie('token', '');
-        return 200;
-    });
 
     /**
      * Returns the list of dicts.
