@@ -10,6 +10,10 @@ async function authFetch(url, options = {}) {
     e.unauthorized = true;
     throw e;
   }
+  if (Math.floor(r.status / 100) != 2) {
+    const e = new Error(await r.text());
+    throw e;
+  }
   return r;
 }
 

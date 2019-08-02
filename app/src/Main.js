@@ -10,8 +10,12 @@ import { withRouter } from "react-router";
 
 const Header = withRouter(function Header(props) {
   async function logout() {
-    await api.logout();
-    props.history.push("/login");
+    try {
+      await api.logout();
+      props.history.push("/login");
+    } catch (err) {
+      alert("failed to log out: " + err);
+    }
   }
   return (
     <header>

@@ -65,6 +65,11 @@ function makeWebRoutes(\App $the, $makeStorage)
         return $r;
     }));
 
+    $app->post('/api/logout', function () {
+        setcookie('token', '');
+        return 200;
+    });
+
     /**
      * Returns the list of dicts.
      */
