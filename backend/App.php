@@ -14,17 +14,18 @@ class App
      */
     const WINDOW = 200;
 
-    private $s;
+    private $storage;
 
     function setStorage(Storage $s)
     {
-        $this->s = $s;
+        $this->storage = $s;
     }
 
-    function generateTest($dict_id): Test
+    function generateTest(string $dict_id): Test
     {
+        $storage = $this->storage;
         $size = 20;
-        $entries = $this->s->allEntries($dict_id);
+        $entries = $storage->allEntries($dict_id);
         $pick1 = $this->pick($entries, $size, 0);
         $pick2 = $this->pick($entries, $size, 1);
 
@@ -32,7 +33,7 @@ class App
         foreach (array_merge($pick1, $pick2) as $e) {
             if (!$e->touched) {
                 $e->touched = 1;
-                $this->s->saveEntry($e);
+                $storage->saveEntry($e);
             }
         }
 
@@ -72,7 +73,7 @@ class App
 
     function verifyTest(string $dict_id, array $answers): TestResults
     {
-        $storage = $this->s;
+        $storage = $this->storage;
         $questions = [];
         $correct = [];
         foreach ($answers as $a) {
@@ -92,7 +93,7 @@ class App
             } else {
                 $question->entry()->answers1++;
             }
-            $this->s->saveEntry($question->entry());
+            $storage->saveEntry($question->entry());
         }
 
         // Save a score record.
@@ -113,11 +114,12 @@ class App
 
     function appendWords(string $dict_id, array $entries): array
     {
+        $storage = $this->storage;
         $added = 0;
         $skipped = 0;
         foreach ($entries as $entry) {
-            if (!$this->s->hasEntry($dict_id, $entry)) {
-                $this->s->saveEntry($entry);
+            if (!$storage->hasEntry($dict_id, $entry)) {
+                $storage->saveEntry($entry);
                 $added++;
             } else {
                 $skipped++;
@@ -128,13 +130,13 @@ class App
 
     function dicts(): array
     {
-        return $this->s->dicts();
+        return $this->storage->dicts();
     }
 
-    function dictStats($dict_id): Stats
+    function dictStats(string $dict_id): Stats
     {
-        $s = $this->s;
-        $entries = $s->allEntries($dict_id);
+        $storage = $this->storage;
+        $entries = $storage->allEntries($dict_id);
 
         $stats = new Stats;
         $stats->totalEntries = count($entries);
@@ -150,15 +152,15 @@ class App
             }
         }
 
-        $stats->successRate = successRate($s, $dict_id);
+        $stats->successRate = successRate($storage, $dict_id);
         return $stats;
     }
 
     function hint(Question $q)
     {
-        $s = $this->s;
+        $storage = $this->storage;
         $entry = $q->entry();
-        $sim = $s->similars($entry, $q->reverse);
+        $sim = $storage->similars($entry, $q->reverse);
         if (count($sim) == 0) {
             return null;
         }
@@ -171,14 +173,14 @@ class App
         return preg_replace('/\*+/', '...', $hint);
     }
 
-    function entry($id): Entry
+    function entry(string $id): Entry
     {
-        return $this->s->entry($id);
+        return $this->storage->entry($id);
     }
 
     function updateEntry(Entry $entry)
     {
-        $this->s->saveEntry($entry);
+        $this->storage->saveEntry($entry);
     }
 }
 
