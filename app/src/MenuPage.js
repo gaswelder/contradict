@@ -7,7 +7,12 @@ class MenuPage extends React.Component {
   render() {
     return (
       <Resource getPromise={this.props.api.dicts}>
-        {data => data.map(d => <Dictionary key={d.id} dict={d} />)}
+        {data => {
+          if (!data.length) {
+            return <p>No dictionaries.</p>;
+          }
+          return data.map(d => <Dictionary key={d.id} dict={d} />);
+        }}
       </Resource>
     );
   }
