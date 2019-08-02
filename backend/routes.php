@@ -67,11 +67,11 @@ function makeWebRoutes(\App $the)
      * Returns the list of dicts.
      */
     $app->get('/api/', function () use ($the) {
-        $r = ['dicts' => []];
+        $r = [];
         foreach ($the->dicts() as $dict) {
             $d = $dict->format();
-            $d['stats'] = $the->dictStats($dict->id)->format();
-            $r['dicts'][] = $d;
+            $d['stats'] = $the->dictStats($userID, $dict->id)->format();
+            $r[] = $d;
         }
         return $r;
     });
