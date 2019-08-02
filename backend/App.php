@@ -16,7 +16,7 @@ class App
 
     private $s;
 
-    function __construct(Storage $s)
+    function setStorage(Storage $s)
     {
         $this->s = $s;
     }

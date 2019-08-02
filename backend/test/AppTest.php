@@ -52,7 +52,8 @@ class AppTest extends TestCase
             Answer::parse(['entryID' => '1', 'answer' => 'a', 'reverse' => false]), // correct
             Answer::parse(['entryID' => '2', 'answer' => 'qq', 'reverse' => false]) // incorrect
         ];
-        $app = new App($storage);
+        $app = new App;
+        $app->setStorage($storage);
         $app->verifyTest($dict_id, $answers);
         $this->assertArraySubset([
             'right' => 1,

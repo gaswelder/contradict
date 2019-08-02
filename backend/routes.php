@@ -23,12 +23,12 @@ class DummyAuth implements Auth
     }
 }
 
-function makeWebRoutes(\App $the)
+function makeWebRoutes(\App $the, $makeStorage)
 {
     $app = new App(__DIR__);
     $auth = new CookieAuth(getenv('COOKIE_KEY'));
 
-    $app->middleware(function ($next) use ($auth) {
+    $app->middleware(function ($next) use ($auth, $the, $makeStorage) {
         // Require auth for /api/*.
         if (!request::url()->isUnder('/api')) {
             return $next();
@@ -40,7 +40,7 @@ function makeWebRoutes(\App $the)
                 return 405;
             }
             $password = request::post('password');
-            $token = $auth->login('name', $password);
+            $token = $auth->login('gas', $password);
             if ($token) {
                 setcookie('token', $token, time() + 3600 * 24);
                 return 201;
@@ -50,9 +50,11 @@ function makeWebRoutes(\App $the)
         }
 
         $token = $_COOKIE['token'] ?? '';
-        if (!$auth->checkToken($token)) {
+        $userID = $auth->checkToken($token);
+        if (!$userID) {
             return 401;
         }
+        $the->setStorage($makeStorage($userID));
         return $next();
     });
 
@@ -70,7 +72,7 @@ function makeWebRoutes(\App $the)
         $r = [];
         foreach ($the->dicts() as $dict) {
             $d = $dict->format();
-            $d['stats'] = $the->dictStats($userID, $dict->id)->format();
+            $d['stats'] = $the->dictStats($dict->id)->format();
             $r[] = $d;
         }
         return $r;
