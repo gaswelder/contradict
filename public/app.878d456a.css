@@ -1,0 +1,1 @@
+.column-meter{position:relative;display:flex}.column-meter>div{overflow:hidden;font-size:8pt;text-indent:2px;white-space:nowrap}.column-meter .finished{background-color:#b0f1ff}.column-meter .in-progress{background-color:#b9de96}.column-meter .in-queue{background-color:#eee}

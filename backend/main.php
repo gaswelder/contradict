@@ -44,18 +44,25 @@ function makeLocalStorage($userID)
     return new SQLStorage(__DIR__ . '/' . $path);
 }
 
+if (getenv('CLOUDCUBE_URL')) {
+    error_log("using s3 storage");
+    $makeStorage = 'makeS3Storage';
+} else {
+    error_log("using local storage");
+    $makeStorage = 'makeLocalStorage';
+}
 
 $theApp = new App();
-$makeStorage = function ($userID) {
-    $path = __DIR__ . "/database-$userID.json";
-    return new BlobStorage(function () use ($path) {
-        if (!file_exists($path)) {
-            return null;
-        }
-        return file_get_contents($path);
-    }, function ($data) use ($path) {
-        file_put_contents($path, $data);
-    });
-};
+// $makeStorage = function ($userID) {
+//     $path = __DIR__ . "/database-$userID.json";
+//     return new BlobStorage(function () use ($path) {
+//         if (!file_exists($path)) {
+//             return null;
+//         }
+//         return file_get_contents($path);
+//     }, function ($data) use ($path) {
+//         file_put_contents($path, $data);
+//     });
+// };
 $app = makeWebRoutes($theApp, $makeStorage);
 $app->run();
