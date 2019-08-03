@@ -93,6 +93,7 @@ class AppTest extends TestCase
         $app2 = new App;
         $app2->setStorage($storage2);
         $app2->import($dump);
+        $storage2->flush();
 
         $this->assertEquals($storage1->data, $storage2->data);
         $this->assertEquals($storage2->data, testData());

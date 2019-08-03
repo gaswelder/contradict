@@ -5,6 +5,9 @@ class BlobStorage implements Storage
     private $write;
     private $data = [];
 
+    // Whether we have modified the data.
+    private $touched = false;
+
     function __construct($read, $write)
     {
         $this->write = $write;
@@ -27,14 +30,22 @@ class BlobStorage implements Storage
         $this->flush();
     }
 
-    private function flush()
+    /**
+     * Saves recent data changes to the storage.
+     */
+    function flush()
     {
+        if (!$this->touched) {
+            return;
+        }
+        $this->touched = true;
         call_user_func($this->write, json_encode($this->data));
     }
 
     function saveDict(Dict $d)
     {
         $this->data['dicts'][$d->id] = $d->format();
+        $this->touched = true;
     }
 
     function dicts(): array
@@ -69,6 +80,7 @@ class BlobStorage implements Storage
             $score->id = uniqid();
         }
         $this->data['scores'][$score->id] = $score->format();
+        $this->touched = true;
     }
 
     function scores(): array
@@ -108,6 +120,7 @@ class BlobStorage implements Storage
             $e->id = uniqid();
         }
         $this->data['words'][$e->id] = $e->format();
+        $this->touched = true;
         return $e;
     }
 
