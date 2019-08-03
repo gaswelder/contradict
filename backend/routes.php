@@ -212,8 +212,8 @@ function makeWebRoutes(\App $the, $makeStorage)
         return response::staticFile(__DIR__ . '/dict.sqlite')->downloadAs('dict.sqlite');
     });
 
-    $app->get('*', function () {
-        return file_get_contents(__DIR__ . '/public/index.html');
+    $app->get('/', function () {
+        return file_get_contents(__DIR__ . '/../public/index.html');
     });
 
     $app->cmd('genkey', function () {
