@@ -13,7 +13,7 @@ class CookieAuth implements Auth
     {
         $this->key = base64_decode($key);
         if (strlen($this->key) != SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
-            throw new Exception("invalid cookie key length");
+            throw new Exception("invalid cookie key length (" . strlen($this->key) . ")");
         }
     }
 
