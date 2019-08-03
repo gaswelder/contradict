@@ -2,7 +2,7 @@
 
 use Aws\S3\S3Client;
 
-class CloudCube implements Storage
+class CloudCube
 {
     private function dir()
     {
