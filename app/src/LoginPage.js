@@ -10,9 +10,11 @@ class LoginPage extends React.Component {
 
   async handleSubmit(e) {
     e.preventDefault();
-    const password = e.target.querySelector("input").value;
+    const form = e.target;
+    const login = form.querySelector('[name="login"]').value;
+    const password = form.querySelector('[name="password"]').value;
     try {
-      await api.login(password);
+      await api.login(login, password);
       this.props.history.push("/");
     } catch (e) {
       alert(e.toString());
@@ -23,7 +25,10 @@ class LoginPage extends React.Component {
     return (
       <form method="post" id="login-form" onSubmit={this.handleSubmit}>
         <div>
-          <input type="password" name="password" autoFocus />
+          <input name="login" autoFocus required />
+        </div>
+        <div>
+          <input type="password" name="password" required />
         </div>
         <button type="submit">Login</button>
       </form>

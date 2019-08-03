@@ -54,8 +54,8 @@ function postJSON(url, data) {
 }
 
 export default {
-  async login(password) {
-    const response = await post("/login", { password });
+  async login(login, password) {
+    const response = await post("/login", { login, password });
     const body = await response.text();
     if (response.status != 201) {
       throw new Error("login failed: " + body);

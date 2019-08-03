@@ -39,8 +39,8 @@ function makeAuthMiddleware(Auth $auth, $urlPrefix, $loginURL, $logoutURL, $onAu
             if (request::method() !== 'POST') {
                 return 405;
             }
+            $name = request::post('login');
             $password = request::post('password');
-            $name = 'gas';
             $token = $auth->login($name, $password);
             if ($token) {
                 setcookie('token', $token, time() + 3600 * 24);
