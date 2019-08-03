@@ -11,7 +11,8 @@ interface Storage
     function scores(): array;
 
     function entry(string $id): Entry;
-    function saveEntry(Entry $e);
+    function saveEntry(Entry $e): Entry;
     function entries(array $ids): array;
     function allEntries(string $dict_id): array;
+    function hasEntry(string $dict_id, Entry $e): bool;
 }

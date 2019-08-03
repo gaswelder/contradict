@@ -8,20 +8,25 @@ class Entry
     public $answers2 = 0;
     public $id;
     public $dict_id;
-    public $touched;
+    public $touched = false;
 
-    function format()
+    function format(): array
     {
-        return json_decode(json_encode($this), true);
+        $row = json_decode(json_encode($this), true);
+        $row['touched'] = $this->touched ? 1 : 0;
+        return $row;
     }
 
-    static function parse($row)
+    static function parse(array $row): self
     {
         $keys = ['id', 'q', 'a', 'answers1', 'answers2', 'dict_id', 'touched'];
         $e = new Entry;
         foreach ($keys as $k) {
             $e->$k = $row[$k];
         }
+        $e->touched = !!$e->touched;
+        $e->answers1 = intval($e->answers1);
+        $e->answers2 = intval($e->answers2);
         return $e;
     }
 

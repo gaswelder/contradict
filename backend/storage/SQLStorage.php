@@ -60,7 +60,7 @@ class SQLStorage implements Storage
         $this->db->insert('results', $s->format());
     }
 
-    function hasEntry($dict_id, $entry)
+    function hasEntry(string $dict_id, Entry $entry): bool
     {
         return $this->db->getValue(
             "select count(*)
@@ -101,7 +101,7 @@ class SQLStorage implements Storage
         return Entry::parse($row);
     }
 
-    function saveEntry(Entry $e)
+    function saveEntry(Entry $e): Entry
     {
         if ($e->id) {
             $this->db->update('words', [
@@ -120,6 +120,7 @@ class SQLStorage implements Storage
                 'dict_id' => $e->dict_id,
             ]);
         }
+        return $e;
     }
 
     function entries(array $ids): array

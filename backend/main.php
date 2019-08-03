@@ -24,10 +24,38 @@ function clg(...$var)
 
 Appget\Env::parse(__DIR__ . '/.env');
 
-$theApp = new App();
-$makeStorage = function () {
+
+function makeS3Storage($userID)
+{
+    $s3 = new CloudCube();
+    return new BlobStorage(function () use ($s3, $userID) {
+        if (!$s3->exists($userID)) {
+            return null;
+        }
+        return $s3->read($userID);
+    }, function ($data) use ($s3, $userID) {
+        $s3->write($userID, $data);
+    });
+}
+
+function makeLocalStorage($userID)
+{
     $path = getenv('DATABASE');
     return new SQLStorage(__DIR__ . '/' . $path);
+}
+
+
+$theApp = new App();
+$makeStorage = function ($userID) {
+    $path = __DIR__ . "/database-$userID.json";
+    return new BlobStorage(function () use ($path) {
+        if (!file_exists($path)) {
+            return null;
+        }
+        return file_get_contents($path);
+    }, function ($data) use ($path) {
+        file_put_contents($path, $data);
+    });
 };
 $app = makeWebRoutes($theApp, $makeStorage);
 $app->run();

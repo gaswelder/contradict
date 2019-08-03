@@ -22,7 +22,12 @@ class BlobStorage implements Storage
         }
     }
 
-    private function save()
+    function __destruct()
+    {
+        $this->flush();
+    }
+
+    private function flush()
     {
         call_user_func($this->write, json_encode($this->data));
     }
@@ -64,7 +69,6 @@ class BlobStorage implements Storage
             $score->id = uniqid();
         }
         $this->data['scores'][$score->id] = $score->format();
-        $this->save();
     }
 
     function scores(): array
@@ -98,13 +102,23 @@ class BlobStorage implements Storage
         return $entries;
     }
 
-    function saveEntry(Entry $e)
+    function saveEntry(Entry $e): Entry
     {
         if (!$e->id) {
             $e->id = uniqid();
         }
-        $this->data['words'][$e->id] = $e;
-        $this->save();
+        $this->data['words'][$e->id] = $e->format();
+        return $e;
+    }
+
+    function hasEntry(string $dict_id, Entry $e): bool
+    {
+        foreach ($this->allEntries($dict_id) as $entry) {
+            if ($entry->q == $e->q && $entry->a == $e->a) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function similars(Entry $e, bool $reverse): array
