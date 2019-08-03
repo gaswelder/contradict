@@ -6,7 +6,7 @@ class CloudCube
 {
     private function dir()
     {
-        // https://cloud-cube-eu.s3.amazonaws.com/abcdefgh
+        // Something like https://cloud-cube-eu.s3.amazonaws.com/abcdefgh
         return basename(getenv('CLOUDCUBE_URL'));
     }
 
@@ -27,7 +27,7 @@ class CloudCube
 
     function write($name, $data)
     {
-        $result = $this->s3()->putObject([
+        $this->s3()->putObject([
             'Bucket' => 'cloud-cube-eu',
             'Key' => $this->dir() . '/' . $name,
             'Body' => $data
@@ -36,7 +36,7 @@ class CloudCube
 
     function exists($name): bool
     {
-        return $this->s3()->doesObjectExist('cloud-cube-eu', $name);
+        return $this->s3()->doesObjectExist('cloud-cube-eu', $this->dir() . '/' . $name);
     }
 
     function read($name)
