@@ -22,7 +22,9 @@ function clg(...$var)
     }
 }
 
-Appget\Env::parse(__DIR__ . '/.env');
+if (file_exists(__DIR__ . '/.env')) {
+    Appget\Env::parse(__DIR__ . '/.env');
+}
 
 
 function makeS3Storage($userID)
