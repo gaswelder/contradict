@@ -11,8 +11,10 @@
     }
   ],
   "require": {
-    "ext-sodium": "*",
     "php": "^7.2.0",
+    "ext-sodium": "*",
+    "ext-mbstring": "*",
+    "ext-json": "*",
     "gaswelder/havana": "dev-master",
     "aws/aws-sdk-php": "^3.108"
   },
