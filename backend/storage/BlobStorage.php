@@ -8,11 +8,16 @@ class BlobStorage implements Storage
     function __construct($read, $write)
     {
         $this->write = $write;
-        $this->data = json_decode($read(), true);
-        $keys = ['dicts', 'words', 'scores'];
-        foreach ($keys as $key) {
-            if (!isset($this->data[$key]) || !is_array(($this->data[$key]))) {
-                throw new Exception("missing key '$key' from storage data");
+        $data = $read();
+        if (!$data) {
+            $this->data = ['dicts' => [], 'words' => [], 'scores' => []];
+        } else {
+            $this->data = json_decode($read(), true);
+            $keys = ['dicts', 'words', 'scores'];
+            foreach ($keys as $key) {
+                if (!isset($this->data[$key]) || !is_array(($this->data[$key]))) {
+                    throw new Exception("missing key '$key' from storage data");
+                }
             }
         }
     }
@@ -50,7 +55,7 @@ class BlobStorage implements Storage
             }
             $rows[] = Score::parse($score);
         }
-        return $rows;
+        return array_reverse($rows);
     }
 
     function saveScore(Score $score)
@@ -60,6 +65,11 @@ class BlobStorage implements Storage
         }
         $this->data['scores'][$score->id] = $score->format();
         $this->save();
+    }
+
+    function scores(): array
+    {
+        return array_map([Score::class, 'parse'], $this->data['scores']);
     }
 
     function entry(string $id): Entry

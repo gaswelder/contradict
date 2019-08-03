@@ -12,8 +12,8 @@ class Score
         $s = new self;
         $s->id = $row['id'];
         $s->dict_id = $row['dict_id'];
-        $s->right = $row['right'];
-        $s->wrong = $row['wrong'];
+        $s->right = intval($row['right']);
+        $s->wrong = intval($row['wrong']);
         return $s;
     }
 

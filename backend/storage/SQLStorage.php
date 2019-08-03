@@ -46,6 +46,12 @@ class SQLStorage implements Storage
         return array_map([Score::class, 'parse'], $rows);
     }
 
+    function scores(): array
+    {
+        $rows = $this->db->getRows('select id, right, wrong, dict_id from results order by id');
+        return array_map([Score::class, 'parse'], $rows);
+    }
+
     function saveScore(Score $s)
     {
         if ($s->id) {

@@ -6,6 +6,7 @@ import Header from "./Header";
 import LoginPage from "./LoginPage";
 import MenuPage from "./MenuPage";
 import TestPage from "./TestPage";
+import Export from "./Export";
 
 function page(Component, header = true) {
   return function page(props) {
@@ -28,6 +29,7 @@ class Main extends React.Component {
           <Route path="/:id/add" component={page(AddEntriesPage)} />
           <Route path="/entries/:id" component={page(EntryPage)} />
           <Route path="/login" component={page(LoginPage, false)} />
+          <Route path="/export" component={page(Export)} />
           <Route component={page(() => "Not Found")} />
         </Switch>
       </BrowserRouter>

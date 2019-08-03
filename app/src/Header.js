@@ -15,6 +15,7 @@ const Header = withRouter(function Header(props) {
   return (
     <header>
       <Link to="/">Dict</Link>
+      <Link to="/export">Export/Import</Link>
       <button className="logout" onClick={logout}>
         Logout
       </button>

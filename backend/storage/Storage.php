@@ -8,6 +8,7 @@ interface Storage
 
     function lastScores(string $dict_id): array;
     function saveScore(Score $score);
+    function scores(): array;
 
     function entry(string $id): Entry;
     function saveEntry(Entry $e);

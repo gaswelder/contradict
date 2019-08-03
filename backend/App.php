@@ -182,6 +182,42 @@ class App
     {
         $this->storage->saveEntry($entry);
     }
+
+    function export(): array
+    {
+        $storage = $this->storage;
+        $data = [
+            'dicts' => [],
+            'entries' => [],
+            'scores' => []
+        ];
+        foreach ($storage->dicts() as $dict) {
+            $data['dicts'][] = $dict->format();
+            foreach ($storage->allEntries($dict->id) as $e) {
+                $data['entries'][] = $e->format();
+            }
+        }
+        foreach ($storage->scores() as $score) {
+            $data['scores'][] = $score->format();
+        }
+        return $data;
+    }
+
+    function import(array $data)
+    {
+        $storage = $this->storage;
+        foreach ($data['dicts'] as $row) {
+            $d = Dict::parse($row);
+            $storage->saveDict($d);
+        }
+        foreach ($data['entries'] as $row) {
+            $e = Entry::parse($row);
+            $storage->saveEntry($e);
+        }
+        foreach ($data['scores'] as $row) {
+            $storage->saveScore(Score::parse($row));
+        }
+    }
 }
 
 function successRate(Storage $s, string $dict_id): float

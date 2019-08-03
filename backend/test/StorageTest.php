@@ -6,34 +6,6 @@ registerClasses(__DIR__ . '/../classes');
 
 use PHPUnit\Framework\TestCase;
 
-function export(Storage $s)
-{
-    $data = [
-        'dicts' => [],
-        'entries' => [],
-        'scores' => []
-    ];
-    foreach ($s->dicts() as $dict) {
-        $data['dicts'][] = $dict->format();
-        foreach ($s->allEntries($dict->id) as $e) {
-            $data['entries'][] = $e->format();
-        }
-    }
-    return $data;
-}
-
-function import(Storage $s, $data)
-{
-    foreach ($data['dicts'] as $row) {
-        $d = Dict::parse($row);
-        $s->saveDict($d);
-    }
-    foreach ($data['entries'] as $row) {
-        $e = Entry::parse($row);
-        $s->saveEntry($e);
-    }
-}
-
 class StorageTest extends TestCase
 {
     function storages()
@@ -58,7 +30,14 @@ class StorageTest extends TestCase
                         'answers2' => 0,
                     ]
                 ],
-                'scores' => []
+                'scores' => [
+                    '1' => [
+                        'id' => '1',
+                        'dict_id' => '1',
+                        'right' => 1,
+                        'wrong' => 2
+                    ]
+                ]
             ]);
         }, function ($data) {
             //
@@ -78,6 +57,35 @@ class StorageTest extends TestCase
         }
     }
 
+    /**
+     * @dataProvider storages
+     */
+    function testScores(Storage $s)
+    {
+        $dict = $s->dicts()[0];
+
+        $scores1 = $s->scores();
+
+        // Add a new score
+        $score = new Score;
+        $score->right = rand();
+        $score->wrong = rand();
+        $score->dict_id = $dict->id;
+        $s->saveScore($score);
+
+        $lastScores = $s->lastScores($dict->id);
+        $f1 = $score->format();
+        $f2 = $lastScores[0]->format();
+        unset($f1['id']);
+        unset($f2['id']);
+        $this->assertEquals($f1, $f2, 'the new score should appear first in lastScores');
+
+        $scores2 = $s->scores();
+        $this->assertEquals(count($scores1) + 1, count($scores2), 'the number of score records should increase by one');
+        // $this->assertEquals($score->right, $sc->right);
+        // $this->assertEquals($score->wrong, $sc->wrong);
+    }
+
     private function checkDict(Storage $s, Dict $dict)
     {
         $this->assertNotEmpty($dict->id);
@@ -86,17 +94,6 @@ class StorageTest extends TestCase
         $d = $s->dict($dict->id);
         $this->assertEquals($d->id, $dict->id);
         $this->assertEquals($d->name, $dict->name);
-
-        $scores1 = $s->lastScores($dict->id);
-        $score = new Score;
-        $score->right = rand();
-        $score->wrong = rand();
-        $score->dict_id = $dict->id;
-        $s->saveScore($score);
-        $scores2 = $s->lastScores($dict->id);
-        $sc = $scores2[0];
-        $this->assertEquals($score->right, $sc->right);
-        $this->assertEquals($score->wrong, $sc->wrong);
 
         $ee = $s->allEntries($dict->id);
         $this->assertNotEmpty($ee);
@@ -111,23 +108,5 @@ class StorageTest extends TestCase
         $this->assertCount(1, $ee);
 
         $s->saveEntry($e);
-    }
-
-    function testImport()
-    {
-        $sql = new SQLStorage(__DIR__ . '/../dict.sqlite');
-        $blob = new BlobStorage(function () {
-            return json_encode([
-                'dicts' => [],
-                'words' => [],
-                'scores' => [],
-            ]);
-        }, function ($data) {
-            // var_dump($data);
-            // $this->assertArrayHasKey('dicts', $data);
-            // $this->assertArrayHasKey('words', $data);
-        });
-        $data = export($sql);
-        import($blob, $data);
     }
 }

@@ -30,6 +30,10 @@ function makeAuthMiddleware(Auth $auth, $urlPrefix, $loginURL, $logoutURL, $onAu
             return $next();
         }
 
+        if (request::method() == 'OPTIONS') {
+            return $next();
+        }
+
         if (request::url()->path == $loginURL) {
             // Allow only posting to login.
             if (request::method() !== 'POST') {
@@ -77,9 +81,14 @@ function makeWebRoutes(\App $the, $makeStorage)
     $app->middleware(makeAuthMiddleware($auth, '/api', '/api/login', '/api/logout', $onAuth));
 
     $app->middleware((function ($next) {
-        $r = $next();
+        if (request::method() != 'OPTIONS') {
+            $r = $next();
+        } else {
+            $r = new response;
+        }
         $r->setHeader('Access-Control-Allow-Origin', 'http://localhost:1234');
         $r->setHeader('Access-Control-Allow-Credentials', 'true');
+        $r->setHeader('Access-Control-Allow-Headers', 'Content-Type');
         return $r;
     }));
 
@@ -182,6 +191,21 @@ function makeWebRoutes(\App $the, $makeStorage)
         $entry->a = request::post('a');
         $the->updateEntry($entry);
         return 'ok';
+    });
+
+    /**
+     * Exports a database.
+     */
+    $app->get('/api/export', function () use ($the) {
+        return $the->export();
+    });
+
+    /**
+     * Imports a database.
+     */
+    $app->post('/api/export', function () use ($the) {
+        $data = json_decode(request::body(), true);
+        $the->import($data);
     });
 
     $app->get('/backup', function () {

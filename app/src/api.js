@@ -43,6 +43,16 @@ async function post(url, data) {
   return r;
 }
 
+function postJSON(url, data) {
+  return authFetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+}
+
 export default {
   async login(password) {
     const response = await post("/login", { password });
@@ -88,5 +98,8 @@ export default {
   addEntries(dictID, entries) {
     const string = entries.map(e => `${e.q} - ${e.a}`).join("\n");
     return post(`/${dictID}/add`, { words: string }).then(r => r.json());
-  }
+  },
+
+  dump: () => getJSON("/export"),
+  load: data => postJSON("/export", data)
 };
