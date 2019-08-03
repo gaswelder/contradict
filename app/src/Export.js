@@ -5,7 +5,12 @@ export default function Export() {
   const handleSubmit = async e => {
     e.preventDefault();
     const data = e.target.querySelector("textarea").value;
-    await api.load(JSON.parse(data));
+    try {
+      await api.load(JSON.parse(data));
+      alert("import finished");
+    } catch (e) {
+      alert("import failed: " + e);
+    }
   };
 
   const [dump, setDump] = useState("");
