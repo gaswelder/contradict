@@ -3,3 +3,6 @@ vendor/
 *.sqlite
 .env
 /public
+.cache
+node_modules
+dist
