@@ -14,6 +14,7 @@ class AddEntriesPage extends React.Component {
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.addMore = this.addMore.bind(this);
+    this.handlePaste = this.handlePaste.bind(this);
   }
 
   async handleSubmit(e) {
@@ -54,10 +55,39 @@ class AddEntriesPage extends React.Component {
     });
   }
 
+  handlePaste(event) {
+    const text = event.clipboardData.getData("text");
+    const tuples = text
+      .split(/\r?\n/)
+      .map(line => line.trim())
+      .filter(line => line != "")
+      .map(line => line.split(" - "));
+    if (!tuples.every(tuple => tuple.length == 2)) {
+      return;
+    }
+    event.preventDefault();
+    this.setState(state => ({
+      entries: [
+        ...state.entries,
+        ...tuples.map(([q, a], i) => ({
+          number: state.nextEntryNumber + i + 1,
+          q,
+          a
+        }))
+      ].filter(r => r.q != "" || r.a != ""),
+      nextEntryNumber: state.nextEntryNumber + tuples.length + 1
+    }));
+  }
+
   render() {
     const { loading, entries } = this.state;
     return (
       <form method="post" onSubmit={this.handleSubmit}>
+        <p>
+          <small>
+            Hint: pasting text lines in form &quot;q - a&quot; also works.
+          </small>
+        </p>
         {entries.map(entry => (
           <div key={entry.number}>
             <input
@@ -65,6 +95,7 @@ class AddEntriesPage extends React.Component {
               value={entry.q}
               onChange={e => this.handleEntryInput(entry.number, "q", e)}
               onBlur={this.addMore}
+              onPaste={this.handlePaste}
             />
             <input
               placeholder="A"
