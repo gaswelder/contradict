@@ -2,4 +2,4 @@ _/
 vendor/
 *.sqlite
 .env
-
+/public
