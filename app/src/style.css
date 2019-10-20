@@ -22,8 +22,11 @@ header a {
   margin-right: 1em;
 }
 
-header .logout {
+header .import {
   margin-left: auto;
+  margin-right: 2em;
+  font-size: smaller;
+  font-weight: normal;
 }
 
 /* #app {
