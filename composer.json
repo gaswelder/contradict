@@ -2,10 +2,7 @@
   "name": "gas/links",
   "type": "project",
   "scripts": {
-    "test": "phpunit backend/test/",
-    "compile": [
-      "cd app; yarn && yarn build"
-    ]
+    "test": "phpunit backend/test/"
   },
   "repositories": [
     {
