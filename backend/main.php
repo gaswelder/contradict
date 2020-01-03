@@ -27,44 +27,38 @@ if (file_exists(__DIR__ . '/.env')) {
 }
 
 
-function makeS3Storage($userID)
+function getStorageMaker()
 {
-    $s3 = new CloudCube();
-    return new BlobStorage(function () use ($s3, $userID) {
-        if (!$s3->exists($userID)) {
-            return null;
-        }
-        return $s3->read($userID);
-    }, function ($data) use ($s3, $userID) {
-        $s3->write($userID, $data);
-    });
-}
-
-function makeLocalStorage($userID)
-{
-    $path = getenv('DATABASE');
-    return new SQLStorage(__DIR__ . '/' . $path);
-}
-
-if (getenv('CLOUDCUBE_URL')) {
-    error_log("using s3 storage");
-    $makeStorage = 'makeS3Storage';
-} else {
-    error_log("using local storage");
-    $makeStorage = 'makeLocalStorage';
+    if (getenv('CLOUDCUBE_URL')) {
+        error_log("using s3 storage");
+        return function ($userID) {
+            $s3 = new CloudCube();
+            return new BlobStorage(function () use ($s3, $userID) {
+                if (!$s3->exists($userID)) {
+                    return null;
+                }
+                return $s3->read($userID);
+            }, function ($data) use ($s3, $userID) {
+                $s3->write($userID, $data);
+            });
+        };
+    } else {
+        error_log("using local storage");
+        return function ($userID) {
+            $path = __DIR__ . "/database-$userID.json";
+            return new BlobStorage(function () use ($path) {
+                if (!file_exists($path)) {
+                    return null;
+                }
+                return file_get_contents($path);
+            }, function ($data) use ($path) {
+                file_put_contents($path, $data);
+            });
+        };
+    }
 }
 
 $theApp = new App();
-// $makeStorage = function ($userID) {
-//     $path = __DIR__ . "/database-$userID.json";
-//     return new BlobStorage(function () use ($path) {
-//         if (!file_exists($path)) {
-//             return null;
-//         }
-//         return file_get_contents($path);
-//     }, function ($data) use ($path) {
-//         file_put_contents($path, $data);
-//     });
-// };
-$app = makeWebRoutes($theApp, $makeStorage);
+
+$app = makeWebRoutes($theApp, getStorageMaker());
 $app->run();

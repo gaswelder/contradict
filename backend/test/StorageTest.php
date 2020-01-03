@@ -10,7 +10,6 @@ class StorageTest extends TestCase
 {
     function storages()
     {
-        $sql = new SQLStorage(__DIR__ . '/../dict.sqlite');
         $blob = new BlobStorage(function () {
             return json_encode([
                 'dicts' => [
@@ -42,7 +41,7 @@ class StorageTest extends TestCase
         }, function ($data) {
             //
         });
-        return [[$sql], [$blob]];
+        return [[$blob]];
     }
 
     /**
