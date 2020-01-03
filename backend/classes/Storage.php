@@ -1,6 +1,6 @@
 <?php
 
-class BlobStorage implements Storage
+class Storage
 {
     private $write;
     private $data = [];

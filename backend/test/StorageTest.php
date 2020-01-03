@@ -10,7 +10,7 @@ class StorageTest extends TestCase
 {
     function storages()
     {
-        $blob = new BlobStorage(function () {
+        $blob = new Storage(function () {
             return json_encode([
                 'dicts' => [
                     '1' => [

@@ -5,10 +5,9 @@ require 'vendor/autoload.php';
 use PHPUnit\Framework\TestCase;
 
 registerClasses('backend/classes');
-registerClasses('backend/storage');
 registerClasses('backend');
 
-class TestBlobStorage extends BlobStorage
+class TestStorage extends Storage
 {
     public $data = [];
     function __construct($data)
@@ -66,7 +65,7 @@ class AppTest extends TestCase
 {
     function test()
     {
-        $storage = new TestBlobStorage(testData());
+        $storage = new TestStorage(testData());
 
         $dict_id = '1';
         $answers = [
@@ -84,12 +83,12 @@ class AppTest extends TestCase
 
     function testImportExport()
     {
-        $storage1 = new TestBlobStorage(testData());
+        $storage1 = new TestStorage(testData());
         $app1 = new App;
         $app1->setStorage($storage1);
         $dump = $app1->export();
 
-        $storage2 = new TestBlobStorage(['dicts' => [], 'words' => [], 'scores' => []]);
+        $storage2 = new TestStorage(['dicts' => [], 'words' => [], 'scores' => []]);
         $app2 = new App;
         $app2->setStorage($storage2);
         $app2->import($dump);

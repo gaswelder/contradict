@@ -1,6 +1,5 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
-registerClasses(__DIR__ . '/storage');
 registerClasses(__DIR__);
 
 // require '/home/gas/code/pub/havana/main.php';
@@ -26,14 +25,13 @@ if (file_exists(__DIR__ . '/.env')) {
     Appget\Env::parse(__DIR__ . '/.env');
 }
 
-
 function getStorageMaker()
 {
     if (getenv('CLOUDCUBE_URL')) {
         error_log("using s3 storage");
         return function ($userID) {
             $s3 = new CloudCube();
-            return new BlobStorage(function () use ($s3, $userID) {
+            return new Storage(function () use ($s3, $userID) {
                 if (!$s3->exists($userID)) {
                     return null;
                 }
@@ -46,7 +44,7 @@ function getStorageMaker()
         error_log("using local storage");
         return function ($userID) {
             $path = __DIR__ . "/database-$userID.json";
-            return new BlobStorage(function () use ($path) {
+            return new Storage(function () use ($path) {
                 if (!file_exists($path)) {
                     return null;
                 }
