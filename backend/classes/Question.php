@@ -10,6 +10,15 @@ class Question
 		return $this->e;
 	}
 
+	/**
+	 * Returns true if the given answer is correct for this question.
+	 */
+	function checkAnswer(string $answer): bool
+	{
+		$realAnswer = $this->reverse ? $this->entry()->q : $this->entry()->a;
+		return mb_strtolower($realAnswer) == mb_strtolower($answer);
+	}
+
 	function __construct(Entry $e, $reverse)
 	{
 		$this->reverse = $reverse;

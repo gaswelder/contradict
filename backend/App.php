@@ -80,7 +80,7 @@ class App
             $entry = $storage->entry($a->entryID);
             $question = new Question($entry, $a->reverse);
             $questions[] = $question;
-            $ok = checkAnswer($question, $a->answer);
+            $ok = $question->checkAnswer($a->answer);
             $correct[] = $ok;
             if (!$ok) {
                 continue;
@@ -152,7 +152,7 @@ class App
             }
         }
 
-        $stats->successRate = successRate($storage, $dict_id);
+        $stats->successRate = $storage->getSuccessRate($dict_id);
         return $stats;
     }
 
@@ -171,16 +171,6 @@ class App
         }
         $hint = h($q->entry()->$field, $values);
         return preg_replace('/\*+/', '...', $hint);
-    }
-
-    function entry(string $id): Entry
-    {
-        return $this->storage->entry($id);
-    }
-
-    function updateEntry(Entry $entry)
-    {
-        $this->storage->saveEntry($entry);
     }
 
     function export(): array
@@ -220,18 +210,6 @@ class App
     }
 }
 
-function successRate(Storage $s, string $dict_id): float
-{
-    $scores = $s->lastScores($dict_id);
-    $total = 0;
-    $n = 0;
-    foreach ($scores as $score) {
-        $n++;
-        $total += $score->right / ($score->right + $score->wrong);
-    }
-    return $n > 0 ? $total / $n : 1;
-}
-
 function h($word, $others)
 {
     $list = array_unique(array_merge([$word], $others));
@@ -249,10 +227,4 @@ function h($word, $others)
     };
     $replace = $first[0] == ' ' ? ' ' : '*';
     return $replace . h($rest($word), array_map($rest, $others));
-}
-
-function checkAnswer(Question $q, $answer)
-{
-    $realAnswer = $q->reverse ? $q->entry()->q : $q->entry()->a;
-    return mb_strtolower($realAnswer) == mb_strtolower($answer);
 }

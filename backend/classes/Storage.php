@@ -146,4 +146,16 @@ class Storage
         }
         return $sim;
     }
+
+    function getSuccessRate($dict_id): float
+    {
+        $scores = $this->lastScores($dict_id);
+        $total = 0;
+        $n = 0;
+        foreach ($scores as $score) {
+            $n++;
+            $total += $score->right / ($score->right + $score->wrong);
+        }
+        return $n > 0 ? $total / $n : 1;
+    }
 }

@@ -74,8 +74,13 @@ function makeWebRoutes(\App $the, $makeStorage)
     $app = new App(__DIR__);
     $auth = new CookieAuth(getenv('COOKIE_KEY'));
 
-    $onAuth = function ($userID) use ($the, $makeStorage) {
-        $the->setStorage($makeStorage($userID));
+    /**
+     * @var Storage
+     */
+    $storage = null;
+    $onAuth = function ($userID) use ($the, $makeStorage, &$storage) {
+        $storage = $makeStorage($userID);
+        $the->setStorage($storage);
     };
 
     $app->middleware(makeAuthMiddleware($auth, '/api', '/api/login', '/api/logout', $onAuth));
@@ -175,21 +180,21 @@ function makeWebRoutes(\App $the, $makeStorage)
     /**
      * Returns a single entry by ID.
      */
-    $app->get('/api/entries/{\d+}', function ($id) use ($the) {
+    $app->get('/api/entries/{\d+}', function ($id) use (&$storage) {
         return [
-            'entry' => $the->entry($id)->format()
+            'entry' => $storage->entry($id)->format()
         ];
     });
 
     /**
      * Updates an entry.
      */
-    $app->post('/api/entries/{\d+}', function ($id) use ($the) {
+    $app->post('/api/entries/{\d+}', function ($id) use (&$storage) {
         $entry = new Entry;
         $entry->id = $id;
         $entry->q = request::post('q');
         $entry->a = request::post('a');
-        $the->updateEntry($entry);
+        $storage->saveEntry($entry);
         return 'ok';
     });
 
