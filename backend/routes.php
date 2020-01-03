@@ -4,25 +4,6 @@ use Appget\App;
 use havana\request;
 use havana\response;
 
-class DummyAuth implements Auth
-{
-    function login(string $name, string $password): string
-    {
-        if ($password == '123') {
-            return 'token';
-        }
-        return '';
-    }
-
-    function checkToken(string $token): string
-    {
-        if ($token == 'token') {
-            return 'me';
-        }
-        return '';
-    }
-}
-
 function makeAuthMiddleware(Auth $auth, $urlPrefix, $loginURL, $logoutURL, $onAuth)
 {
     return function ($next) use ($auth, $urlPrefix, $loginURL, $logoutURL, $onAuth) {
