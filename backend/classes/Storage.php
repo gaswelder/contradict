@@ -13,7 +13,11 @@ class Storage
     {
         $this->fs = $fs;
         if ($this->fs->exists('')) {
-            $this->data = json_decode($this->fs->read(''), true);
+            $data = $this->fs->read('');
+            if (substr($data, 0, 2) != '{"') {
+                $data = gzuncompress($data);
+            }
+            $this->data = json_decode($data, true);
             $keys = ['dicts', 'words', 'scores'];
             foreach ($keys as $key) {
                 if (!isset($this->data[$key]) || !is_array(($this->data[$key]))) {
@@ -38,7 +42,7 @@ class Storage
         if (!$this->touched) {
             return;
         }
-        $this->fs->write('', json_encode($this->data));
+        $this->fs->write('', gzcompress(json_encode($this->data)));
         $this->touched = false;
     }
 
