@@ -31,27 +31,14 @@ function getStorageMaker()
         error_log("using s3 storage");
         return function ($userID) {
             $s3 = new CloudCube();
-            return new Storage(function () use ($s3, $userID) {
-                if (!$s3->exists($userID)) {
-                    return null;
-                }
-                return $s3->read($userID);
-            }, function ($data) use ($s3, $userID) {
-                $s3->write($userID, $data);
-            });
+            $fs = new S3($s3, $userID);
+            return new Storage($fs);
         };
     } else {
         error_log("using local storage");
         return function ($userID) {
-            $path = __DIR__ . "/database-$userID.json";
-            return new Storage(function () use ($path) {
-                if (!file_exists($path)) {
-                    return null;
-                }
-                return file_get_contents($path);
-            }, function ($data) use ($path) {
-                file_put_contents($path, $data);
-            });
+            $fs = new LocalFS(__DIR__ . "/database-$userID.json");
+            return new Storage($fs);
         };
     }
 }

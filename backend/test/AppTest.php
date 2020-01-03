@@ -7,17 +7,31 @@ use PHPUnit\Framework\TestCase;
 registerClasses('backend/classes');
 registerClasses('backend');
 
+class TestFS implements FileSystem
+{
+    function __construct(string $data)
+    {
+        $this->files = ['' => $data];
+    }
+    function exists(string $path): bool
+    {
+        return isset($this->files[$path]);
+    }
+    function write(string $path, string $data)
+    {
+        $this->files[$path] = $data;
+    }
+    function read(string $path): string
+    {
+        return $this->files[$path];
+    }
+}
+
 class TestStorage extends Storage
 {
-    public $data = [];
     function __construct($data)
     {
-        $this->data = $data;
-        parent::__construct(function () {
-            return json_encode($this->data);
-        }, function ($newData) {
-            $this->data = json_decode($newData, true);
-        });
+        parent::__construct(new TestFS(json_encode($data)));
     }
 }
 
@@ -75,7 +89,7 @@ class AppTest extends TestCase
         $app = new App;
         $app->setStorage($storage);
         $app->verifyTest($dict_id, $answers);
-        $first = reset($storage->data['scores']);
+        $first = reset(testData()['scores']);
         $this->assertEquals(1, $first['right']);
         $this->assertEquals(2, $first['wrong']);
         $this->assertEquals(1, $first['dict_id']);
@@ -86,15 +100,14 @@ class AppTest extends TestCase
         $storage1 = new TestStorage(testData());
         $app1 = new App;
         $app1->setStorage($storage1);
-        $dump = $app1->export();
 
         $storage2 = new TestStorage(['dicts' => [], 'words' => [], 'scores' => []]);
         $app2 = new App;
         $app2->setStorage($storage2);
-        $app2->import($dump);
-        $storage2->flush();
 
-        $this->assertEquals($storage1->data, $storage2->data);
-        $this->assertEquals($storage2->data, testData());
+        $this->assertNotEquals($app1->export(), $app2->export());
+
+        $app2->import($app1->export());
+        $this->assertEquals($app1->export(), $app2->export());
     }
 }

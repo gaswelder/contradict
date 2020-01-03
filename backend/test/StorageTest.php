@@ -6,41 +6,57 @@ registerClasses(__DIR__ . '/../classes');
 
 use PHPUnit\Framework\TestCase;
 
+class TestReadonlyFS implements FileSystem
+{
+    function __construct($data)
+    {
+        $this->files = ['' => $data];
+    }
+    function exists(string $path): bool
+    {
+        return isset($this->files[$path]);
+    }
+    function write(string $path, string $data)
+    {
+        // $this->files[$path] = $data;
+    }
+    function read(string $path): string
+    {
+        return $this->files[$path];
+    }
+}
+
 class StorageTest extends TestCase
 {
     function storages()
     {
-        $blob = new Storage(function () {
-            return json_encode([
-                'dicts' => [
-                    '1' => [
-                        'id' => '1',
-                        'name' => 'Sample dict'
-                    ]
-                ],
-                'words' => [
-                    '1' => [
-                        'id' => '1',
-                        'dict_id' => '1',
-                        'q' => 'q',
-                        'a' => 'a',
-                        'touched' => 0,
-                        'answers1' => 0,
-                        'answers2' => 0,
-                    ]
-                ],
-                'scores' => [
-                    '1' => [
-                        'id' => '1',
-                        'dict_id' => '1',
-                        'right' => 1,
-                        'wrong' => 2
-                    ]
+        $blob = new Storage(new TestReadonlyFS(json_encode([
+            'dicts' => [
+                '1' => [
+                    'id' => '1',
+                    'name' => 'Sample dict'
                 ]
-            ]);
-        }, function ($data) {
-            //
-        });
+            ],
+            'words' => [
+                '1' => [
+                    'id' => '1',
+                    'dict_id' => '1',
+                    'q' => 'q',
+                    'a' => 'a',
+                    'touched' => 0,
+                    'answers1' => 0,
+                    'answers2' => 0,
+                ]
+            ],
+            'scores' => [
+                '1' => [
+                    'id' => '1',
+                    'dict_id' => '1',
+                    'right' => 1,
+                    'wrong' => 2
+                ]
+            ]
+        ])));
         return [[$blob]];
     }
 

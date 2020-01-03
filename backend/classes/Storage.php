@@ -2,26 +2,26 @@
 
 class Storage
 {
-    private $write;
     private $data = [];
 
     // Whether we have modified the data.
     private $touched = false;
 
-    function __construct($read, $write)
+    private $fs;
+
+    function __construct(FileSystem $fs)
     {
-        $this->write = $write;
-        $data = $read();
-        if (!$data) {
-            $this->data = ['dicts' => [], 'words' => [], 'scores' => []];
-        } else {
-            $this->data = json_decode($read(), true);
+        $this->fs = $fs;
+        if ($this->fs->exists('')) {
+            $this->data = json_decode($this->fs->read(''), true);
             $keys = ['dicts', 'words', 'scores'];
             foreach ($keys as $key) {
                 if (!isset($this->data[$key]) || !is_array(($this->data[$key]))) {
                     throw new Exception("missing key '$key' from storage data");
                 }
             }
+        } else {
+            $this->data = ['dicts' => [], 'words' => [], 'scores' => []];
         }
     }
 
@@ -38,8 +38,8 @@ class Storage
         if (!$this->touched) {
             return;
         }
-        $this->touched = true;
-        call_user_func($this->write, json_encode($this->data));
+        $this->fs->write('', json_encode($this->data));
+        $this->touched = false;
     }
 
     function saveDict(Dict $d)
