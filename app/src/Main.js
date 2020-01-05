@@ -5,7 +5,7 @@ import EntryPage from "./EntryPage";
 import Header from "./Header";
 import LoginPage from "./LoginPage";
 import MenuPage from "./MenuPage";
-import TestPage from "./TestPage";
+import TestPage from "./TestPage/TestPage";
 import Export from "./Export";
 import DictPage from "./DictPage";
 
