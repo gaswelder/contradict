@@ -24,6 +24,7 @@ class App
     function generateTest(string $dict_id): Test
     {
         $storage = $this->storage;
+        $dict = $storage->dict($dict_id);
         $size = 20;
         $entries = $storage->allEntries($dict_id);
         $pick1 = $this->pick($entries, $size, 0);
@@ -39,11 +40,11 @@ class App
 
         $questions1 = [];
         foreach ($pick1 as $entry) {
-            $questions1[] = new Question($entry, false);
+            $questions1[] = new Question($dict, $entry, false);
         }
         $questions2 = [];
         foreach ($pick2 as $entry) {
-            $questions2[] = new Question($entry, true);
+            $questions2[] = new Question($dict, $entry, true);
         }
 
         $test = new Test($questions1, $questions2);
@@ -74,11 +75,12 @@ class App
     function verifyTest(string $dict_id, array $answers): TestResults
     {
         $storage = $this->storage;
+        $dict = $storage->dict($dict_id);
         $questions = [];
         $correct = [];
         foreach ($answers as $a) {
             $entry = $storage->entry($a->entryID);
-            $question = new Question($entry, $a->reverse);
+            $question = new Question($dict, $entry, $a->reverse);
             $questions[] = $question;
             $ok = $question->checkAnswer($a->answer);
             $correct[] = $ok;

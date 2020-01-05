@@ -4,6 +4,7 @@ class Question
 {
 	public $reverse;
 	private $e;
+	private $dict;
 
 	function entry()
 	{
@@ -19,8 +20,9 @@ class Question
 		return mb_strtolower($realAnswer) == mb_strtolower($answer);
 	}
 
-	function __construct(Entry $e, $reverse)
+	function __construct(Dict $d, Entry $e, $reverse)
 	{
+		$this->dict = $d;
 		$this->reverse = $reverse;
 		$this->e = $e;
 	}
@@ -52,7 +54,7 @@ class Question
 			'q' => $this->q(),
 			'a' => $this->a(),
 			'times' => $this->times(),
-			'wikiURL' => $this->e->wikiURL(),
+			'wikiURL' => $this->dict->wikiURL($this->e->q),
 			'dir' => $this->reverse ? 1 : 0
 		];
 	}

@@ -23,4 +23,24 @@ class Dict
             'lookupURLTemplate' => $this->lookupURLTemplate
         ];
     }
+
+    function wikiURL(string $entryText)
+    {
+        if (!$this->lookupURLTemplate) {
+            return null;
+        }
+        $words = explode(' ', $entryText);
+        if (empty($words)) {
+            return null;
+        }
+        if (in_array(strtolower($words[0]), ['das', 'die', 'der'])) {
+            array_shift($words);
+        }
+        if (count($words) != 1) {
+            return null;
+        }
+
+        $wiki = $words[0];
+        return str_replace('{{word}}', urlencode($wiki), $this->lookupURLTemplate);
+    }
 }

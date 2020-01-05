@@ -29,17 +29,4 @@ class Entry
         $e->answers2 = intval($e->answers2);
         return $e;
     }
-
-    function wikiURL()
-    {
-        $words = explode(' ', $this->q);
-        if (empty($words)) return null;
-        if (in_array(strtolower($words[0]), ['das', 'die', 'der'])) {
-            array_shift($words);
-        }
-        if (count($words) != 1) return null;
-
-        $wiki = $words[0];
-        return 'https://de.wiktionary.org/w/index.php?search=' . urlencode($wiki);
-    }
 }
