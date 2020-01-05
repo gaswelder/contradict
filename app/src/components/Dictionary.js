@@ -7,6 +7,7 @@ function Dictionary(props) {
   return (
     <section className="dict-preview">
       <h3>{dict.name}</h3>
+      <Link to={`dicts/${dict.id}`}>Edit</Link>
       <Stats stats={dict.stats} />
       <Link to={`/${dict.id}/test`}>Do a test</Link>{" "}
       <Link to={`/${dict.id}/add`}>Add words</Link>

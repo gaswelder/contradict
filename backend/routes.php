@@ -92,6 +92,20 @@ function makeWebRoutes(\App $the, $makeStorage)
     });
 
     /**
+     * Updates a dictionary.
+     */
+    $app->post('/api/{\d+}', function ($dict_id) use (&$storage) {
+        $dict = $storage->dict($dict_id);
+        if (!$dict) {
+            return 404;
+        }
+        $data = json_decode(request::body(), true);
+        $dict->name = $data['name'] ?? $dict->name;
+        $dict->lookupURLTemplate = $data['lookupURLTemplate'] ?? $dict->lookupURLTemplate;
+        $storage->saveDict($dict);
+    });
+
+    /**
      * Adds words to a dictionary.
      */
     $app->post('/api/{\d+}/add', function ($dict_id) use ($the) {

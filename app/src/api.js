@@ -70,6 +70,15 @@ export default {
     return getJSON("/");
   },
 
+  async dict(id) {
+    const dicts = await this.dicts();
+    return dicts.find(d => d.id == id);
+  },
+
+  updateDict(id, body) {
+    return postJSON(`/${id}`, body);
+  },
+
   test(dictID) {
     return getJSON(`/${dictID}/test`);
   },
