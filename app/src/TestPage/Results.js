@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { ButtonLink } from "../components/ButtonLink";
 import CorrectTable from "./CorrectTable";
 
 function Fail(props) {
@@ -25,11 +26,11 @@ function Fail(props) {
 function Results(props) {
   const { results, dict_id: dictID } = props.data;
 
-  const ok = results.filter(e => e.correct);
-  const fail = results.filter(e => !e.correct);
+  const ok = results.filter((e) => e.correct);
+  const fail = results.filter((e) => !e.correct);
   const stats = {
     right: ok.length,
-    wrong: fail.length
+    wrong: fail.length,
   };
 
   return (
@@ -50,12 +51,8 @@ function Results(props) {
       <CorrectTable results={ok} />
 
       <nav>
-        <a className="btn" href={`/${dictID}/test`}>
-          New test
-        </a>
-        <a className="btn" href="/">
-          Home
-        </a>
+        <ButtonLink to={`/${dictID}/test`}>New test</ButtonLink>
+        <ButtonLink to="/">Home</ButtonLink>
       </nav>
     </React.Fragment>
   );
