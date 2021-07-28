@@ -1,36 +1,10 @@
 import React from "react";
 
-function Test(props) {
-  const { tuples1, tuples2 } = props.data;
-  const { onSubmit, busy } = props;
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    const r = [...e.target.querySelectorAll("input")].map(input => [
-      input.name,
-      input.value
-    ]);
-    onSubmit(r);
-  }
-
-  return (
-    <form method="post" className="test-form" onSubmit={handleSubmit}>
-      <TestSection tuples={tuples1} dir="0" />
-      <TestSection tuples={tuples2} dir="1" />
-      <div>
-        <button type="submit" disabled={busy}>
-          Submit
-        </button>
-      </div>
-    </form>
-  );
-}
-
-function TestSection(props) {
+export function TestSection(props) {
   const { dir, tuples } = props;
   return (
     <section>
-      {tuples.map(question => (
+      {tuples.map((question) => (
         <div key={`${dir}-${question.id}`}>
           <input type="hidden" name="q[]" value={question.id} />
           <input type="hidden" name="dir[]" value={dir} />
@@ -43,5 +17,3 @@ function TestSection(props) {
     </section>
   );
 }
-
-export default Test;

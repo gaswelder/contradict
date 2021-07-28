@@ -1,51 +1,42 @@
 import React from "react";
-import Test from "./Test";
-import withAPI from "../components/withAPI";
 import { withRouter } from "react-router";
+import Resource from "../components/Resource";
+import withAPI from "../components/withAPI";
+import { TestSection } from "./Test";
 
-class TestPage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      questions: null,
-    };
-    this.submit = this.submit.bind(this);
-    this.reset = this.reset.bind(this);
-  }
-
-  async componentDidMount() {
-    const questions = await this.props.api.test(this.props.match.params.id);
-    this.setState({ questions });
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (!prevState.results && this.state.results) {
-      document.body.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }
-
-  async submit(entries) {
-    const id = this.props.match.params.id;
-    const results = await this.props.api.submitAnswers(id, entries);
+const TestPage = ({ api, match, busy, history }) => {
+  const handleSubmit = async (entries) => {
+    const id = match.params.id;
+    const results = await api.submitAnswers(id, entries);
     localStorage.setItem(`results-${id}`, JSON.stringify(results));
-    this.props.history.push(`results`);
-  }
-
-  async reset() {
-    this.setState({ questions: null, results: null });
-    const questions = await this.props.api.test(this.props.match.params.id);
-    this.setState({ questions });
-  }
-
-  render() {
-    const { questions } = this.state;
-    if (questions) {
-      return (
-        <Test data={questions} onSubmit={this.submit} busy={this.props.busy} />
-      );
-    }
-    return "Loading...";
-  }
-}
+    history.push(`results`);
+  };
+  return (
+    <Resource getPromise={() => api.test(match.params.id)}>
+      {(data) => (
+        <form
+          method="post"
+          className="test-form"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const r = [...e.target.querySelectorAll("input")].map((input) => [
+              input.name,
+              input.value,
+            ]);
+            handleSubmit(r);
+          }}
+        >
+          <TestSection tuples={data.tuples1} dir="0" />
+          <TestSection tuples={data.tuples2} dir="1" />
+          <div>
+            <button type="submit" disabled={busy}>
+              Submit
+            </button>
+          </div>
+        </form>
+      )}
+    </Resource>
+  );
+};
 
 export default withRouter(withAPI(TestPage));
