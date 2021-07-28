@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import ColumnMeter from "./ColumnMeter";
+import ColumnMeter from "../components/ColumnMeter";
 
 function Dictionary(props) {
   const { dict } = props;

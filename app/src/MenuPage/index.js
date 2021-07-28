@@ -1,7 +1,7 @@
 import React from "react";
-import Dictionary from "./components/Dictionary";
-import Resource from "./components/Resource";
-import withAPI from "./components/withAPI";
+import Dictionary from "./Dictionary";
+import Resource from "../components/Resource";
+import withAPI from "../components/withAPI";
 
 const MenuPage = ({ api }) => {
   return (
