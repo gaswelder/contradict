@@ -1,11 +1,11 @@
 {
   "name": "app",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "public/index.html",
   "license": "MIT",
   "scripts": {
     "dev": "parcel app/index.html",
-    "build": "BACKEND_URL=/api parcel build -d public app/index.html"
+    "build": "BACKEND_URL=/api parcel build app/index.html"
   },
   "dependencies": {
     "babel-eslint": "^10.0.1",
