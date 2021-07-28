@@ -1,33 +1,27 @@
-import React from "react";
+import { useEffect, useState } from "react";
 
-class Resource extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      loading: true,
-      result: null
-    };
+export const usePromise = (getPromise) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [data, setData] = useState(undefined);
+  useEffect(() => {
+    getPromise()
+      .then(setData)
+      .catch(setError)
+      .finally(() => setLoading(false));
+  }, []);
+  return { data, error, loading };
+};
+
+export const Resource = ({ getPromise, children }) => {
+  const { data, error, loading } = usePromise(getPromise);
+  if (loading) {
+    return "Loading";
   }
-
-  async componentDidMount() {
-    const result = await this.props.getPromise();
-    this.setState({ result, loading: false });
+  if (error) {
+    return "Error: " + error.toString();
   }
-
-  render() {
-    const { loading, result, error } = this.state;
-    const { children } = this.props;
-
-    if (loading) {
-      return "Loading";
-    }
-
-    if (error) {
-      return "Error: " + error.toString();
-    }
-
-    return children(result);
-  }
-}
+  return children(data);
+};
 
 export default Resource;
