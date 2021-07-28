@@ -8,6 +8,7 @@ import MenuPage from "./MenuPage";
 import TestPage from "./TestPage/TestPage";
 import Export from "./Export";
 import DictPage from "./DictPage";
+import { ResultsPage } from "./ResultsPage";
 
 function page(Component, header = true) {
   return function page(props) {
@@ -27,6 +28,7 @@ class Main extends React.Component {
         <Switch>
           <Route exact path="/" component={page(MenuPage)} />
           <Route path="/:id/test" component={page(TestPage)} />
+          <Route path="/:id/results" component={page(ResultsPage)} />
           <Route path="/:id/add" component={page(AddEntriesPage)} />
           <Route path="/dicts/:id" component={page(DictPage)} />
           <Route path="/entries/:id" component={page(EntryPage)} />

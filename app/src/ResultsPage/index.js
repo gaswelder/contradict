@@ -1,31 +1,30 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { ButtonLink } from "../components/ButtonLink";
-import CorrectTable from "./CorrectTable";
+import { CorrectTable } from "./CorrectTable";
+import { Fail } from "./Fail";
 
-function Fail(props) {
-  const { question, answer } = props;
-  return (
-    <article className="fail-card">
-      <h3>{question.q}</h3>
-      <p>
-        {question.a}
-        <br />
-        <span className="strike">{answer}</span>
-      </p>
-      <Link to={`/entries/${question.id}`}>Edit</Link>{" "}
-      {question.wikiURL && (
-        <a href={question.wikiURL} target="_blank" rel="noopener noreferrer">
-          Open on wiki
-        </a>
-      )}
-    </article>
-  );
-}
+export const ResultsPage = ({ match }) => {
+  const id = match.params.id;
+  let data = null;
+  try {
+    data = JSON.parse(localStorage.getItem(`results-${id}`));
+  } catch (err) {
+    //
+  }
 
-function Results(props) {
-  const { results, dict_id: dictID } = props.data;
+  if (!data) {
+    return (
+      <>
+        <p>No results</p>
+        <nav>
+          <ButtonLink to={`test`}>New test</ButtonLink>
+          <ButtonLink to="/">Home</ButtonLink>
+        </nav>
+      </>
+    );
+  }
 
+  const { results, dict_id: dictID } = data;
   const ok = results.filter((e) => e.correct);
   const fail = results.filter((e) => !e.correct);
   const stats = {
@@ -56,6 +55,4 @@ function Results(props) {
       </nav>
     </React.Fragment>
   );
-}
-
-export default Results;
+};

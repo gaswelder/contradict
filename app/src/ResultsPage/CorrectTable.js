@@ -1,6 +1,6 @@
 import React from "react";
 
-function CorrectTable(props) {
+export function CorrectTable(props) {
   const { results } = props;
 
   return (
@@ -13,7 +13,7 @@ function CorrectTable(props) {
         </tr>
       </thead>
       <tbody>
-        {results.map(r => (
+        {results.map((r) => (
           <tr key={r.question.id}>
             <td>{r["question"]["q"]}</td>
             <td>{r["question"]["a"]}</td>
@@ -24,5 +24,3 @@ function CorrectTable(props) {
     </table>
   );
 }
-
-export default CorrectTable;
