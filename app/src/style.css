@@ -214,19 +214,6 @@ hr {
   text-decoration: line-through;
 }
 
-.test-form > section {
-  /* display: inline-block; */
-  vertical-align: top;
-  margin-bottom: 1em;
-  /* margin-right: 1em; */
-}
-
-.test-form > section > div {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 0.5em;
-}
-
 .fail-card {
   padding: 1em;
 }
