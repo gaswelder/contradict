@@ -1,17 +1,53 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
 import ColumnMeter from "../components/ColumnMeter";
 
-function Dictionary(props) {
-  const { dict } = props;
+const Container = styled.section`
+  display: inline-block;
+  padding: 1em;
+  margin-bottom: 0.5em;
+  & dl {
+    display: grid;
+    grid-template-columns: max-content max-content;
+  }
+  & dd {
+    text-align: right;
+  }
+`;
+
+const EditLinks = styled.div`
+  font-size: smaller;
+  & a + a {
+    margin-left: 0.3em;
+  }
+`;
+
+const TestLink = styled(Link)`
+  display: inline-block;
+  font-size: 14px;
+  padding: 6px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  background-color: #334ba2;
+  border: none;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+  margin-top: 0.5em;
+`;
+
+function Dictionary({ dict }) {
   return (
-    <section className="dict-preview">
+    <Container>
       <h3>{dict.name}</h3>
-      <Link to={`dicts/${dict.id}`}>Edit</Link>
+      <EditLinks>
+        <Link to={`dicts/${dict.id}`}>Edit</Link>
+        <Link to={`/${dict.id}/add`}>Add words</Link>
+      </EditLinks>
       <Stats stats={dict.stats} />
-      <Link to={`/${dict.id}/test`}>Do a test</Link>{" "}
-      <Link to={`/${dict.id}/add`}>Add words</Link>
-    </section>
+      <TestLink to={`/${dict.id}/test`}>Do a test</TestLink>{" "}
+    </Container>
   );
 }
 

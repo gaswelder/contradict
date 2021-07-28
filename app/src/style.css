@@ -209,21 +209,6 @@ hr {
   min-height: 30em;
 }
 
-.dict-preview {
-  display: inline-block;
-  padding: 1em;
-  margin-bottom: 0.5em;
-}
-
-.dict-preview dl {
-  display: grid;
-  grid-template-columns: max-content max-content;
-}
-
-.dict-preview dd {
-  text-align: right;
-}
-
 .nope td:nth-child(3) {
   color: red;
   text-decoration: line-through;
