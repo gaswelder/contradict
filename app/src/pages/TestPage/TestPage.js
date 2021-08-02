@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { withRouter } from "react-router";
 import styled from "styled-components";
 import Resource from "../../components/Resource";
@@ -31,6 +31,8 @@ const TestPage = ({ api, match, busy, history }) => {
     history.push(`results`);
   };
 
+  const focused = useRef(false);
+
   return (
     <Resource getPromise={() => api.test(match.params.id)}>
       {(data) => (
@@ -39,6 +41,10 @@ const TestPage = ({ api, match, busy, history }) => {
             if (!form) {
               return;
             }
+            if (focused.current) {
+              return;
+            }
+            focused.current = true;
             form.querySelector('input[name="a[]"]').focus();
           }}
           method="post"
