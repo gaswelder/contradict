@@ -1,12 +1,19 @@
 import React from "react";
+import styled from "styled-components";
 import withAPI from "./components/withAPI";
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
 class EntryPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       entry: null,
-      saving: false
+      saving: false,
     };
     this.submit = this.submit.bind(this);
   }
@@ -32,11 +39,17 @@ class EntryPage extends React.Component {
     const { entry, saving } = this.state;
     if (!entry) return "Loading...";
     return (
-      <form method="post" onSubmit={this.submit}>
-        <input name="q" defaultValue={entry.q} required />
-        <input name="a" defaultValue={entry.a} required />
+      <Form method="post" onSubmit={this.submit}>
+        <div>
+          <label>Q</label>
+          <input name="q" defaultValue={entry.q} required />
+        </div>
+        <div>
+          <label>A</label>
+          <input name="a" defaultValue={entry.a} required />
+        </div>
         <button disabled={saving}>Save</button>
-      </form>
+      </Form>
     );
   }
 }
