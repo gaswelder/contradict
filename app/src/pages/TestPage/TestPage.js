@@ -30,10 +30,17 @@ const TestPage = ({ api, match, busy, history }) => {
     localStorage.setItem(`results-${id}`, JSON.stringify(results));
     history.push(`results`);
   };
+
   return (
     <Resource getPromise={() => api.test(match.params.id)}>
       {(data) => (
         <Form
+          ref={(form) => {
+            if (!form) {
+              return;
+            }
+            form.querySelector('input[name="a[]"]').focus();
+          }}
           method="post"
           className="test-form"
           onFocus={(e) => {
