@@ -2,23 +2,21 @@ import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import AddEntriesPage from "./AddEntriesPage";
 import EntryPage from "./EntryPage";
-import Header from "./Header";
 import LoginPage from "./LoginPage";
 import MenuPage from "./MenuPage";
 import TestPage from "./TestPage/TestPage";
 import Export from "./Export";
 import DictPage from "./DictPage";
 import { ResultsPage } from "./ResultsPage";
+import { Page } from "./components/Page";
 
 function page(Component, header = true) {
-  return function page(props) {
-    return (
-      <main className="page">
-        {header && <Header />}
-        <Component {...props} />
-      </main>
-    );
-  };
+  const wrappedPage = (props) => (
+    <Page header={header}>
+      <Component {...props} />
+    </Page>
+  );
+  return wrappedPage;
 }
 
 class Main extends React.Component {
