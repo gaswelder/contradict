@@ -37,7 +37,7 @@ const TestPage = ({ api, match, busy, history }) => {
           method="post"
           className="test-form"
           onFocus={(e) => {
-            e.target.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            e.target.scrollIntoView({ behavior: "smooth", block: "center" });
           }}
           onSubmit={(e) => {
             e.preventDefault();
