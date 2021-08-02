@@ -1,8 +1,8 @@
 import React from "react";
 import { withRouter } from "react-router";
 import styled from "styled-components";
-import Resource from "../components/Resource";
-import withAPI from "../components/withAPI";
+import Resource from "../../components/Resource";
+import withAPI from "../../components/withAPI";
 import { TestSection } from "./Test";
 
 const Form = styled.form`

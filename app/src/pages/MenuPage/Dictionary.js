@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { ButtonLink } from "../components/ButtonLink";
-import ColumnMeter from "../components/ColumnMeter";
+import { ButtonLink } from "../../components/ButtonLink";
+import ColumnMeter from "../../components/ColumnMeter";
 
 const Container = styled.section`
   display: inline-block;

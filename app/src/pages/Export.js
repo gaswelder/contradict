@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import api from "./api";
+import api from "../api";
 
 export default function Export() {
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const data = e.target.querySelector("textarea").value;
     try {

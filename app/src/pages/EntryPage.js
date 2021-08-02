@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import Resource from "./components/Resource";
-import withAPI from "./components/withAPI";
+import Resource from "../components/Resource";
+import withAPI from "../components/withAPI";
 
 const Form = styled.form`
   display: flex;

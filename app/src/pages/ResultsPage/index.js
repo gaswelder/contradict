@@ -1,5 +1,5 @@
 import React from "react";
-import { ButtonLink } from "../components/ButtonLink";
+import { ButtonLink } from "../../components/ButtonLink";
 import { CorrectTable } from "./CorrectTable";
 import { Fail } from "./Fail";
 

@@ -1,13 +1,13 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import AddEntriesPage from "./AddEntriesPage";
-import EntryPage from "./EntryPage";
-import LoginPage from "./LoginPage";
-import MenuPage from "./MenuPage";
-import TestPage from "./TestPage/TestPage";
-import Export from "./Export";
-import DictPage from "./DictPage";
-import { ResultsPage } from "./ResultsPage";
+import AddEntriesPage from "./pages/AddEntriesPage";
+import EntryPage from "./pages/EntryPage";
+import LoginPage from "./pages/LoginPage";
+import MenuPage from "./pages/MenuPage";
+import TestPage from "./pages/TestPage/TestPage";
+import Export from "./pages/Export";
+import DictPage from "./pages/DictPage";
+import { ResultsPage } from "./pages/ResultsPage";
 import { Page } from "./components/Page";
 
 function page(Component, header = true) {

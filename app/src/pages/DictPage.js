@@ -1,11 +1,11 @@
 import React from "react";
-import api from "./api";
+import api from "../api";
 
 export default function DictPage(props) {
   const {
     match: {
-      params: { id }
-    }
+      params: { id },
+    },
   } = props;
 
   const [dict, setDict] = React.useState(null);
@@ -21,7 +21,7 @@ export default function DictPage(props) {
 
   return (
     <form
-      onSubmit={async e => {
+      onSubmit={async (e) => {
         e.preventDefault();
         const name = e.target.querySelector('[name="name"]');
         const lookupURLTemplate = e.target.querySelector(
@@ -30,7 +30,7 @@ export default function DictPage(props) {
         setSaving(true);
         await api.updateDict(dict.id, {
           name: name.value,
-          lookupURLTemplate: lookupURLTemplate.value
+          lookupURLTemplate: lookupURLTemplate.value,
         });
         setSaving(false);
       }}
