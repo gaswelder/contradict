@@ -1,45 +1,22 @@
+html,
+body,
+#app {
+  padding: 0;
+  margin: 0;
+  height: 100vh;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+}
+
 body {
   /* font-family: Arial, sans-serif; */
   font-size: 16px;
-  padding: 0;
-  margin: 1em 1em 4em;
   line-height: 20px;
 }
-
-header {
-  background-color: #204c72;
-  color: white;
-  padding: 1em;
-  margin: -1em -1em 1em -1em;
-  display: flex;
-  align-items: center;
-}
-
-header a {
-  text-decoration: none;
-  color: white;
-  font-weight: bold;
-  margin-right: 1em;
-}
-
-header .import {
-  margin-left: auto;
-  margin-right: 2em;
-  font-size: smaller;
-  font-weight: normal;
-}
-
-/* #app {
-  border: thin solid gold;
-  height: 100%;
-}
-
-main.page {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-} */
 
 h3 {
   font-size: 16px;
@@ -198,10 +175,6 @@ hr {
 
 .error {
   color: #e42;
-}
-
-#login-form {
-  text-align: center;
 }
 
 #dest-frame {

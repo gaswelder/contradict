@@ -13,7 +13,7 @@ const Header = withRouter(function Header(props) {
     }
   }
   return (
-    <header>
+    <>
       <Link to="/">Dict</Link>
       <Link to="/export" className="import">
         Export/Import
@@ -21,7 +21,7 @@ const Header = withRouter(function Header(props) {
       <button className="logout" onClick={logout}>
         Logout
       </button>
-    </header>
+    </>
   );
 });
 

@@ -1,6 +1,15 @@
 import React from "react";
 import api from "./api";
 import { withRouter } from "react-router";
+import styled from "styled-components";
+
+const Form = styled.form`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
 
 class LoginPage extends React.Component {
   constructor(props) {
@@ -23,15 +32,20 @@ class LoginPage extends React.Component {
 
   render() {
     return (
-      <form method="post" id="login-form" onSubmit={this.handleSubmit}>
+      <Form method="post" id="login-form" onSubmit={this.handleSubmit}>
         <div>
-          <input name="login" autoFocus required />
+          <input name="login" autoFocus required placeholder="Login" />
         </div>
         <div>
-          <input type="password" name="password" required />
+          <input
+            type="password"
+            name="password"
+            required
+            placeholder="Password"
+          />
         </div>
         <button type="submit">Login</button>
-      </form>
+      </Form>
     );
   }
 }
