@@ -16,11 +16,8 @@ const HeaderContainer = styled.header`
     margin-right: 1em;
   }
 
-  & .import {
+  & .logout {
     margin-left: auto;
-    margin-right: 2em;
-    font-size: smaller;
-    font-weight: normal;
   }
 `;
 
