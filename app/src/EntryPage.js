@@ -9,7 +9,7 @@ const Form = styled.form`
   align-items: center;
 `;
 
-const EntryPage = ({ match, api }) => {
+const EntryPage = ({ match, api, history }) => {
   const [saving, setSaving] = useState(false);
 
   const id = match.params.id;
@@ -22,6 +22,7 @@ const EntryPage = ({ match, api }) => {
     setSaving(true);
     await api.updateEntry(id, { q, a });
     setSaving(false);
+    history.goBack();
   };
 
   return (
