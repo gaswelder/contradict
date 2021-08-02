@@ -36,6 +36,9 @@ const TestPage = ({ api, match, busy, history }) => {
         <Form
           method="post"
           className="test-form"
+          onFocus={(e) => {
+            e.target.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }}
           onSubmit={(e) => {
             e.preventDefault();
             const r = [...e.target.querySelectorAll("input")].map((input) => [
