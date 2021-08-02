@@ -1,6 +1,7 @@
 import React from "react";
+import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
-import Header from "../Header";
+import api from "../api";
 
 const HeaderContainer = styled.header`
   background-color: #204c72;
@@ -28,11 +29,24 @@ const Content = styled.main`
 `;
 
 export const Page = ({ children, header }) => {
+  const history = useHistory();
+  async function logout() {
+    try {
+      await api.logout();
+      history.push("/login");
+    } catch (err) {
+      alert("failed to log out: " + err);
+    }
+  }
+
   return (
     <>
       {header && (
         <HeaderContainer>
-          <Header />
+          <Link to="/">Dict</Link>
+          <button className="logout" onClick={logout}>
+            Logout
+          </button>
         </HeaderContainer>
       )}
       <Content>{children}</Content>
