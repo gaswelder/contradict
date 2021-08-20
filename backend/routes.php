@@ -56,7 +56,7 @@ function makeWebRoutes(\App $the, $makeStorage)
     $auth = new CookieAuth(getenv('COOKIE_KEY'));
 
     /**
-     * @var Storage
+     * @var Dictionaries
      */
     $storage = null;
     $onAuth = function ($userID) use ($the, $makeStorage, &$storage) {

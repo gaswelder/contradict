@@ -1,6 +1,6 @@
 <?php
 
-class Storage
+class Dictionaries
 {
     private $data = [];
 

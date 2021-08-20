@@ -30,7 +30,7 @@ class StorageTest extends TestCase
 {
     function storages()
     {
-        $blob = new Storage(new TestReadonlyFS(json_encode([
+        $blob = new Dictionaries(new TestReadonlyFS(json_encode([
             'dicts' => [
                 '1' => [
                     'id' => '1',
@@ -63,7 +63,7 @@ class StorageTest extends TestCase
     /**
      * @dataProvider storages
      */
-    function testStorage(Storage $s)
+    function testStorage(Dictionaries $s)
     {
         $dicts = $s->dicts();
         $this->assertNotEmpty($dicts);
@@ -75,7 +75,7 @@ class StorageTest extends TestCase
     /**
      * @dataProvider storages
      */
-    function testScores(Storage $s)
+    function testScores(Dictionaries $s)
     {
         $dict = $s->dicts()[0];
 
@@ -102,7 +102,7 @@ class StorageTest extends TestCase
     /**
      * @dataProvider storages
      */
-    function testEntries(Storage $s)
+    function testEntries(Dictionaries $s)
     {
         $dict = $s->dicts()[0];
 
@@ -131,7 +131,7 @@ class StorageTest extends TestCase
         $this->assertEquals($re, $s->entry($e->id));
     }
 
-    private function checkDict(Storage $s, Dict $dict)
+    private function checkDict(Dictionaries $s, Dict $dict)
     {
         $this->assertNotEmpty($dict->id);
         $this->assertNotEmpty($dict->name);

@@ -32,13 +32,13 @@ function getStorageMaker()
         return function ($userID) {
             $s3 = new CloudCube();
             $fs = new S3($s3, $userID);
-            return new Storage($fs);
+            return new Dictionaries($fs);
         };
     } else {
         error_log("using local storage");
         return function ($userID) {
             $fs = new LocalFS(__DIR__ . "/database-$userID.json");
-            return new Storage($fs);
+            return new Dictionaries($fs);
         };
     }
 }

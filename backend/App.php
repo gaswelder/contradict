@@ -16,7 +16,7 @@ class App
 
     private $storage;
 
-    function setStorage(Storage $s)
+    function setStorage(Dictionaries $s)
     {
         $this->storage = $s;
     }
