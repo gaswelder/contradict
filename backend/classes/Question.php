@@ -6,9 +6,28 @@ class Question
 	private $e;
 	private $dict;
 
-	function entry()
+	function __construct(Dict $d, Entry $e, $reverse)
 	{
-		return $this->e;
+		$this->dict = $d;
+		$this->reverse = $reverse;
+		$this->e = $e;
+	}
+
+	function hint()
+	{
+		$q = $this;
+		$entry = $q->e;
+		$sim = $q->dict->similars($entry, $q->reverse);
+		if (count($sim) == 0) {
+			return null;
+		}
+		$field = $q->reverse ? 'q' : 'a';
+		$values = [];
+		foreach ($sim as $entry) {
+			$values[] = $entry->$field;
+		}
+		$hint = h($q->e->$field, $values);
+		return preg_replace('/\*+/', '...', $hint);
 	}
 
 	/**
@@ -16,15 +35,8 @@ class Question
 	 */
 	function checkAnswer(string $answer): bool
 	{
-		$realAnswer = $this->reverse ? $this->entry()->q : $this->entry()->a;
+		$realAnswer = $this->reverse ? $this->e->q : $this->e->a;
 		return mb_strtolower($realAnswer) == mb_strtolower($answer);
-	}
-
-	function __construct(Dict $d, Entry $e, $reverse)
-	{
-		$this->dict = $d;
-		$this->reverse = $reverse;
-		$this->e = $e;
 	}
 
 	private function id()
@@ -58,4 +70,23 @@ class Question
 			'dir' => $this->reverse ? 1 : 0
 		];
 	}
+}
+
+function h($word, $others)
+{
+	$list = array_unique(array_merge([$word], $others));
+	if (count($list) < 2) return null;
+
+	$first = array_map(function ($str) {
+		return mb_substr($str, 0, 1);
+	}, $list);
+
+	if (count(array_unique($first)) == count($first)) {
+		return $first[0] . (mb_strlen($word) > 1 ? '*' : '');
+	}
+	$rest = function ($str) {
+		return mb_substr($str, 1);
+	};
+	$replace = $first[0] == ' ' ? ' ' : '*';
+	return $replace . h($rest($word), array_map($rest, $others));
 }

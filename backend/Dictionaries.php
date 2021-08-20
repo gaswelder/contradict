@@ -1,5 +1,47 @@
 <?php
 
+function migrate($data)
+{
+    $v = $data['version'] ?? 0;
+    if ($v == 0) {
+        $v1 = [
+            'version' => 1,
+            'dicts' => [
+                "" => [
+                    "id" => "",
+                    "name" => "(recovered)",
+                ]
+            ]
+        ];
+        foreach ($data['dicts'] as $dict) {
+            $v1['dicts'][$dict['id']] = array_merge($dict, [
+                'words' => [],
+                'scores' => []
+            ]);
+        }
+        foreach ($data['words'] as $id => $word) {
+            $v1['dicts'][$word['dict_id']]['words'][$id] = $word;
+        }
+        foreach ($data['scores'] as $id => $score) {
+            $v1['dicts'][$score['dict_id']]['scores'][$id] = $score;
+        }
+        return migrate($v1);
+    }
+    if ($v == 1) {
+        return $data;
+    }
+    throw new Error("unexpected data version: $v");
+}
+
+function parseData($data)
+{
+    if (substr($data, 0, 1) != '{') {
+        $data = gzuncompress($data);
+    }
+    $data = json_decode($data, true);
+    return migrate($data);
+}
+
 class Dictionaries
 {
     private $data = [];
@@ -13,20 +55,22 @@ class Dictionaries
     {
         $this->fs = $fs;
         if ($this->fs->exists('')) {
-            $data = $this->fs->read('');
-            if (substr($data, 0, 2) != '{"') {
-                $data = gzuncompress($data);
-            }
-            $this->data = json_decode($data, true);
-            $keys = ['dicts', 'words', 'scores'];
-            foreach ($keys as $key) {
-                if (!isset($this->data[$key]) || !is_array(($this->data[$key]))) {
-                    throw new Exception("missing key '$key' from storage data");
-                }
-            }
+            $this->data = parseData($this->fs->read(''));
+            file_put_contents('dump.json', json_encode($this->data, JSON_PRETTY_PRINT));
         } else {
-            $this->data = ['dicts' => [], 'words' => [], 'scores' => []];
+            $this->data = ['dicts' => []];
         }
+    }
+
+    function export()
+    {
+        return $this->data;
+    }
+
+    function import($data)
+    {
+        $this->data = $data;
+        $this->touched = true;
     }
 
     function __destruct()
@@ -46,12 +90,18 @@ class Dictionaries
         $this->touched = false;
     }
 
+    /**
+     * Creates or updates a dict.
+     */
     function saveDict(Dict $d)
     {
-        $this->data['dicts'][$d->id] = $d->format();
+        $this->data['dicts'][$d->id] = array_merge($this->data['dicts'][$d->id], $d->format());
         $this->touched = true;
     }
 
+    /**
+     * Returns all saved dicts.
+     */
     function dicts(): array
     {
         $dicts = [];
@@ -61,105 +111,11 @@ class Dictionaries
         return $dicts;
     }
 
+    /**
+     * Returns a saved dict with the given id.
+     */
     function dict(string $id): Dict
     {
         return Dict::parse($this->data['dicts'][$id]);
-    }
-
-    function lastScores(string $dict_id): array
-    {
-        $rows = [];
-        foreach ($this->data['scores'] as $score) {
-            if ($score['dict_id'] != $dict_id) {
-                continue;
-            }
-            $rows[] = Score::parse($score);
-        }
-        return array_reverse($rows);
-    }
-
-    function saveScore(Score $score)
-    {
-        if (!$score->id) {
-            $score->id = uniqid();
-        }
-        $this->data['scores'][$score->id] = $score->format();
-        $this->touched = true;
-    }
-
-    function scores(): array
-    {
-        return array_map([Score::class, 'parse'], $this->data['scores']);
-    }
-
-    function entry(string $id): Entry
-    {
-        return Entry::parse($this->data['words'][$id]);
-    }
-
-    function entries(array $ids): array
-    {
-        $entries = [];
-        foreach ($ids as $id) {
-            $entries[] = $this->entry($id);
-        }
-        return $entries;
-    }
-
-    function allEntries(string $dict_id): array
-    {
-        $entries = [];
-        foreach ($this->data['words'] as $row) {
-            if ($row['dict_id'] != $dict_id) {
-                continue;
-            }
-            $entries[] = Entry::parse($row);
-        }
-        return $entries;
-    }
-
-    function saveEntry(Entry $e): Entry
-    {
-        if (!$e->id) {
-            $e->id = uniqid();
-        }
-        $this->data['words'][$e->id] = $e->format();
-        $this->touched = true;
-        return $e;
-    }
-
-    function hasEntry(string $dict_id, Entry $e): bool
-    {
-        foreach ($this->allEntries($dict_id) as $entry) {
-            if ($entry->q == $e->q && $entry->a == $e->a) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    function similars(Entry $e, bool $reverse): array
-    {
-        $ee = $this->allEntries($e->dict_id);
-        $sim = [];
-        foreach ($ee as $entry) {
-            if ($entry->id == $e->id) continue;
-            if ($reverse && $entry->a != $e->a) continue;
-            if (!$reverse && $entry->q != $e->q) continue;
-            $sim[] = $entry;
-        }
-        return $sim;
-    }
-
-    function getSuccessRate($dict_id): float
-    {
-        $scores = $this->lastScores($dict_id);
-        $total = 0;
-        $n = 0;
-        foreach ($scores as $score) {
-            $n++;
-            $total += $score->right / ($score->right + $score->wrong);
-        }
-        return $n > 0 ? $total / $n : 1;
     }
 }

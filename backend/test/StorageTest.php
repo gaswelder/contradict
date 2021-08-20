@@ -31,31 +31,32 @@ class StorageTest extends TestCase
     function storages()
     {
         $blob = new Dictionaries(new TestReadonlyFS(json_encode([
+            'version' => 1,
             'dicts' => [
                 '1' => [
                     'id' => '1',
-                    'name' => 'Sample dict'
+                    'name' => 'Sample dict',
+                    'words' => [
+                        '1' => [
+                            'id' => '1',
+                            'dict_id' => '1',
+                            'q' => 'q',
+                            'a' => 'a',
+                            'touched' => 0,
+                            'answers1' => 0,
+                            'answers2' => 0,
+                        ]
+                    ],
+                    'scores' => [
+                        '1' => [
+                            'id' => '1',
+                            'dict_id' => '1',
+                            'right' => 1,
+                            'wrong' => 2
+                        ]
+                    ]
                 ]
             ],
-            'words' => [
-                '1' => [
-                    'id' => '1',
-                    'dict_id' => '1',
-                    'q' => 'q',
-                    'a' => 'a',
-                    'touched' => 0,
-                    'answers1' => 0,
-                    'answers2' => 0,
-                ]
-            ],
-            'scores' => [
-                '1' => [
-                    'id' => '1',
-                    'dict_id' => '1',
-                    'right' => 1,
-                    'wrong' => 2
-                ]
-            ]
         ])));
         return [[$blob]];
     }
@@ -79,23 +80,23 @@ class StorageTest extends TestCase
     {
         $dict = $s->dicts()[0];
 
-        $scores1 = $s->scores();
+        $scores1 = $dict->lastScores();
 
         // Add a new score
         $score = new Score;
         $score->right = rand();
         $score->wrong = rand();
         $score->dict_id = $dict->id;
-        $s->saveScore($score);
+        $dict->saveScore($score);
 
-        $lastScores = $s->lastScores($dict->id);
+        $lastScores = $dict->lastScores();
         $f1 = $score->format();
         $f2 = $lastScores[0]->format();
         unset($f1['id']);
         unset($f2['id']);
         $this->assertEquals($f1, $f2, 'the new score should appear first in lastScores');
 
-        $scores2 = $s->scores();
+        $scores2 = $dict->lastScores();
         $this->assertEquals(count($scores1) + 1, count($scores2), 'the number of score records should increase by one');
     }
 
@@ -106,7 +107,7 @@ class StorageTest extends TestCase
     {
         $dict = $s->dicts()[0];
 
-        $ee = $s->allEntries($dict->id);
+        $ee = $dict->allEntries();
 
         // Create a new entry and check that total count increased.
         $e = new Entry;
@@ -114,21 +115,21 @@ class StorageTest extends TestCase
         $e->q = uniqid();
         $e->a = uniqid();
 
-        $this->assertFalse($s->hasEntry($dict->id, $e));
+        $this->assertFalse($dict->hasEntry($e));
 
-        $e = $s->saveEntry($e);
-        $this->assertCount(count($ee) + 1, $s->allEntries($dict->id));
-        $this->assertTrue($s->hasEntry($dict->id, $e));
+        $e = $dict->saveEntry($e);
+        $this->assertCount(count($ee) + 1, $dict->allEntries());
+        $this->assertTrue($dict->hasEntry($e));
 
         // Read the created entry and compare it with what we saved.
-        $re = $s->entry($e->id);
+        $re = $dict->entry($e->id);
         $this->assertEquals($re, $e);
 
         // Update the array and compare.
         $re->q = 'qq';
         $re->a = 'aa';
-        $s->saveEntry($re);
-        $this->assertEquals($re, $s->entry($e->id));
+        $dict->saveEntry($re);
+        $this->assertEquals($re, $dict->entry($e->id));
     }
 
     private function checkDict(Dictionaries $s, Dict $dict)
@@ -140,7 +141,7 @@ class StorageTest extends TestCase
         $this->assertEquals($d->id, $dict->id);
         $this->assertEquals($d->name, $dict->name);
 
-        $ee = $s->allEntries($dict->id);
-        $s->similars($ee[0], false);
+        $ee = $d->allEntries();
+        $d->similars($ee[0], false);
     }
 }

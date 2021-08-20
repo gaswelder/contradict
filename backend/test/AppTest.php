@@ -27,7 +27,7 @@ class TestFS implements FileSystem
     }
 }
 
-class TestStorage extends Storage
+class TestStorage extends Dictionaries
 {
     function __construct($data)
     {
@@ -88,7 +88,7 @@ class AppTest extends TestCase
         ];
         $app = new App;
         $app->setStorage($storage);
-        $app->verifyTest($dict_id, $answers);
+        $app->submitTest($dict_id, $answers);
         $first = reset(testData()['scores']);
         $this->assertEquals(1, $first['right']);
         $this->assertEquals(2, $first['wrong']);
@@ -98,16 +98,10 @@ class AppTest extends TestCase
     function testImportExport()
     {
         $storage1 = new TestStorage(testData());
-        $app1 = new App;
-        $app1->setStorage($storage1);
-
         $storage2 = new TestStorage(['dicts' => [], 'words' => [], 'scores' => []]);
-        $app2 = new App;
-        $app2->setStorage($storage2);
+        $this->assertNotEquals($storage1->export(), $storage2->export());
 
-        $this->assertNotEquals($app1->export(), $app2->export());
-
-        $app2->import($app1->export());
-        $this->assertEquals($app1->export(), $app2->export());
+        $storage2->import($storage1->export());
+        $this->assertEquals($storage1->export(), $storage2->export());
     }
 }

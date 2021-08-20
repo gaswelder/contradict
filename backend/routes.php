@@ -137,10 +137,10 @@ function makeWebRoutes(\App $the, $makeStorage)
         $hints1 = [];
         $hints2 = [];
         foreach ($test->tuples1 as $q) {
-            $hints1[] = $the->hint($q);
+            $hints1[] = $q->hint();
         }
         foreach ($test->tuples2 as $q) {
-            $hints2[] = $the->hint($q);
+            $hints2[] = $q->hint();
         }
 
         $f = $test->format();
@@ -168,7 +168,7 @@ function makeWebRoutes(\App $the, $makeStorage)
             $answers[] = $a;
         }
 
-        $results = $the->verifyTest($dict_id, $answers);
+        $results = $the->submitTest($dict_id, $answers);
         return $results->format();
     });
 
@@ -176,36 +176,60 @@ function makeWebRoutes(\App $the, $makeStorage)
      * Returns a single entry by ID.
      */
     $app->get('/api/entries/{\d+}', function ($id) use (&$storage) {
-        return [
-            'entry' => $storage->entry($id)->format()
-        ];
+        $dd = $storage->dicts();
+        $e = null;
+        foreach ($dd as $d) {
+            $e = $d->entry($id);
+            if ($e) {
+                break;
+            }
+        }
+        if ($e) {
+            return [
+                'entry' => $e->format()
+            ];
+        }
+        return null;
     });
 
     /**
      * Updates an entry.
      */
     $app->post('/api/entries/{\d+}', function ($id) use (&$storage) {
+        // Find the dictionary
+        $dict_id = '';
+        foreach ($storage->dicts() as $d) {
+            $e = $d->entry($id);
+            if ($e) {
+                $dict_id = $d->id;
+                break;
+            }
+        }
+        $dict = $storage->dict($dict_id);
+
+        // Save the entry.
         $entry = new Entry;
         $entry->id = $id;
         $entry->q = request::post('q');
         $entry->a = request::post('a');
-        $storage->saveEntry($entry);
+        $dict->saveEntry($entry);
+        $storage->saveDict($dict);
         return 'ok';
     });
 
     /**
      * Exports a database.
      */
-    $app->get('/api/export', function () use ($the) {
-        return $the->export();
+    $app->get('/api/export', function () use ($storage) {
+        return $storage->export();
     });
 
     /**
      * Imports a database.
      */
-    $app->post('/api/export', function () use ($the) {
+    $app->post('/api/export', function () use ($storage) {
         $data = json_decode(request::body(), true);
-        $the->import($data);
+        $storage->import($data);
     });
 
     $app->get('/backup', function () {

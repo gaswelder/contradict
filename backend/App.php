@@ -26,7 +26,7 @@ class App
         $storage = $this->storage;
         $dict = $storage->dict($dict_id);
         $size = 20;
-        $entries = $storage->allEntries($dict_id);
+        $entries = $dict->allEntries();
         $pick1 = $this->pick($entries, $size, 0);
         $pick2 = $this->pick($entries, $size, 1);
 
@@ -34,9 +34,10 @@ class App
         foreach (array_merge($pick1, $pick2) as $e) {
             if (!$e->touched) {
                 $e->touched = 1;
-                $storage->saveEntry($e);
+                $dict->saveEntry($e);
             }
         }
+        $storage->saveDict($dict);
 
         $questions1 = [];
         foreach ($pick1 as $entry) {
@@ -47,8 +48,7 @@ class App
             $questions2[] = new Question($dict, $entry, true);
         }
 
-        $test = new Test($questions1, $questions2);
-        return $test;
+        return new Test($questions1, $questions2);
     }
 
     private function pick(array $entries, int $size, $dir): array
@@ -72,14 +72,15 @@ class App
         return $entries;
     }
 
-    function verifyTest(string $dict_id, array $answers): TestResults
+    function submitTest(string $dict_id, array $answers): TestResults
     {
         $storage = $this->storage;
         $dict = $storage->dict($dict_id);
+
         $questions = [];
         $correct = [];
         foreach ($answers as $a) {
-            $entry = $storage->entry($a->entryID);
+            $entry = $dict->entry($a->entryID);
             $question = new Question($dict, $entry, $a->reverse);
             $questions[] = $question;
             $ok = $question->checkAnswer($a->answer);
@@ -91,11 +92,11 @@ class App
             // Update correct answer counters
             // For all questions that are correct, increment the corresponding counter (dir 0/1) and save.
             if ($question->reverse) {
-                $question->entry()->answers2++;
+                $entry->answers2++;
             } else {
-                $question->entry()->answers1++;
+                $entry->answers1++;
             }
-            $storage->saveEntry($question->entry());
+            $dict->saveEntry($entry);
         }
 
         // Save a score record.
@@ -109,7 +110,10 @@ class App
         $score->dict_id = $dict_id;
         $score->right = $right;
         $score->wrong = $wrong;
-        $storage->saveScore($score);
+
+        $dict->saveScore($score);
+        $storage->saveDict($dict);
+        $storage->flush();
 
         return new TestResults($dict_id, $questions, $answers, $correct);
     }
@@ -117,16 +121,18 @@ class App
     function appendWords(string $dict_id, array $entries): array
     {
         $storage = $this->storage;
+        $dict = $storage->dict($dict_id);
         $added = 0;
         $skipped = 0;
         foreach ($entries as $entry) {
-            if (!$storage->hasEntry($dict_id, $entry)) {
-                $storage->saveEntry($entry);
+            if (!$dict->hasEntry($entry)) {
+                $dict->saveEntry($entry);
                 $added++;
             } else {
                 $skipped++;
             }
         }
+        $storage->saveDict($dict);
         return compact('added', 'skipped');
     }
 
@@ -138,7 +144,8 @@ class App
     function dictStats(string $dict_id): Stats
     {
         $storage = $this->storage;
-        $entries = $storage->allEntries($dict_id);
+        $dict = $storage->dict($dict_id);
+        $entries = $dict->allEntries();
 
         $stats = new Stats;
         $stats->totalEntries = count($entries);
@@ -154,79 +161,7 @@ class App
             }
         }
 
-        $stats->successRate = $storage->getSuccessRate($dict_id);
+        $stats->successRate = $dict->getSuccessRate();
         return $stats;
     }
-
-    function hint(Question $q)
-    {
-        $storage = $this->storage;
-        $entry = $q->entry();
-        $sim = $storage->similars($entry, $q->reverse);
-        if (count($sim) == 0) {
-            return null;
-        }
-        $field = $q->reverse ? 'q' : 'a';
-        $values = [];
-        foreach ($sim as $entry) {
-            $values[] = $entry->$field;
-        }
-        $hint = h($q->entry()->$field, $values);
-        return preg_replace('/\*+/', '...', $hint);
-    }
-
-    function export(): array
-    {
-        $storage = $this->storage;
-        $data = [
-            'dicts' => [],
-            'entries' => [],
-            'scores' => []
-        ];
-        foreach ($storage->dicts() as $dict) {
-            $data['dicts'][] = $dict->format();
-            foreach ($storage->allEntries($dict->id) as $e) {
-                $data['entries'][] = $e->format();
-            }
-        }
-        foreach ($storage->scores() as $score) {
-            $data['scores'][] = $score->format();
-        }
-        return $data;
-    }
-
-    function import(array $data)
-    {
-        $storage = $this->storage;
-        foreach ($data['dicts'] as $row) {
-            $d = Dict::parse($row);
-            $storage->saveDict($d);
-        }
-        foreach ($data['entries'] as $row) {
-            $e = Entry::parse($row);
-            $storage->saveEntry($e);
-        }
-        foreach ($data['scores'] as $row) {
-            $storage->saveScore(Score::parse($row));
-        }
-    }
-}
-
-function h($word, $others)
-{
-    $list = array_unique(array_merge([$word], $others));
-    if (count($list) < 2) return null;
-
-    $first = array_map(function ($str) {
-        return mb_substr($str, 0, 1);
-    }, $list);
-
-    if (count(array_unique($first)) == count($first)) {
-        return $first[0] . (mb_strlen($word) > 1 ? '*' : '');
-    }
-    $rest = function ($str) {
-        return mb_substr($str, 1);
-    };
-    $replace = $first[0] == ' ' ? ' ' : '*';
-    return $replace . h($rest($word), array_map($rest, $others));
 }
