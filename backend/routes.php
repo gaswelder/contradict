@@ -220,7 +220,7 @@ function makeWebRoutes(\App $the, $makeStorage)
     /**
      * Exports a database.
      */
-    $app->get('/api/export', function () use ($storage) {
+    $app->get('/api/export', function () use (&$storage) {
         return $storage->export();
     });
 
