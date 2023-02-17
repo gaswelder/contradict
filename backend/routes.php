@@ -50,7 +50,7 @@ function makeAuthMiddleware(Auth $auth, $urlPrefix, $loginURL, $logoutURL, $onAu
     };
 }
 
-function makeWebRoutes(\App $the, $makeStorage)
+function makeWebRoutes(\App $the)
 {
     $app = new App(__DIR__);
     $auth = new CookieAuth(getenv('COOKIE_KEY'));
@@ -59,8 +59,10 @@ function makeWebRoutes(\App $the, $makeStorage)
      * @var Dictionaries
      */
     $storage = null;
-    $onAuth = function ($userID) use ($the, $makeStorage, &$storage) {
-        $storage = $makeStorage($userID);
+    $onAuth = function ($userID) use ($the, &$storage) {
+        error_log("using local storage");
+        $fs = new LocalFS(__DIR__ . "/database-$userID.json");
+        $storage = new Dictionaries($fs);
         $the->setStorage($storage);
     };
 

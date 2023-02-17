@@ -25,25 +25,5 @@ if (file_exists(__DIR__ . '/.env')) {
     Appget\Env::parse(__DIR__ . '/.env');
 }
 
-function getStorageMaker()
-{
-    if (getenv('CLOUDCUBE_URL')) {
-        error_log("using s3 storage");
-        return function ($userID) {
-            $s3 = new CloudCube();
-            $fs = new S3($s3, $userID);
-            return new Dictionaries($fs);
-        };
-    } else {
-        error_log("using local storage");
-        return function ($userID) {
-            $fs = new LocalFS(__DIR__ . "/database-$userID.json");
-            return new Dictionaries($fs);
-        };
-    }
-}
-
 $theApp = new App();
-
-$app = makeWebRoutes($theApp, getStorageMaker());
-$app->run();
+makeWebRoutes($theApp)->run();
