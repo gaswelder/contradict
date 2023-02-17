@@ -4,18 +4,22 @@ use Appget\App;
 use havana\request;
 use havana\response;
 
-function makeAuthMiddleware(Auth $auth, $urlPrefix, $loginURL, $logoutURL, $onAuth)
+function makeWebRoutes()
 {
-    return function ($next) use ($auth, $urlPrefix, $loginURL, $logoutURL, $onAuth) {
-        if (!request::url()->isUnder($urlPrefix)) {
+    $the = new Contradict();
+    $app = new App(__DIR__);
+    $auth = new CookieAuth(getenv('COOKIE_KEY'));
+
+    /**
+     * @var Dictionaries
+     */
+    $storage = null;
+
+    $app->middleware(function ($next) use ($auth, $the) {
+        if (!request::url()->isUnder('/api') || request::method() == 'OPTIONS') {
             return $next();
         }
-
-        if (request::method() == 'OPTIONS') {
-            return $next();
-        }
-
-        if (request::url()->path == $loginURL) {
+        if (request::url()->path == '/api/login') {
             // Allow only posting to login.
             if (request::method() !== 'POST') {
                 return 405;
@@ -30,8 +34,7 @@ function makeAuthMiddleware(Auth $auth, $urlPrefix, $loginURL, $logoutURL, $onAu
                 return response::make('Invalid login/password')->setStatus(403);
             }
         }
-
-        if (request::url()->path == $logoutURL) {
+        if (request::url()->path == '/api/logout') {
             // Allow only posting to logout.
             if (request::method() !== 'POST') {
                 return 405;
@@ -45,29 +48,12 @@ function makeAuthMiddleware(Auth $auth, $urlPrefix, $loginURL, $logoutURL, $onAu
         if (!$userID) {
             return 401;
         }
-        $onAuth($userID);
-        return $next();
-    };
-}
-
-function makeWebRoutes()
-{
-    $the = new Contradict();
-    $app = new App(__DIR__);
-    $auth = new CookieAuth(getenv('COOKIE_KEY'));
-
-    /**
-     * @var Dictionaries
-     */
-    $storage = null;
-    $onAuth = function ($userID) use ($the, &$storage) {
         error_log("using local storage");
         $fs = new LocalFS(__DIR__ . "/database-$userID.json");
         $storage = new Dictionaries($fs);
         $the->setStorage($storage);
-    };
-
-    $app->middleware(makeAuthMiddleware($auth, '/api', '/api/login', '/api/logout', $onAuth));
+        return $next();
+    });
 
     $app->middleware((function ($next) {
         if (request::method() != 'OPTIONS') {
