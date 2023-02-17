@@ -50,8 +50,9 @@ function makeAuthMiddleware(Auth $auth, $urlPrefix, $loginURL, $logoutURL, $onAu
     };
 }
 
-function makeWebRoutes(\App $the)
+function makeWebRoutes()
 {
+    $the = new Contradict();
     $app = new App(__DIR__);
     $auth = new CookieAuth(getenv('COOKIE_KEY'));
 

@@ -1,6 +1,6 @@
 <?php
 
-class App
+class Contradict
 {
     /**
      * How many correct answers needed for an entry to be "finished".

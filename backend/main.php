@@ -25,5 +25,4 @@ if (file_exists(__DIR__ . '/.env')) {
     Appget\Env::parse(__DIR__ . '/.env');
 }
 
-$theApp = new App();
-makeWebRoutes($theApp)->run();
+makeWebRoutes()->run();
