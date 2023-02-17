@@ -9,7 +9,7 @@ class CookieAuthTest extends TestCase
         $this->checkAuth(new CookieAuth('nIkpxL8wkMRZIAf+r+eldeSPVrhm+jj38TjoiGbjk8Y='));
     }
 
-    function checkAuth(Auth $auth)
+    function checkAuth(CookieAuth $auth)
     {
         // Obtain tokens, verify tokens.
         $t1 = $auth->login('bob', 'marley');

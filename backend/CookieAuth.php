@@ -1,6 +1,6 @@
 <?php
 
-class CookieAuth implements Auth
+class CookieAuth
 {
     private $key;
 
