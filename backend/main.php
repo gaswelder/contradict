@@ -1,10 +1,10 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
+registerClasses(__DIR__ . '/classes');
 registerClasses(__DIR__);
 
 // require '/home/gas/code/pub/havana/main.php';
 require __DIR__ . '/routes.php';
-require __DIR__ . '/App.php';
 
 function varfmt($var)
 {
