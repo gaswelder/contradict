@@ -78,14 +78,7 @@ function main()
     });
 
     $router->add('get', '/api/', function () {
-        $the = getThe();
-        $list = [];
-        foreach ($the->dicts() as $dict) {
-            $d = $dict->format();
-            $d['stats'] = $the->dictStats($dict->id)->format();
-            $list[] = $d;
-        }
-        send(response::json($list));
+        send(response::json(getThe()->getDicts()));
     });
 
     /**

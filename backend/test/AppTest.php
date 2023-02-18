@@ -219,4 +219,63 @@ class AppTest extends TestCase
             ]
         ]);
     }
+
+    function testDicts()
+    {
+        // pre: app with some dicts
+        $app = $this->app();
+
+        // action: get the list
+        $r = $app->getDicts();
+
+        // post: correct list
+        $this->assertEquals($r, array(
+            0 =>
+            array(
+                'id' => '1',
+                'name' => 'Sample dict',
+                'words' =>
+                array(
+                    1 =>
+                    [
+                        'id' => '1',
+                        'dict_id' => '1',
+                        'q' => 'q',
+                        'a' => 'a',
+                        'touched' => 0,
+                        'answers1' => 1,
+                        'answers2' => 2,
+                    ],
+                    2 =>
+                    [
+                        'id' => '2',
+                        'dict_id' => '1',
+                        'q' => 'x',
+                        'a' => 'y',
+                        'touched' => 0,
+                        'answers1' => 3,
+                        'answers2' => 4,
+                    ],
+                ),
+                'scores' =>
+                array(
+                    1 =>
+                    array(
+                        'id' => '1',
+                        'dict_id' => '1',
+                        'right' => 1,
+                        'wrong' => 2,
+                    ),
+                ),
+                'lookupURLTemplate' => '',
+                'stats' =>
+                array(
+                    'pairs' => 2.0,
+                    'finished' => 0,
+                    'touched' => 0.0,
+                    'successRate' => 0.3333333333333333,
+                ),
+            ),
+        ));
+    }
 }

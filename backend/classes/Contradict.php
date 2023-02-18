@@ -57,6 +57,17 @@ class Contradict
         return $this->data;
     }
 
+    function getDicts(): array
+    {
+        $list = [];
+        foreach ($this->dicts() as $dict) {
+            $d = $dict->format();
+            $d['stats'] = $this->dictStats($dict->id)->format();
+            $list[] = $d;
+        }
+        return $list;
+    }
+
     /**
      * Returns all saved dicts.
      */
