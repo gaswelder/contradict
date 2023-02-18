@@ -61,9 +61,32 @@ class Contradict
     {
         $list = [];
         foreach ($this->dicts() as $dict) {
-            $d = $dict->format();
-            $d['stats'] = $this->dictStats($dict->id)->format();
-            $list[] = $d;
+
+            $entries = $dict->allEntries();
+            $totalEntries = count($entries);
+            $finished = 0;
+            $touched = 0;
+            foreach ($entries as $e) {
+                $isfinished = $e->answers1 >= self::GOAL && $e->answers2 >= self::GOAL;
+                if ($isfinished) {
+                    $finished++;
+                    continue;
+                }
+                if ($e->touched) {
+                    $touched++;
+                }
+            }
+            $list[] = array_merge($dict->data, [
+                'id' => $dict->id,
+                'name' => $dict->name,
+                'lookupURLTemplate' => $dict->lookupURLTemplate,
+                'stats' => [
+                    'pairs' => floatval($totalEntries),
+                    'finished' => $finished,
+                    'touched' => floatval($touched),
+                    'successRate' => $dict->getSuccessRate()
+                ]
+            ]);
         }
         return $list;
     }
@@ -285,29 +308,6 @@ class Contradict
         }
         $this->saveDict($dict);
         return compact('added', 'skipped');
-    }
-
-    function dictStats(string $dict_id): Stats
-    {
-        $dict = $this->getDict($dict_id);
-        $entries = $dict->allEntries();
-
-        $stats = new Stats;
-        $stats->totalEntries = count($entries);
-
-        foreach ($entries as $e) {
-            $isfinished = $e->answers1 >= self::GOAL && $e->answers2 >= self::GOAL;
-            if ($isfinished) {
-                $stats->finished++;
-                continue;
-            }
-            if ($e->touched) {
-                $stats->touched++;
-            }
-        }
-
-        $stats->successRate = $dict->getSuccessRate();
-        return $stats;
     }
 
     function markTouch($id, $dir, $success)

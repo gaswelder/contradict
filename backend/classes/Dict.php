@@ -5,7 +5,7 @@ class Dict
     public $id;
     public $name;
     public $lookupURLTemplate;
-    private $data = ['words' => []];
+    public $data = ['words' => []];
 
     static function parse(array $arr): Dict
     {
