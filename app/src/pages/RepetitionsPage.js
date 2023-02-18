@@ -80,8 +80,8 @@ export const RepetitionsPage = withRouter(
             {cc.q}
             {cc.hint && ` (${cc.hint})`}
             {show && (
-              <p>
-                {cc.a}
+              <>
+                <p>{cc.a}</p>
                 <ul>
                   {cc.urls.map((url) => (
                     <li key={url}>
@@ -91,7 +91,7 @@ export const RepetitionsPage = withRouter(
                     </li>
                   ))}
                 </ul>
-              </p>
+              </>
             )}
           </div>
         </Card>
