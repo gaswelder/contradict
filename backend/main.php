@@ -102,7 +102,7 @@ try {
     error_log("route not found: " . request::url());
     send(response::make(404)->setContent("route not found: " . request::url()));
 } catch (Exception $e) {
-    error_log($e::class . ': ' . $e->getMessage());
+    error_log(get_class($e) . ': ' . $e->getMessage());
     send(response::make(500));
 }
 
