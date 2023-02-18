@@ -81,7 +81,16 @@ export const RepetitionsPage = withRouter(
             {cc.hint && ` (${cc.hint})`}
             {show && (
               <p>
-                {cc.a} <a href={cc.wikiURL}>wiki</a>
+                {cc.a}
+                <ul>
+                  {cc.urls.map((url) => (
+                    <li key={url}>
+                      <a target="_blank" rel="noreferrer" href={url}>
+                        {urlTitle(url)}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </p>
             )}
           </div>
@@ -112,3 +121,10 @@ export const RepetitionsPage = withRouter(
     );
   })
 );
+
+const urlTitle = (url) => {
+  return new URL(url).hostname
+    .split(".")
+    .filter((x) => x != "www" && x != "com" && x != "org")
+    .join(".");
+};

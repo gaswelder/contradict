@@ -12,11 +12,11 @@ export function Fail(props) {
         <span className="strike">{answer}</span>
       </p>
       <Link to={`/entries/${question.id}`}>Edit</Link>{" "}
-      {question.wikiURL && (
-        <a href={question.wikiURL} target="_blank" rel="noopener noreferrer">
-          Open on wiki
+      {question.urls.map((url) => (
+        <a key={url} href={url} target="_blank" rel="noopener noreferrer">
+          {url}
         </a>
-      )}
+      ))}
     </article>
   );
 }

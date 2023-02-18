@@ -147,7 +147,7 @@ class AppTest extends TestCase
                     'q' => 'q',
                     'a' => 'a',
                     'times' => 0,
-                    'wikiURL' => NULL,
+                    'urls' => [],
                     'reverse' => false,
                     'hint' => NULL,
                 ),
@@ -160,7 +160,7 @@ class AppTest extends TestCase
                     'q' => 'a',
                     'a' => 'q',
                     'times' => 0,
-                    'wikiURL' => NULL,
+                    'urls' => [],
                     'reverse' => true,
                     'hint' => NULL,
                 ),
@@ -187,7 +187,7 @@ class AppTest extends TestCase
                         'q' => 'q',
                         'a' => 'a',
                         'times' => 2,
-                        'wikiURL' => NULL,
+                        'urls' => [],
                         'dir' => 0,
                     ],
                     'correct' => true
@@ -199,7 +199,7 @@ class AppTest extends TestCase
                         'q' => 'x',
                         'a' => 'y',
                         'times' => 3,
-                        'wikiURL' => NULL,
+                        'urls' => [],
                         'dir' => 0,
                     ],
                     'correct' => false
@@ -245,7 +245,7 @@ class AppTest extends TestCase
                         'answers2' => 4,
                     ],
                 ),
-                'lookupURLTemplate' => '',
+                'lookupURLTemplates' => [],
                 'stats' =>
                 array(
                     'pairs' => 2.0,

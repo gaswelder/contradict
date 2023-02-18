@@ -66,7 +66,7 @@ class Question
 			'q' => $this->q(),
 			'a' => $this->a(),
 			'times' => $this->times(),
-			'wikiURL' => $this->dict->wikiURL($this->e->q),
+			'urls' => $this->dict->wikiURLs($this->e->q),
 			'dir' => $this->reverse ? 1 : 0
 		];
 	}

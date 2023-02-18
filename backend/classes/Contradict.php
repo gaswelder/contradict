@@ -38,7 +38,18 @@ class Contradict
         if (substr($data, 0, 1) != '{') {
             $data = gzuncompress($data);
         }
-        $this->data = json_decode($data, true);
+        $data = json_decode($data, true);
+        foreach ($data['dicts'] as $id => $dict) {
+            if (!array_key_exists('lookupURLTemplates', $dict)) {
+                $data['dicts'][$id]['lookupURLTemplates'] = [];
+                $t = trim($dict['lookupURLTemplate'] ?? "");
+                if ($t) {
+                    $data['dicts'][$id]['lookupURLTemplates'][] = $t;
+                }
+                unset($data['dicts'][$id]['lookupURLTemplate']);
+            }
+        }
+        $this->data = $data;
     }
 
     function __destruct()
@@ -61,7 +72,6 @@ class Contradict
     {
         $list = [];
         foreach ($this->dicts() as $dict) {
-
             $entries = $dict->allEntries();
             $totalEntries = count($entries);
             $finished = 0;
@@ -79,7 +89,7 @@ class Contradict
             $list[] = array_merge($dict->data, [
                 'id' => $dict->id,
                 'name' => $dict->name,
-                'lookupURLTemplate' => $dict->lookupURLTemplate,
+                'lookupURLTemplates' => $dict->lookupURLTemplates,
                 'stats' => [
                     'pairs' => floatval($totalEntries),
                     'finished' => $finished,
@@ -117,7 +127,7 @@ class Contradict
             throw new DictNotFound();
         }
         $dict->name = $data['name'] ?? $dict->name;
-        $dict->lookupURLTemplate = $data['lookupURLTemplate'] ?? $dict->lookupURLTemplate;
+        $dict->lookupURLTemplates = $data['lookupURLTemplates'] ?? $dict->lookupURLTemplates;
         $this->saveDict($dict);
     }
 
@@ -191,7 +201,7 @@ class Contradict
                 'q' => $entry->q,
                 'a' => $entry->a,
                 'times' => $entry->answers1,
-                'wikiURL' => $dict->wikiURL($entry->q),
+                'urls' => $dict->wikiURLs($entry->q),
                 'reverse' => false,
                 'hint' => $tuple->hint()
             ];
@@ -203,7 +213,7 @@ class Contradict
                 'q' => $entry->a,
                 'a' => $entry->q,
                 'times' => $entry->answers2,
-                'wikiURL' => $dict->wikiURL($entry->q),
+                'urls' => $dict->wikiURLs($entry->q),
                 'reverse' => true,
                 'hint' => $tuple->hint()
             ];

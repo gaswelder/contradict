@@ -4,7 +4,7 @@ class Dict
 {
     public $id;
     public $name;
-    public $lookupURLTemplate;
+    public $lookupURLTemplates;
     public $data = ['words' => []];
 
     static function parse(array $arr): Dict
@@ -13,7 +13,7 @@ class Dict
         $d->data = $arr;
         $d->id = $arr['id'];
         $d->name = $arr['name'];
-        $d->lookupURLTemplate = $arr['lookupURLTemplate'] ?? '';
+        $d->lookupURLTemplates = $arr['lookupURLTemplates'] ?? [];
         return $d;
     }
 
@@ -22,28 +22,26 @@ class Dict
         return array_merge($this->data, [
             'id' => $this->id,
             'name' => $this->name,
-            'lookupURLTemplate' => $this->lookupURLTemplate
+            'lookupURLTemplates' => $this->lookupURLTemplates
         ]);
     }
 
-    function wikiURL(string $entryText)
+    function wikiURLs(string $entryText): array
     {
-        if (!$this->lookupURLTemplate) {
-            return null;
-        }
         $words = explode(' ', $entryText);
         if (empty($words)) {
-            return null;
+            return [];
         }
-        if (in_array(strtolower($words[0]), ['das', 'die', 'der'])) {
+        if (in_array(strtolower($words[0]), ['das', 'die', 'der', 'to'])) {
             array_shift($words);
         }
         if (count($words) != 1) {
-            return null;
+            return [];
         }
-
-        $wiki = $words[0];
-        return str_replace('{{word}}', urlencode($wiki), $this->lookupURLTemplate);
+        $word = $words[0];
+        return array_map(function ($template) use ($word) {
+            return str_replace('{{word}}', urlencode($word), $template);
+        }, $this->lookupURLTemplates);
     }
 
     function allEntries(): array

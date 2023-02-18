@@ -24,13 +24,16 @@ export default function DictPage(props) {
       onSubmit={async (e) => {
         e.preventDefault();
         const name = e.target.querySelector('[name="name"]');
-        const lookupURLTemplate = e.target.querySelector(
-          '[name="lookupURLTemplate"]'
+        const lookupURLTemplates = e.target.querySelector(
+          '[name="lookupURLTemplates"]'
         );
         setSaving(true);
         await api.updateDict(dict.id, {
           name: name.value,
-          lookupURLTemplate: lookupURLTemplate.value,
+          lookupURLTemplates: lookupURLTemplates.value
+            .split(/\n/)
+            .map((line) => line.trim())
+            .filter((line) => line != ""),
         });
         setSaving(false);
       }}
@@ -40,8 +43,11 @@ export default function DictPage(props) {
         <input name="name" defaultValue={dict.name} />
       </div>
       <div>
-        <label>World lookup URL template</label>
-        <input name="lookupURLTemplate" defaultValue={dict.lookupURLTemplate} />
+        <label>World lookup URL templates</label>
+        <textarea
+          name="lookupURLTemplates"
+          defaultValue={dict.lookupURLTemplates.join("\n")}
+        />
         <br />
         <small>
           For example, {"https://de.wiktionary.org/w/index.php?search={{word}}"}
