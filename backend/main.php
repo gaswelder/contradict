@@ -85,7 +85,7 @@ function main()
      * Updates a dictionary.
      */
     $router->add('post', '/api/{\d+}', function ($dict_id) {
-        $data = json_decode(request::body(), true);
+        $data = request::json();
         try {
             getThe()->updateDict($dict_id, $data);
         } catch (DictNotFound $e) {
@@ -153,7 +153,7 @@ function main()
     });
 
     $router->add('post', '/api/touches/{\w+}', function ($id) {
-        $body = json_decode(request::body(), true);
+        $body = request::json();
         getThe()->markTouch($id, $body['dir'], $body['success']);
         send(response::make('ok'));
     });

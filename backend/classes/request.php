@@ -7,6 +7,14 @@ class request
 	private static $get = [];
 
 	/**
+	 * Returns request's payload parsed as JSON.
+	 */
+	static function json()
+	{
+		return json_decode(self::body(), true);
+	}
+
+	/**
 	 * Returns the request's method.
 	 */
 	static function method(): string
