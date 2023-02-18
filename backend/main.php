@@ -159,7 +159,7 @@ function main()
         send(response::make('ok'));
     });
 
-    $router->add('post', '/api/touches/{\d+}', function ($id) {
+    $router->add('post', '/api/touches/{\w+}', function ($id) {
         $body = json_decode(request::body(), true);
         getThe()->markTouch($id, $body['dir'], $body['success']);
         send(response::make('ok'));
@@ -168,8 +168,10 @@ function main()
     try {
         $router->dispatch();
     } catch (RouteNotFound $e) {
-        send(response::make(404));
+        error_log("route not found: " . request::url());
+        send(response::make(404)->setContent("route not found: " . request::url()));
     } catch (Exception $e) {
+        error_log($e->getMessage());
         send(response::make(500));
     }
 }
