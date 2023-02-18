@@ -15,6 +15,14 @@ class TestCase
         }
     }
 
+    function assertNotEquals($actual, $expected)
+    {
+        if ($actual === $expected) {
+            echo "expected to not equal '$expected'\n";
+            throw new AssertException();
+        }
+    }
+
     function assertContains($substring, $string)
     {
         if (strpos($string, $substring) === false) {

@@ -1,45 +1,11 @@
 <?php
 
-function migrate($data)
-{
-    $v = $data['version'] ?? 0;
-    if ($v == 0) {
-        $v1 = [
-            'version' => 1,
-            'dicts' => [
-                "" => [
-                    "id" => "",
-                    "name" => "(recovered)",
-                ]
-            ]
-        ];
-        foreach ($data['dicts'] as $dict) {
-            $v1['dicts'][$dict['id']] = array_merge($dict, [
-                'words' => [],
-                'scores' => []
-            ]);
-        }
-        foreach ($data['words'] as $id => $word) {
-            $v1['dicts'][$word['dict_id']]['words'][$id] = $word;
-        }
-        foreach ($data['scores'] as $id => $score) {
-            $v1['dicts'][$score['dict_id']]['scores'][$id] = $score;
-        }
-        return migrate($v1);
-    }
-    if ($v == 1) {
-        return $data;
-    }
-    throw new Error("unexpected data version: $v");
-}
-
 function parseData($data)
 {
     if (substr($data, 0, 1) != '{') {
         $data = gzuncompress($data);
     }
-    $data = json_decode($data, true);
-    return migrate($data);
+    return json_decode($data, true);
 }
 
 class Dictionaries

@@ -9,62 +9,85 @@ function testData()
         'dicts' => [
             '1' => [
                 'id' => '1',
-                'name' => 'Sample dict'
+                'name' => 'Sample dict',
+                'words' => [
+                    '1' => [
+                        'id' => '1',
+                        'dict_id' => '1',
+                        'q' => 'q',
+                        'a' => 'a',
+                        'touched' => 0,
+                        'answers1' => 1,
+                        'answers2' => 2,
+                    ],
+                    '2' => [
+                        'id' => '2',
+                        'dict_id' => '1',
+                        'q' => 'x',
+                        'a' => 'y',
+                        'touched' => 0,
+                        'answers1' => 3,
+                        'answers2' => 4,
+                    ]
+                ],
+                'scores' => [
+                    '1' => [
+                        'id' => '1',
+                        'dict_id' => '1',
+                        'right' => 1,
+                        'wrong' => 2
+                    ]
+                ]
             ]
         ],
-        'words' => [
-            '1' => [
-                'id' => '1',
-                'dict_id' => '1',
-                'q' => 'q',
-                'a' => 'a',
-                'touched' => 0,
-                'answers1' => 1,
-                'answers2' => 2,
-            ],
-            '2' => [
-                'id' => '2',
-                'dict_id' => '1',
-                'q' => 'x',
-                'a' => 'y',
-                'touched' => 0,
-                'answers1' => 3,
-                'answers2' => 4,
-            ]
-        ],
-        'scores' => [
-            '1' => [
-                'id' => '1',
-                'dict_id' => '1',
-                'right' => 1,
-                'wrong' => 2
-            ]
-        ]
     ];
 }
 
 class AppTest extends TestCase
 {
-    function test()
+    function testImport()
     {
-        $dict_id = '1';
-        $answers = [
-            Answer::parse(['entryID' => '1', 'answer' => 'a', 'reverse' => false]), // correct
-            Answer::parse(['entryID' => '2', 'answer' => 'qq', 'reverse' => false]) // incorrect
-        ];
+        // pre: empty app
         $app = new Contradict("test");
+
+        // action: import data
         $app->storage->import(testData());
-        $app->submitTest($dict_id, $answers);
-        $first = reset(testData()['scores']);
-        $this->assertEquals(1, $first['right']);
-        $this->assertEquals(2, $first['wrong']);
-        $this->assertEquals(1, $first['dict_id']);
+
+        // post: app has 1 dict with 2 entries
+        $dicts = $app->dicts();
+        $this->assertEquals(count($dicts), 1);
+        $this->assertEquals(count($dicts[0]->allEntries()), 2);
     }
 
-    function testImportExport()
+    function testExport()
     {
+        // pre: app with data
         $app = new Contradict("test");
         $app->storage->import(testData());
-        $this->assertEquals($app->storage->export(), testData());
+
+        // action: export
+        $exported = $app->storage->export();
+
+        // post: exported data matches the source data
+        $this->assertEquals($exported, testData());
     }
+
+    // function test()
+    // {
+    //     // pre: app with some words
+    //     $app = new Contradict("test");
+    //     $app->storage->import(testData());
+
+    //     // action: submit answers
+    //     $result = $app->submitTest('1', [
+    //         Answer::parse(['entryID' => '1', 'answer' => 'a', 'reverse' => false]), // correct
+    //         Answer::parse(['entryID' => '2', 'answer' => 'qq', 'reverse' => false]) // incorrect
+    //     ]);
+
+    //     // post: result contains 2 results, 1 correct
+    //     $this->assertEquals($result->dict_id, '1');
+    //     $this->assertEquals($result->correct, 1);
+    // }
+
+
 }

@@ -77,11 +77,15 @@ class Contradict
     {
         $storage = $this->storage;
         $dict = $storage->dict($dict_id);
+        var_dump($dict);
 
         $questions = [];
         $correct = [];
         foreach ($answers as $a) {
             $entry = $dict->entry($a->entryID);
+            if (!$entry) {
+                throw new Exception("couldn't find entry $dict_id/$a->entryID");
+            }
             $question = new Question($dict, $entry, $a->reverse);
             $questions[] = $question;
             $ok = $question->checkAnswer($a->answer);

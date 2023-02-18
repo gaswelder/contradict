@@ -1,7 +1,5 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
-
 class CookieAuthTest extends TestCase
 {
     function test()
