@@ -152,19 +152,8 @@ function main()
      * Parses test answers and returns results.
      */
     $router->add('post', '/api/{\d+}/test', function ($dict_id) {
-        $the = getThe();
-        $directions = request::post('dir');
-        $ids = request::post('q');
-        $answers = [];
-        foreach (request::post('a') as $i => $answer) {
-            $a = new Answer;
-            $a->answer = $answer;
-            $a->entryID = $ids[$i];
-            $a->reverse = $directions[$i] == 1;
-            $answers[] = $a;
-        }
-        $results = $the->submitTest($dict_id, $answers);
-        send(response::json($results->format()));
+        $results = getThe()->submitTest($dict_id, request::post('dir'), request::post('q'), request::post('a'));
+        send(response::json($results));
     });
 
     /**

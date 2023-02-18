@@ -8,9 +8,11 @@ class TestCase
 {
     function assertEquals($actual, $expected)
     {
-        if ($actual !== $expected) {
-            echo "expected: $expected\n";
-            echo "actual:   $actual\n";
+        if ($actual != $expected) {
+            $e = var_export($expected, true);
+            $a = var_export($actual, true);
+            echo "expected: $e\n";
+            echo "actual:   $a\n";
             throw new AssertException();
         }
     }
@@ -90,4 +92,8 @@ foreach (array_slice($argv, 1) as $path) {
     $cc = $cc1;
     echo "\n";
 }
-echo "fails: $fails, successes: $ok\n";
+if ($fails > 0) {
+    echo "fails: $fails, successes: $ok\n";
+} else {
+    echo "successes: $ok, fails: $fails\n";
+}

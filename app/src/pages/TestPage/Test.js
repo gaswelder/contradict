@@ -1,7 +1,8 @@
 import React from "react";
 
 export function TestSection(props) {
-  const { dir, tuples } = props;
+  const { reverse, tuples } = props;
+  const dir = reverse ? 1 : 0;
   return (
     <section>
       {tuples.map((question) => (

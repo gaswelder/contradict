@@ -71,7 +71,7 @@ class AppTest extends TestCase
         $this->assertEquals($exported, testData());
     }
 
-    private function app()
+    private function app(): Contradict
     {
         $app = new Contradict("test");
         $app->import(testData());
@@ -134,22 +134,43 @@ class AppTest extends TestCase
         $this->assertEquals('2', $e->id);
     }
 
-    // function test()
-    // {
-    //     // pre: app with some words
-    //     $app = new Contradict("test");
-    //     $app->storage->import(testData());
+    function test()
+    {
+        // pre: app with some words
+        $app = $this->app();
 
-    //     // action: submit answers
-    //     $result = $app->submitTest('1', [
-    //         Answer::parse(['entryID' => '1', 'answer' => 'a', 'reverse' => false]), // correct
-    //         Answer::parse(['entryID' => '2', 'answer' => 'qq', 'reverse' => false]) // incorrect
-    //     ]);
+        // action: submit answers, one correct, one incorrect.
+        $result = $app->submitTest('1', [0, 0], ['1', '2'], ['a', 'qq']);
 
-    //     // post: result contains 2 results, 1 correct
-    //     $this->assertEquals($result->dict_id, '1');
-    //     $this->assertEquals($result->correct, 1);
-    // }
-
-
+        // post: result contains 2 results, 1 correct
+        $this->assertEquals($result, [
+            'dict_id' => '1',
+            'results' => [
+                [
+                    'answer' => 'a',
+                    'question' => [
+                        'id' => '1',
+                        'q' => 'q',
+                        'a' => 'a',
+                        'times' => 2,
+                        'wikiURL' => NULL,
+                        'dir' => 0,
+                    ],
+                    'correct' => true
+                ],
+                [
+                    'answer' => 'qq',
+                    'question' => [
+                        'id' => '2',
+                        'q' => 'x',
+                        'a' => 'y',
+                        'times' => 3,
+                        'wikiURL' => NULL,
+                        'dir' => 0,
+                    ],
+                    'correct' => false
+                ]
+            ]
+        ]);
+    }
 }

@@ -52,7 +52,7 @@ export const RepetitionsPage = withRouter(
     }
     return (
       <ContainerDiv>
-        <Card reverse={cc.dir}>
+        <Card reverse={cc.reverse}>
           {cc.q} ({cc.hint})
           {show && (
             <p>
@@ -64,7 +64,7 @@ export const RepetitionsPage = withRouter(
           <button
             disabled={busy}
             onClick={async () => {
-              api.touchCard(cc.id, cc.dir, true);
+              api.touchCard(cc.id, cc.reverse, true);
               next();
             }}
           >
@@ -75,7 +75,7 @@ export const RepetitionsPage = withRouter(
           onClick={async () => {
             if (!show) {
               setShow(true);
-              api.touchCard(cc.id, cc.dir, true);
+              api.touchCard(cc.id, cc.reverse, true);
             } else {
               next();
               setShow(false);

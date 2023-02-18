@@ -179,52 +179,54 @@ class Contradict
         return $entries;
     }
 
-    function submitTest(string $dict_id, array $answers): TestResults
+    function submitTest(string $dict_id, array $directions, array $ids, array $aa): array
     {
         $dict = $this->getDict($dict_id);
+        $results = [];
+        $right = 0;
+        $wrong = 0;
+        foreach ($aa as $i => $answer) {
+            $entryID = $ids[$i];
+            $reverse = $directions[$i] == 1;
 
-        $questions = [];
-        $correct = [];
-        foreach ($answers as $a) {
-            $entry = $dict->entry($a->entryID);
+            $entry = $dict->entry($entryID);
             if (!$entry) {
-                throw new Exception("couldn't find entry $dict_id/$a->entryID");
+                throw new Exception("couldn't find entry $dict_id/$entryID");
             }
-            $question = new Question($dict, $entry, $a->reverse);
-            $questions[] = $question;
-            $ok = $question->checkAnswer($a->answer);
-            $correct[] = $ok;
-            if (!$ok) {
-                continue;
-            }
-
-            // Update correct answer counters
-            // For all questions that are correct, increment the corresponding counter (dir 0/1) and save.
-            if ($question->reverse) {
-                $entry->answers2++;
+            $question = new Question($dict, $entry, $reverse);
+            $ok = $question->checkAnswer($answer);
+            if ($ok) {
+                $right++;
+                // Update correct answer counters
+                // For all questions that are correct, increment the corresponding counter (dir 0/1) and save.
+                if ($reverse) {
+                    $entry->answers2++;
+                } else {
+                    $entry->answers1++;
+                }
+                $dict->saveEntry($entry);
             } else {
-                $entry->answers1++;
+                $wrong++;
             }
-            $dict->saveEntry($entry);
+            $results[] = [
+                "answer" => $answer,
+                "question" => $question->format(),
+                "correct" => $ok
+            ];
         }
 
         // Save a score record.
-        $right = 0;
-        $wrong = 0;
-        foreach ($correct as $ok) {
-            if ($ok) $right++;
-            else $wrong++;
-        }
         $score = new Score;
         $score->dict_id = $dict_id;
         $score->right = $right;
         $score->wrong = $wrong;
-
         $dict->saveScore($score);
         $this->saveDict($dict);
         $this->flush();
-
-        return new TestResults($dict_id, $questions, $answers, $correct);
+        return [
+            'dict_id' => $dict_id,
+            'results' => $results,
+        ];
     }
 
     function appendWords(string $dict_id, array $entries): array
