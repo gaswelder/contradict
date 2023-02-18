@@ -51,7 +51,7 @@ class AppTest extends TestCase
         $app = new Contradict("test");
 
         // action: import data
-        $app->storage->import(testData());
+        $app->import(testData());
 
         // post: app has 1 dict with 2 entries
         $dicts = $app->dicts();
@@ -65,7 +65,7 @@ class AppTest extends TestCase
         $app = $this->app();
 
         // action: export
-        $exported = $app->storage->export();
+        $exported = $app->export();
 
         // post: exported data matches the source data
         $this->assertEquals($exported, testData());
@@ -74,7 +74,7 @@ class AppTest extends TestCase
     private function app()
     {
         $app = new Contradict("test");
-        $app->storage->import(testData());
+        $app->import(testData());
         return $app;
     }
 
@@ -87,7 +87,7 @@ class AppTest extends TestCase
         $app->updateDict('1', ['name' => 'foo']);
 
         // post: dictionary renamed
-        $this->assertEquals($app->storage->dict('1')->name, 'foo');
+        $this->assertEquals($app->getDict('1')->name, 'foo');
     }
 
     function testUpdateEntry()

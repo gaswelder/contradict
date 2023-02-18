@@ -18,12 +18,27 @@ class Contradict
      */
     const WINDOW = 200;
 
-    public $storage;
+    private $storage;
 
     function __construct(string $userID)
     {
         $fs = new LocalFS(__DIR__ . "/../database-$userID.json");
         $this->storage = new Dictionaries($fs);
+    }
+
+    function import(array $data)
+    {
+        $this->storage->import($data);
+    }
+
+    function export()
+    {
+        return $this->storage->export();
+    }
+
+    function getDict(string $dict_id)
+    {
+        return $this->storage->dict($dict_id);
     }
 
     function updateDict(string $dict_id, array $data)
