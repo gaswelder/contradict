@@ -6,10 +6,10 @@ import LoginPage from "./pages/LoginPage";
 import MenuPage from "./pages/MenuPage";
 import TestPage from "./pages/TestPage/TestPage";
 import Export from "./pages/Export";
-import DictPage from "./pages/DictPage";
 import { ResultsPage } from "./pages/ResultsPage";
 import { Page } from "./components/Page";
 import { RepetitionsPage } from "./pages/RepetitionsPage";
+import { DictPage } from "./pages/DictPage";
 
 function page(Component, header = true) {
   const wrappedPage = (props) => (
