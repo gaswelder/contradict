@@ -1,11 +1,12 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
-registerClasses(__DIR__ . '/classes');
-registerClasses(__DIR__);
 
-use Appget\App;
-use havana\request;
-use havana\response;
+spl_autoload_register(function ($cn) {
+    $path = __DIR__ . "/classes/$cn.php";
+    if (file_exists($path)) {
+        require_once $path;
+    }
+});
 
 function varfmt($var)
 {
@@ -23,234 +24,238 @@ function clg(...$var)
 }
 
 if (file_exists(__DIR__ . '/.env')) {
-    Appget\Env::parse(__DIR__ . '/.env');
+    Env::parse(__DIR__ . '/.env');
 }
 
-$the = new Contradict();
-$app = new App(__DIR__);
-$auth = new CookieAuth(getenv('COOKIE_KEY'));
-
-/**
- * @var Dictionaries
- */
-$storage = null;
-
-$app->middleware(function ($next) use ($auth, $the) {
-    if (!request::url()->isUnder('/api') || request::method() == 'OPTIONS') {
-        return $next();
-    }
-    if (request::url()->path == '/api/login') {
-        // Allow only posting to login.
-        if (request::method() !== 'POST') {
-            return 405;
-        }
-        $name = request::post('login');
-        $password = request::post('password');
-        $token = $auth->login($name, $password);
-        if ($token) {
-            setcookie('token', $token, time() + 3600 * 24);
-            return 201;
-        } else {
-            return response::make('Invalid login/password')->setStatus(403);
-        }
-    }
-    if (request::url()->path == '/api/logout') {
-        // Allow only posting to logout.
-        if (request::method() !== 'POST') {
-            return 405;
-        }
-        setcookie('token', '');
-        return 200;
-    }
-
+function getThe()
+{
+    $the = new Contradict();
+    $auth = new CookieAuth(getenv('COOKIE_KEY'));
     $token = $_COOKIE['token'] ?? '';
     $userID = $auth->checkToken($token);
     if (!$userID) {
-        return 401;
+        throw response::make(response::STATUS_UNAUTHORIZED);
     }
-    error_log("using local storage");
     $fs = new LocalFS(__DIR__ . "/database-$userID.json");
     $storage = new Dictionaries($fs);
     $the->setStorage($storage);
-    return $next();
-});
+    return $the;
+}
 
-$app->middleware((function ($next) {
-    if (request::method() != 'OPTIONS') {
-        $r = $next();
-    } else {
-        $r = new response;
-    }
+function send($r)
+{
     $r->setHeader('Access-Control-Allow-Origin', 'http://localhost:1234');
     $r->setHeader('Access-Control-Allow-Credentials', 'true');
     $r->setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    return $r;
-}));
+    $r->flush();
+}
 
-/**
- * Returns the list of dicts.
- */
-$app->get('/api/', function () use ($the) {
-    $r = [];
-    foreach ($the->dicts() as $dict) {
-        $d = $dict->format();
-        $d['stats'] = $the->dictStats($dict->id)->format();
-        $r[] = $d;
-    }
-    return $r;
-});
+function main()
+{
+    $router = new router();
 
-/**
- * Updates a dictionary.
- */
-$app->post('/api/{\d+}', function ($dict_id) use (&$storage) {
-    $dict = $storage->dict($dict_id);
-    if (!$dict) {
-        return 404;
-    }
-    $data = json_decode(request::body(), true);
-    $dict->name = $data['name'] ?? $dict->name;
-    $dict->lookupURLTemplate = $data['lookupURLTemplate'] ?? $dict->lookupURLTemplate;
-    $storage->saveDict($dict);
-});
+    $router->add('options', '/api/', function () {
+        clg("ok?");
+        $r = new response;
+        $r->setHeader('Access-Control-Allow-Origin', 'http://localhost:1234');
+        $r->setHeader('Access-Control-Allow-Credentials', 'true');
+        $r->setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        $r->flush();
+        clg("ok");
+    });
 
-/**
- * Adds words to a dictionary.
- */
-$app->post('/api/{\d+}/add', function ($dict_id) use ($the) {
-    // Parse words posted as text file
-    // to array of [word, translation] pairs.
-    $str = request::post('words');
-    $lines = array_map('trim', explode("\n", $str));
-    $lines = array_filter($lines, 'strlen');
-    $lines = array_map(function ($line) {
-        return preg_split('/\s+-\s+/', $line, 2);
-    }, $lines);
+    $router->add('post', '/api/login', function () {
+        $name = request::post('login');
+        $password = request::post('password');
+        $auth = new CookieAuth(getenv('COOKIE_KEY'));
+        $token = $auth->login($name, $password);
+        if ($token) {
+            setcookie('token', $token, time() + 3600 * 24);
+            send(response::make(201));
+        } else {
+            send(response::make('Invalid login/password')->setStatus(403));
+        }
+    });
 
-    $entries = [];
-    foreach ($lines as $tuple) {
+    $router->add('post', '/api/logout', function () {
+        setcookie('token', '');
+        send(response::make(200));
+    });
+
+    $router->add('get', '/api/', function () {
+        $the = getThe();
+        $list = [];
+        foreach ($the->dicts() as $dict) {
+            $d = $dict->format();
+            $d['stats'] = $the->dictStats($dict->id)->format();
+            $list[] = $d;
+        }
+        send(response::json($list));
+    });
+
+    /**
+     * Updates a dictionary.
+     */
+    $router->add('post', '/api/{\d+}', function ($dict_id) {
+        $the = getThe();
+        $storage = $the->storage;
+        $dict = $storage->dict($dict_id);
+        if (!$dict) {
+            send(response::make(404));
+            return;
+        }
+        $data = json_decode(request::body(), true);
+        $dict->name = $data['name'] ?? $dict->name;
+        $dict->lookupURLTemplate = $data['lookupURLTemplate'] ?? $dict->lookupURLTemplate;
+        $storage->saveDict($dict);
+        send(response::make(200));
+    });
+
+    /**
+     * Adds words to a dictionary.
+     */
+    $router->add('post', '/api/{\d+}/add', function ($dict_id) {
+        $the = getThe();
+        // Parse words posted as text file
+        // to array of [word, translation] pairs.
+        $str = request::post('words');
+        $lines = array_map('trim', explode("\n", $str));
+        $lines = array_filter($lines, 'strlen');
+        $lines = array_map(function ($line) {
+            return preg_split('/\s+-\s+/', $line, 2);
+        }, $lines);
+
+        $entries = [];
+        foreach ($lines as $tuple) {
+            $entry = new Entry;
+            $entry->dict_id = $dict_id;
+            $entry->q = $tuple[0];
+            $entry->a = $tuple[1];
+            $entries[] = $entry;
+        }
+        send(response::json($the->appendWords($dict_id, $entries)));
+    });
+
+    $router->add('get', '/api/{\d+}/test', function ($dict_id) {
+        $the = getThe();
+        $test = $the->generateTest($dict_id);
+        $hints1 = [];
+        $hints2 = [];
+        foreach ($test->tuples1 as $q) {
+            $hints1[] = $q->hint();
+        }
+        foreach ($test->tuples2 as $q) {
+            $hints2[] = $q->hint();
+        }
+        $f = $test->format();
+        foreach ($f['tuples1'] as $k => $tuple) {
+            $f['tuples1'][$k]['hint'] = $hints1[$k];
+        }
+        foreach ($f['tuples2'] as $k => $tuple) {
+            $f['tuples2'][$k]['hint'] = $hints2[$k];
+        }
+        send(response::json($f));
+    });
+
+    /**
+     * Parses test answers and returns results.
+     */
+    $router->add('post', '/api/{\d+}/test', function ($dict_id) {
+        $the = getThe();
+        $directions = request::post('dir');
+        $ids = request::post('q');
+        $answers = [];
+        foreach (request::post('a') as $i => $answer) {
+            $a = new Answer;
+            $a->answer = $answer;
+            $a->entryID = $ids[$i];
+            $a->reverse = $directions[$i] == 1;
+            $answers[] = $a;
+        }
+        $results = $the->submitTest($dict_id, $answers);
+        send(response::json($results->format()));
+    });
+
+    /**
+     * Returns a single entry by ID.
+     */
+    $router->add('get', '/api/entries/{\d+}', function ($id) {
+        $the = getThe();
+        $dd = $the->storage->dicts();
+        $e = null;
+        foreach ($dd as $d) {
+            $e = $d->entry($id);
+            if ($e) {
+                break;
+            }
+        }
+        if ($e) {
+            send(response::json(['entry' => $e->format()]));
+        } else {
+            send(response::json(null));
+        }
+    });
+
+    /**
+     * Updates an entry.
+     */
+    $router->add('post', '/api/entries/{\d+}', function ($id) {
+        // Find the dictionary
+        $the = getThe();
+        $storage = $the->storage;
+        $dict_id = '';
+        foreach ($storage->dicts() as $d) {
+            $e = $d->entry($id);
+            if ($e) {
+                $dict_id = $d->id;
+                break;
+            }
+        }
+        $dict = $storage->dict($dict_id);
+
+        // Save the entry.
         $entry = new Entry;
-        $entry->dict_id = $dict_id;
-        $entry->q = $tuple[0];
-        $entry->a = $tuple[1];
-        $entries[] = $entry;
+        $entry->id = $id;
+        $entry->q = request::post('q');
+        $entry->a = request::post('a');
+        $dict->saveEntry($entry);
+        $storage->saveDict($dict);
+        send(response::make('ok'));
+    });
+
+    try {
+        $router->dispatch();
+    } catch (RouteNotFound $e) {
+        send(response::make(404));
+    } catch (Exception $e) {
+        send(response::make(500));
     }
-    return $the->appendWords($dict_id, $entries);
-});
+}
 
-/**
- * Returns a new test.
- */
-$app->get('/api/{\d+}/test', function ($dict_id) use ($the) {
-    $test = $the->generateTest($dict_id);
-    $hints1 = [];
-    $hints2 = [];
-    foreach ($test->tuples1 as $q) {
-        $hints1[] = $q->hint();
-    }
-    foreach ($test->tuples2 as $q) {
-        $hints2[] = $q->hint();
-    }
+main();
 
-    $f = $test->format();
-    foreach ($f['tuples1'] as $k => $tuple) {
-        $f['tuples1'][$k]['hint'] = $hints1[$k];
-    }
-    foreach ($f['tuples2'] as $k => $tuple) {
-        $f['tuples2'][$k]['hint'] = $hints2[$k];
-    }
-    return $f;
-});
 
-/**
- * Parses test answers and returns results.
- */
-$app->post('/api/{\d+}/test', function ($dict_id) use ($the) {
-    $directions = request::post('dir');
-    $ids = request::post('q');
-    $answers = [];
-    foreach (request::post('a') as $i => $answer) {
-        $a = new Answer;
-        $a->answer = $answer;
-        $a->entryID = $ids[$i];
-        $a->reverse = $directions[$i] == 1;
-        $answers[] = $a;
-    }
 
-    $results = $the->submitTest($dict_id, $answers);
-    return $results->format();
-});
 
-/**
- * Returns a single entry by ID.
- */
-$app->get('/api/entries/{\d+}', function ($id) use (&$storage) {
-    $dd = $storage->dicts();
-    $e = null;
-    foreach ($dd as $d) {
-        $e = $d->entry($id);
-        if ($e) {
-            break;
-        }
-    }
-    if ($e) {
-        return [
-            'entry' => $e->format()
-        ];
-    }
-    return null;
-});
+// /**
+//  * Exports a database.
+//  */
+// $app->get('/api/export', function () use (&$storage) {
+//     return $storage->export();
+// });
 
-/**
- * Updates an entry.
- */
-$app->post('/api/entries/{\d+}', function ($id) use (&$storage) {
-    // Find the dictionary
-    $dict_id = '';
-    foreach ($storage->dicts() as $d) {
-        $e = $d->entry($id);
-        if ($e) {
-            $dict_id = $d->id;
-            break;
-        }
-    }
-    $dict = $storage->dict($dict_id);
+// /**
+//  * Imports a database.
+//  */
+// $app->post('/api/export', function () use ($storage) {
+//     $data = json_decode(request::body(), true);
+//     $storage->import($data);
+// });
 
-    // Save the entry.
-    $entry = new Entry;
-    $entry->id = $id;
-    $entry->q = request::post('q');
-    $entry->a = request::post('a');
-    $dict->saveEntry($entry);
-    $storage->saveDict($dict);
-    return 'ok';
-});
+// $app->get('/backup', function () {
+//     return response::staticFile(__DIR__ . '/dict.sqlite')->downloadAs('dict.sqlite');
+// });
 
-/**
- * Exports a database.
- */
-$app->get('/api/export', function () use (&$storage) {
-    return $storage->export();
-});
-
-/**
- * Imports a database.
- */
-$app->post('/api/export', function () use ($storage) {
-    $data = json_decode(request::body(), true);
-    $storage->import($data);
-});
-
-$app->get('/backup', function () {
-    return response::staticFile(__DIR__ . '/dict.sqlite')->downloadAs('dict.sqlite');
-});
-
-$app->get('/', function () {
-    return file_get_contents(__DIR__ . '/../public/index.html');
-});
-
-$app->cmd('genkey', function () {
-    echo CookieAuth::generateKey(), "\n";
-});
-
-$app->run();
+// $app->get('/', function () {
+//     return file_get_contents(__DIR__ . '/../public/index.html');
+// });

@@ -14,7 +14,7 @@ class Contradict
      */
     const WINDOW = 200;
 
-    private $storage;
+    public $storage;
 
     function setStorage(Dictionaries $s)
     {
