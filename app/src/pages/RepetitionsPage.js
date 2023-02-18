@@ -15,6 +15,18 @@ const Card = styled.div`
   border: 1px solid #eef;
   margin: 2em auto;
   background-color: ${(props) => (props.reverse ? "#ffd9e0" : "white")};
+  position: relative;
+  min-height: 6em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  & .corner {
+    position: absolute;
+    opacity: 0.7;
+    right: 10px;
+    top: 10px;
+    font-size: 90%;
+  }
 `;
 
 const shuffle = (xs) =>
@@ -35,6 +47,7 @@ export const RepetitionsPage = withRouter(
     };
 
     const next = async () => {
+      setShow(false);
       if (cards.length == 1) {
         await nextBatch();
       } else {
@@ -52,38 +65,49 @@ export const RepetitionsPage = withRouter(
     }
     return (
       <ContainerDiv>
-        <Card reverse={cc.reverse}>
-          {cc.q} ({cc.hint})
-          {show && (
-            <p>
-              {cc.a} <a href={cc.wikiURL}>wiki</a>
-            </p>
-          )}
-        </Card>
-        {!show && (
-          <button
-            disabled={busy}
-            onClick={async () => {
-              api.touchCard(cc.id, cc.reverse, true);
-              next();
-            }}
-          >
-            Yes, know it
-          </button>
-        )}{" "}
-        <button
-          onClick={async () => {
-            if (!show) {
-              setShow(true);
-              api.touchCard(cc.id, cc.reverse, true);
-            } else {
-              next();
-              setShow(false);
+        <Card
+          reverse={cc.reverse}
+          onClick={() => {
+            if (show) {
+              return;
             }
+            setShow(true);
+            api.touchCard(cc.id, cc.reverse, true);
           }}
         >
-          {show ? "Next" : "No, forgot it"}
-        </button>
+          <div className="corner">{cc.times}</div>
+          <div>
+            {cc.q}
+            {cc.hint && ` (${cc.hint})`}
+            {show && (
+              <p>
+                {cc.a} <a href={cc.wikiURL}>wiki</a>
+              </p>
+            )}
+          </div>
+        </Card>
+        {show && <button onClick={next}>Next</button>}
+        {!show && (
+          <>
+            <button
+              disabled={busy}
+              onClick={() => {
+                api.touchCard(cc.id, cc.reverse, true);
+                setShow(true);
+              }}
+            >
+              Yes, know it
+            </button>{" "}
+            <button
+              onClick={async () => {
+                api.touchCard(cc.id, cc.reverse, true);
+                setShow(true);
+              }}
+            >
+              No, forgot it
+            </button>
+          </>
+        )}
       </ContainerDiv>
     );
   })
