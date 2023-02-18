@@ -8,21 +8,6 @@ spl_autoload_register(function ($cn) {
     }
 });
 
-function varfmt($var)
-{
-    ob_start();
-    var_dump($var);
-    $s = ob_get_clean();
-    return $s;
-}
-
-function clg(...$var)
-{
-    foreach ($var as $i => $var) {
-        error_log("$i ---> " . varfmt($var));
-    }
-}
-
 if (file_exists(__DIR__ . '/.env')) {
     Env::parse(__DIR__ . '/.env');
 }
