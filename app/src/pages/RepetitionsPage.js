@@ -14,7 +14,14 @@ const Card = styled.div`
   max-width: 20em;
   border: 1px solid #eef;
   margin: 2em auto;
+  background-color: ${(props) => (props.reverse ? "#ffd9e0" : "white")};
 `;
+
+const shuffle = (xs) =>
+  xs
+    .map((x) => [Math.random(), x])
+    .sort((a, b) => a[0] - b[0])
+    .map((x) => x[1]);
 
 export const RepetitionsPage = withRouter(
   withAPI(({ api, match, busy }) => {
@@ -24,7 +31,7 @@ export const RepetitionsPage = withRouter(
 
     const nextBatch = async () => {
       const r = await api.test(dictId);
-      setCards([...r.tuples1, ...r.tuples2]);
+      setCards(shuffle([...r.tuples1, ...r.tuples2]));
     };
 
     const next = async () => {
@@ -40,14 +47,12 @@ export const RepetitionsPage = withRouter(
     }, []);
 
     const cc = cards[0];
-
     if (!cc) {
       return "loading";
     }
-
     return (
       <ContainerDiv>
-        <Card>
+        <Card reverse={cc.dir}>
           {cc.q} ({cc.hint})
           {show && (
             <p>
