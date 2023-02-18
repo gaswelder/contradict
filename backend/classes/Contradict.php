@@ -18,22 +18,27 @@ class Contradict
      */
     const WINDOW = 200;
 
-    private $data = [];
-    private $fs;
-
-    // Whether we have modified the data.
     private $touched = false;
+    private $dataPath;
+    private $data = [];
 
     function __construct(string $userID)
     {
-        $fs = new LocalFS(__DIR__ . "/../database-$userID.json");
-        $this->fs = $fs;
-        if ($this->fs->exists('')) {
-            $this->data = parseData($this->fs->read(''));
-            file_put_contents('dump.json', json_encode($this->data, JSON_PRETTY_PRINT));
-        } else {
+        $this->dataPath = __DIR__ . "/../database-$userID.json";
+        $this->load();
+    }
+
+    private function load()
+    {
+        if (!file_exists($this->dataPath)) {
             $this->data = ['dicts' => []];
+            return;
         }
+        $data = file_get_contents($this->dataPath);
+        if (substr($data, 0, 1) != '{') {
+            $data = gzuncompress($data);
+        }
+        $this->data = json_decode($data, true);
     }
 
     function __destruct()
@@ -299,15 +304,7 @@ class Contradict
         if (!$this->touched) {
             return;
         }
-        $this->fs->write('', gzcompress(json_encode($this->data)));
+        file_put_contents($this->dataPath, gzcompress(json_encode($this->data)));
         $this->touched = false;
     }
-}
-
-function parseData($data)
-{
-    if (substr($data, 0, 1) != '{') {
-        $data = gzuncompress($data);
-    }
-    return json_decode($data, true);
 }
