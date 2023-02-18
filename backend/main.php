@@ -77,70 +77,44 @@ function main()
         send(response::make(200));
     });
 
-    $router->add('get', '/api/', function () {
-        send(response::json(getThe()->getDicts()));
-    });
-
-    /**
-     * Updates a dictionary.
-     */
-    $router->add('post', '/api/{\d+}', function ($dict_id) {
-        $data = request::json();
-        try {
-            getThe()->updateDict($dict_id, $data);
-        } catch (DictNotFound $e) {
-            send(response::make(404));
-            return;
-        }
-        send(response::make(200));
-    });
-
-
-    $router->add('post', '/api/{\d+}/add', function ($dict_id) {
-        send(response::json(getThe()->appendWords($dict_id, request::json()['entries'])));
-    });
-
-    $router->add('get', '/api/{\d+}/test', function ($dict_id) {
-        send(response::json(getThe()->generateTest($dict_id)));
-    });
-
-    /**
-     * Parses test answers and returns results.
-     */
-    $router->add('post', '/api/{\d+}/test', function ($dict_id) {
-        $results = getThe()->submitTest($dict_id, request::post('dir'), request::post('q'), request::post('a'));
-        send(response::json($results));
-    });
-
-    /**
-     * Returns a single entry by ID.
-     */
-    $router->add('get', '/api/entries/{\d+}', function ($id) {
-        $e = getThe()->getEntry($id);
-        if ($e) {
-            send(response::json(['entry' => $e->format()]));
-        } else {
-            send(response::json(null));
-        }
-    });
-
-    /**
-     * Updates an entry.
-     */
-    $router->add('post', '/api/entries/{\d+}', function ($id) {
-        getThe()->updateEntry($id, request::post('q'), request::post('a'));
-        send(response::make('ok'));
-    });
-
-    $router->add('post', '/api/touches/{\w+}', function ($id) {
-        $body = request::json();
-        getThe()->markTouch($id, $body['dir'], $body['success']);
-        send(response::make('ok'));
-    });
-
-    $router->add('get', '/', function () {
-        send(response::make(file_get_contents(__DIR__ . '/../public/index.html')));
-    });
+    $router
+        ->add('get', '/api/', function () {
+            send(response::json(getThe()->getDicts()));
+        })
+        ->add('post', '/api/{\d+}', function ($dict_id) {
+            getThe()->updateDict($dict_id, request::json());
+            send(response::make(200));
+        })
+        ->add('post', '/api/{\d+}/add', function ($dict_id) {
+            send(response::json(getThe()->appendWords($dict_id, request::json()['entries'])));
+        })
+        ->add('get', '/api/{\d+}/test', function ($dict_id) {
+            send(response::json(getThe()->generateTest($dict_id)));
+        })
+        ->add('post', '/api/{\d+}/test', function ($dict_id) {
+            $results = getThe()->submitTest($dict_id, request::post('dir'), request::post('q'), request::post('a'));
+            send(response::json($results));
+        })
+        ->add('get', '/api/entries/{\d+}', function ($id) {
+            $e = getThe()->getEntry($id);
+            if ($e) {
+                send(response::json(['entry' => $e->format()]));
+            } else {
+                send(response::json(null));
+            }
+        })
+        ->add('post', '/api/entries/{\d+}', function ($id) {
+            getThe()->updateEntry($id, request::post('q'), request::post('a'));
+            send(response::make('ok'));
+        })
+        ->add('post', '/api/touches/{\w+}', function ($id) {
+            $body = request::json();
+            getThe()->markTouch($id, $body['dir'], $body['success']);
+            send(response::make('ok'));
+        })
+        ->add('get', '/', function () {
+            send(response::make(file_get_contents(__DIR__ . '/../public/index.html')));
+        });
 
     try {
         $router->dispatch();
