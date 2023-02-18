@@ -159,11 +159,11 @@ class Contradict
                 'a' => $entry->a,
                 'times' => $entry->answers1,
                 'wikiURL' => $dict->wikiURL($entry->q),
-                'dir' => 0,
+                'reverse' => false,
                 'hint' => $tuple->hint()
             ];
         }
-        foreach ($pick2 as $entry) {
+        foreach ($pick2 as $i => $entry) {
             $tuple = new Question($dict, $entry, true);
             $f['tuples2'][$i] = [
                 'id' => $entry->id,
@@ -171,7 +171,7 @@ class Contradict
                 'a' => $entry->q,
                 'times' => $entry->answers2,
                 'wikiURL' => $dict->wikiURL($entry->q),
-                'dir' => 1,
+                'reverse' => true,
                 'hint' => $tuple->hint()
             ];
         }
