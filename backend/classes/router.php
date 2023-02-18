@@ -13,6 +13,11 @@ class router
     // path -> resource
     private $routes = [];
 
+    static function make()
+    {
+        return new router;
+    }
+
     /**
      * Adds a route.
      * 
@@ -33,87 +38,76 @@ class router
         return $this;
     }
 
-    function dispatch()
+    function dispatch(string $method, string $url)
     {
-        $method = strtolower($_SERVER['REQUEST_METHOD']);
-        $url = parse_url($_SERVER['REQUEST_URI']);
-        [$resource, $args] = $this->find($url['path']);
-        if (!$resource) {
+        $path = parse_url($url)['path'];
+        $match = null;
+        foreach ($this->routes as $pattern => $res) {
+            $p = new router_pattern($pattern);
+            [$ok, $args] = $p->match($path);
+            if (!$ok) {
+                continue;
+            }
+            if (!$match || $match['p']->specificity < $p->specificity) {
+                $match = [
+                    'p' => $p,
+                    'resource' => $res,
+                    'args' => $args,
+                ];
+            }
+        }
+        if (!$match) {
             throw new RouteNotFound();
         }
-        if (!isset($resource[$method])) {
+        $func = $match['resource'][strtolower($method)] ?? null;
+        if (!$func) {
             throw new MethodNotAllowed();
         }
-        return call_user_func_array($resource[$method], $args);
+        return call_user_func_array($func, $match['args']);
     }
 
-    private function find($url)
+    function run()
     {
-        $match = null;
-        $specificity = 0;
-        $args = [];
-        foreach ($this->routes as $pattern => $resource) {
-            [$matches, $_args] = match_pattern($pattern, $url);
-            if (!$matches) {
-                continue;
-            }
-            $ps = pattern_specificity($pattern);
-            if ($ps <= $specificity) {
-                continue;
-            }
-            $match = $resource;
-            $args = $_args;
-            $specificity = $ps;
-        }
-        return [$match, $args];
+        return $this->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
     }
 }
 
-function match_pattern($pattern, $url)
+class router_pattern
 {
-    if ($pattern == '*') {
-        return [true, []];
+    public $pattern;
+    private $parts;
+    public $specificity;
+
+    function __construct($pattern)
+    {
+        $this->pattern = $pattern;
+        $s = 1;
+        foreach (explode('/', trim($pattern, '/')) as $part) {
+            $expr = new expr($part);
+            $this->parts[] = $expr;
+            $s += 100 + $expr->specificity();
+        }
+        $this->specificity = $s;
     }
 
-    $parts = [];
-    $pat_parts = explode('/', trim($pattern, '/'));
-    foreach ($pat_parts as $part) {
-        $parts[] = new expr($part);
-    }
-
-    $uri_parts = array_map('urldecode', explode('/', trim($url, '/')));
-    if (count($uri_parts) != count($parts)) {
-        return false;
-    }
-
-    $args = [];
-    foreach ($uri_parts as $i => $part) {
-        $m = [];
-        if (!$parts[$i]->match($part, $m)) {
+    function match(string $url)
+    {
+        $parts = array_map('urldecode', explode('/', trim($url, '/')));
+        if (count($parts) != count($this->parts)) {
             return [false, []];
         }
-        $args = array_merge($args, array_slice($m, 1));
+        // Every path part may produce 0, 1 or more matched params.
+        // They are all collected in a single serial list.
+        $allArgs = [];
+        foreach ($parts as $i => $part) {
+            [$ok, $params] = $this->parts[$i]->match($part);
+            if (!$ok) {
+                return [false, []];
+            }
+            $allArgs = array_merge($allArgs, $params);
+        }
+        return [true, $allArgs];
     }
-    return [true, $args];
-}
-
-function pattern_specificity($pattern)
-{
-    if ($pattern == '*') {
-        return 0;
-    }
-
-    $parts = [];
-    $pat_parts = explode('/', trim($pattern, '/'));
-    foreach ($pat_parts as $part) {
-        $parts[] = new expr($part);
-    }
-
-    $s = 1;
-    foreach ($parts as $expr) {
-        $s += 100 + $expr->specificity();
-    }
-    return $s;
 }
 
 class expr
@@ -129,10 +123,14 @@ class expr
         }
     }
 
-    function match($s, &$m)
+    function match(string $s)
     {
         $p = $this->toPCRE();
-        return preg_match($p, $s, $m);
+        $m = [];
+        if (!preg_match($p, $s, $m)) {
+            return [false, []];
+        }
+        return [true, array_slice($m, 1)];
     }
 
     function specificity()
