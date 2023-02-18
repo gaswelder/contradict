@@ -277,13 +277,6 @@ class Contradict
                 "correct" => $ok
             ];
         }
-
-        // Save a score record.
-        $score = new Score;
-        $score->dict_id = $dict_id;
-        $score->right = $right;
-        $score->wrong = $wrong;
-        $dict->saveScore($score);
         $this->saveDict($dict);
         $this->flush();
         return [

@@ -46,23 +46,6 @@ class Dict
         return str_replace('{{word}}', urlencode($wiki), $this->lookupURLTemplate);
     }
 
-    function lastScores()
-    {
-        $rows = [];
-        foreach ($this->data['scores'] as $score) {
-            $rows[] = Score::parse($score);
-        }
-        return array_reverse($rows);
-    }
-
-    function saveScore(Score $score)
-    {
-        if (!$score->id) {
-            $score->id = uniqid();
-        }
-        $this->data['scores'][$score->id] = $score->format();
-    }
-
     function allEntries(): array
     {
         $entries = [];

@@ -30,14 +30,6 @@ function testData()
                         'answers2' => 4,
                     ]
                 ],
-                'scores' => [
-                    '1' => [
-                        'id' => '1',
-                        'dict_id' => '1',
-                        'right' => 1,
-                        'wrong' => 2
-                    ]
-                ]
             ]
         ],
     ];
@@ -256,16 +248,6 @@ class AppTest extends TestCase
                         'answers1' => 3,
                         'answers2' => 4,
                     ],
-                ),
-                'scores' =>
-                array(
-                    1 =>
-                    array(
-                        'id' => '1',
-                        'dict_id' => '1',
-                        'right' => 1,
-                        'wrong' => 2,
-                    ),
                 ),
                 'lookupURLTemplate' => '',
                 'stats' =>
