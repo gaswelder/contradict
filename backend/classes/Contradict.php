@@ -16,9 +16,10 @@ class Contradict
 
     public $storage;
 
-    function setStorage(Dictionaries $s)
+    function __construct(string $userID)
     {
-        $this->storage = $s;
+        $fs = new LocalFS(__DIR__ . "/../database-$userID.json");
+        $this->storage = new Dictionaries($fs);
     }
 
     function generateTest(string $dict_id): Test

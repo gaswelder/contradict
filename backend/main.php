@@ -29,17 +29,13 @@ if (file_exists(__DIR__ . '/.env')) {
 
 function getThe()
 {
-    $the = new Contradict();
     $auth = new CookieAuth(getenv('COOKIE_KEY'));
     $token = $_COOKIE['token'] ?? '';
     $userID = $auth->checkToken($token);
     if (!$userID) {
         throw response::make(response::STATUS_UNAUTHORIZED);
     }
-    $fs = new LocalFS(__DIR__ . "/database-$userID.json");
-    $storage = new Dictionaries($fs);
-    $the->setStorage($storage);
-    return $the;
+    return new Contradict($userID);
 }
 
 function send($r)
