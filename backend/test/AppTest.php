@@ -1,39 +1,7 @@
 <?php
 
 require 'vendor/autoload.php';
-
-use PHPUnit\Framework\TestCase;
-
-registerClasses('backend/classes');
-registerClasses('backend');
-
-class TestFS implements FileSystem
-{
-    function __construct(string $data)
-    {
-        $this->files = ['' => $data];
-    }
-    function exists(string $path): bool
-    {
-        return isset($this->files[$path]);
-    }
-    function write(string $path, string $data)
-    {
-        $this->files[$path] = $data;
-    }
-    function read(string $path): string
-    {
-        return $this->files[$path];
-    }
-}
-
-class TestStorage extends Dictionaries
-{
-    function __construct($data)
-    {
-        parent::__construct(new TestFS(json_encode($data)));
-    }
-}
+require __DIR__ . '/../classes/__load.php';
 
 function testData()
 {
@@ -79,15 +47,13 @@ class AppTest extends TestCase
 {
     function test()
     {
-        $storage = new TestStorage(testData());
-
         $dict_id = '1';
         $answers = [
             Answer::parse(['entryID' => '1', 'answer' => 'a', 'reverse' => false]), // correct
             Answer::parse(['entryID' => '2', 'answer' => 'qq', 'reverse' => false]) // incorrect
         ];
-        $app = new App;
-        $app->setStorage($storage);
+        $app = new Contradict("test");
+        $app->storage->import(testData());
         $app->submitTest($dict_id, $answers);
         $first = reset(testData()['scores']);
         $this->assertEquals(1, $first['right']);
@@ -97,11 +63,8 @@ class AppTest extends TestCase
 
     function testImportExport()
     {
-        $storage1 = new TestStorage(testData());
-        $storage2 = new TestStorage(['dicts' => [], 'words' => [], 'scores' => []]);
-        $this->assertNotEquals($storage1->export(), $storage2->export());
-
-        $storage2->import($storage1->export());
-        $this->assertEquals($storage1->export(), $storage2->export());
+        $app = new Contradict("test");
+        $app->storage->import(testData());
+        $this->assertEquals($app->storage->export(), testData());
     }
 }

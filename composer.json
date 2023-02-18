@@ -1,7 +1,9 @@
 {
   "name": "gas/contradict",
   "type": "project",
-  "scripts": {},
+  "scripts": {
+    "test": "php backend/test.php backend/test/*.php"
+  },
   "require": {
     "ext-sodium": "*",
     "ext-mbstring": "*",

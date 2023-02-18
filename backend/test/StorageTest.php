@@ -6,25 +6,7 @@ registerClasses(__DIR__ . '/../classes');
 
 use PHPUnit\Framework\TestCase;
 
-class TestReadonlyFS implements FileSystem
-{
-    function __construct($data)
-    {
-        $this->files = ['' => $data];
-    }
-    function exists(string $path): bool
-    {
-        return isset($this->files[$path]);
-    }
-    function write(string $path, string $data)
-    {
-        // $this->files[$path] = $data;
-    }
-    function read(string $path): string
-    {
-        return $this->files[$path];
-    }
-}
+
 
 class StorageTest extends TestCase
 {
