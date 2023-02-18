@@ -1,7 +1,6 @@
 <?php
 
 require 'vendor/autoload.php';
-require __DIR__ . '/../classes/__load.php';
 
 function testData()
 {

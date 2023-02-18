@@ -1,12 +1,6 @@
 <?php
 require __DIR__ . '/../vendor/autoload.php';
-
-spl_autoload_register(function ($cn) {
-    $path = str_replace('//', '/', __DIR__ . "/classes/" . str_replace('\\', '//', $cn) . ".php");
-    if (file_exists($path)) {
-        require_once $path;
-    }
-});
+require __DIR__ . '/autoload.php';
 
 if (file_exists(__DIR__ . '/.env')) {
     gaswelder\Env::parse(__DIR__ . '/.env');

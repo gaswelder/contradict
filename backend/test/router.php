@@ -1,5 +1,7 @@
 <?php
 
+use gaswelder\router;
+
 class RouterTest extends TestCase
 {
     function testFoo()

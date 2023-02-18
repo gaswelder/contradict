@@ -1,5 +1,7 @@
 <?php
 
+require __DIR__ . '/autoload.php';
+
 class AssertException extends Exception
 {
 }
