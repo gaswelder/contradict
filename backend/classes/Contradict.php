@@ -18,45 +18,115 @@ class Contradict
      */
     const WINDOW = 200;
 
-    private $storage;
+    private $data = [];
+    private $fs;
+
+    // Whether we have modified the data.
+    private $touched = false;
 
     function __construct(string $userID)
     {
         $fs = new LocalFS(__DIR__ . "/../database-$userID.json");
-        $this->storage = new Dictionaries($fs);
+        $this->fs = $fs;
+        if ($this->fs->exists('')) {
+            $this->data = parseData($this->fs->read(''));
+            file_put_contents('dump.json', json_encode($this->data, JSON_PRETTY_PRINT));
+        } else {
+            $this->data = ['dicts' => []];
+        }
+    }
+
+    function __destruct()
+    {
+        $this->flush();
     }
 
     function import(array $data)
     {
-        $this->storage->import($data);
+        $this->data = $data;
+        $this->touched = true;
     }
 
     function export()
     {
-        return $this->storage->export();
+        return $this->data;
     }
 
-    function getDict(string $dict_id)
+    /**
+     * Returns all saved dicts.
+     */
+    function dicts(): array
     {
-        return $this->storage->dict($dict_id);
+        $dicts = [];
+        foreach ($this->data['dicts'] as $row) {
+            $dicts[] = Dict::parse($row);
+        }
+        return $dicts;
+    }
+
+    /**
+     * Returns a saved dict with the given id.
+     */
+    function getDict(string $id): Dict
+    {
+        return Dict::parse($this->data['dicts'][$id]);
     }
 
     function updateDict(string $dict_id, array $data)
     {
-        $storage = $this->storage;
-        $dict = $storage->dict($dict_id);
+        $dict = $this->getDict($dict_id);
         if (!$dict) {
             throw new DictNotFound();
         }
         $dict->name = $data['name'] ?? $dict->name;
         $dict->lookupURLTemplate = $data['lookupURLTemplate'] ?? $dict->lookupURLTemplate;
-        $storage->saveDict($dict);
+        $this->saveDict($dict);
+    }
+
+    /**
+     * Creates or updates a dict.
+     */
+    private function saveDict(Dict $d)
+    {
+        $this->data['dicts'][$d->id] = array_merge($this->data['dicts'][$d->id], $d->format());
+        $this->touched = true;
+    }
+
+    function getEntry(string $id)
+    {
+        foreach ($this->dicts() as $d) {
+            $e = $d->entry($id);
+            if ($e) {
+                return $e;
+            }
+        }
+        return null;
+    }
+
+    function updateEntry($id, $q, $a)
+    {
+        $dict_id = '';
+        foreach ($this->dicts() as $d) {
+            $e = $d->entry($id);
+            if ($e) {
+                $dict_id = $d->id;
+                break;
+            }
+        }
+        $dict = $this->getDict($dict_id);
+
+        // Save the entry.
+        $entry = new Entry;
+        $entry->id = $id;
+        $entry->q = $q;
+        $entry->a = $a;
+        $dict->saveEntry($entry);
+        $this->saveDict($dict);
     }
 
     function generateTest(string $dict_id): Test
     {
-        $storage = $this->storage;
-        $dict = $storage->dict($dict_id);
+        $dict = $this->getDict($dict_id);
         $size = 20;
         $entries = $dict->allEntries();
         $pick1 = $this->pick($entries, $size, 0);
@@ -69,7 +139,7 @@ class Contradict
                 $dict->saveEntry($e);
             }
         }
-        $storage->saveDict($dict);
+        $this->saveDict($dict);
 
         $questions1 = [];
         foreach ($pick1 as $entry) {
@@ -106,8 +176,7 @@ class Contradict
 
     function submitTest(string $dict_id, array $answers): TestResults
     {
-        $storage = $this->storage;
-        $dict = $storage->dict($dict_id);
+        $dict = $this->getDict($dict_id);
 
         $questions = [];
         $correct = [];
@@ -147,16 +216,15 @@ class Contradict
         $score->wrong = $wrong;
 
         $dict->saveScore($score);
-        $storage->saveDict($dict);
-        $storage->flush();
+        $this->saveDict($dict);
+        $this->flush();
 
         return new TestResults($dict_id, $questions, $answers, $correct);
     }
 
     function appendWords(string $dict_id, array $entries): array
     {
-        $storage = $this->storage;
-        $dict = $storage->dict($dict_id);
+        $dict = $this->getDict($dict_id);
         $added = 0;
         $skipped = 0;
         foreach ($entries as $entry) {
@@ -167,19 +235,13 @@ class Contradict
                 $skipped++;
             }
         }
-        $storage->saveDict($dict);
+        $this->saveDict($dict);
         return compact('added', 'skipped');
-    }
-
-    function dicts(): array
-    {
-        return $this->storage->dicts();
     }
 
     function dictStats(string $dict_id): Stats
     {
-        $storage = $this->storage;
-        $dict = $storage->dict($dict_id);
+        $dict = $this->getDict($dict_id);
         $entries = $dict->allEntries();
 
         $stats = new Stats;
@@ -202,17 +264,16 @@ class Contradict
 
     function markTouch($id, $dir, $success)
     {
-        $storage = $this->storage;
         $dict_id = '';
         $e = null;
-        foreach ($storage->dicts() as $d) {
+        foreach ($this->dicts() as $d) {
             $e = $d->entry($id);
             if ($e) {
                 $dict_id = $d->id;
                 break;
             }
         }
-        $dict = $storage->dict($dict_id);
+        $dict = $this->getDict($dict_id);
         $new = function ($v) use ($success) {
             if ($success) {
                 return $v + 1;
@@ -227,39 +288,26 @@ class Contradict
         }
         $e->touched = true;
         $dict->saveEntry($e);
-        $storage->saveDict($dict);
+        $this->saveDict($dict);
     }
 
-    function getEntry(string $id)
+    /**
+     * Saves recent data changes to the storage.
+     */
+    private function flush()
     {
-        foreach ($this->storage->dicts() as $d) {
-            $e = $d->entry($id);
-            if ($e) {
-                return $e;
-            }
+        if (!$this->touched) {
+            return;
         }
-        return null;
+        $this->fs->write('', gzcompress(json_encode($this->data)));
+        $this->touched = false;
     }
+}
 
-    function updateEntry($id, $q, $a)
-    {
-        $storage = $this->storage;
-        $dict_id = '';
-        foreach ($storage->dicts() as $d) {
-            $e = $d->entry($id);
-            if ($e) {
-                $dict_id = $d->id;
-                break;
-            }
-        }
-        $dict = $storage->dict($dict_id);
-
-        // Save the entry.
-        $entry = new Entry;
-        $entry->id = $id;
-        $entry->q = $q;
-        $entry->a = $a;
-        $dict->saveEntry($entry);
-        $storage->saveDict($dict);
+function parseData($data)
+{
+    if (substr($data, 0, 1) != '{') {
+        $data = gzuncompress($data);
     }
+    return json_decode($data, true);
 }
