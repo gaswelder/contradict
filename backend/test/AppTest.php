@@ -62,14 +62,76 @@ class AppTest extends TestCase
     function testExport()
     {
         // pre: app with data
-        $app = new Contradict("test");
-        $app->storage->import(testData());
+        $app = $this->app();
 
         // action: export
         $exported = $app->storage->export();
 
         // post: exported data matches the source data
         $this->assertEquals($exported, testData());
+    }
+
+    private function app()
+    {
+        $app = new Contradict("test");
+        $app->storage->import(testData());
+        return $app;
+    }
+
+    function testUpdateDict()
+    {
+        // pre: app with data
+        $app = $this->app();
+
+        // action: rename the dictionary
+        $app->updateDict('1', ['name' => 'foo']);
+
+        // post: dictionary renamed
+        $this->assertEquals($app->storage->dict('1')->name, 'foo');
+    }
+
+    function testUpdateEntry()
+    {
+        // pre: app with data
+        $app = $this->app();
+
+        // action: update entry 2
+        $app->updateEntry('2', 'qqq', 'aaa');
+
+        // post: entry updated
+        $e = $app->getEntry('2');
+        $this->assertEquals('qqq', $e->q);
+        $this->assertEquals('aaa', $e->a);
+    }
+
+    function testTouch()
+    {
+        // pre: app with entries
+        $app = $this->app();
+
+        // action: touch two entries
+        $app->markTouch('1', 0, true);
+        $app->markTouch('2', 1, false);
+
+        // post: counters updated correctly
+        $e1 = $app->getEntry('1');
+        $e2 = $app->getEntry('2');
+        $this->assertEquals($e1->touched, true);
+        $this->assertEquals($e1->answers1, 2);
+        $this->assertEquals($e2->touched, true);
+        $this->assertEquals($e2->answers2, 3);
+    }
+
+    function testGetEntry()
+    {
+        // pre: app with entries
+        $app = $this->app();
+
+        // action: get entry 1
+        $e = $app->getEntry('2');
+
+        // post: success
+        $this->assertEquals('2', $e->id);
     }
 
     // function test()

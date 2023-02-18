@@ -92,17 +92,13 @@ function main()
      * Updates a dictionary.
      */
     $router->add('post', '/api/{\d+}', function ($dict_id) {
-        $the = getThe();
-        $storage = $the->storage;
-        $dict = $storage->dict($dict_id);
-        if (!$dict) {
+        $data = json_decode(request::body(), true);
+        try {
+            getThe()->updateDict($dict_id, $data);
+        } catch (DictNotFound $e) {
             send(response::make(404));
             return;
         }
-        $data = json_decode(request::body(), true);
-        $dict->name = $data['name'] ?? $dict->name;
-        $dict->lookupURLTemplate = $data['lookupURLTemplate'] ?? $dict->lookupURLTemplate;
-        $storage->saveDict($dict);
         send(response::make(200));
     });
 
@@ -175,15 +171,7 @@ function main()
      * Returns a single entry by ID.
      */
     $router->add('get', '/api/entries/{\d+}', function ($id) {
-        $the = getThe();
-        $dd = $the->storage->dicts();
-        $e = null;
-        foreach ($dd as $d) {
-            $e = $d->entry($id);
-            if ($e) {
-                break;
-            }
-        }
+        $e = getThe()->getEntry($id);
         if ($e) {
             send(response::json(['entry' => $e->format()]));
         } else {
@@ -195,26 +183,7 @@ function main()
      * Updates an entry.
      */
     $router->add('post', '/api/entries/{\d+}', function ($id) {
-        // Find the dictionary
-        $the = getThe();
-        $storage = $the->storage;
-        $dict_id = '';
-        foreach ($storage->dicts() as $d) {
-            $e = $d->entry($id);
-            if ($e) {
-                $dict_id = $d->id;
-                break;
-            }
-        }
-        $dict = $storage->dict($dict_id);
-
-        // Save the entry.
-        $entry = new Entry;
-        $entry->id = $id;
-        $entry->q = request::post('q');
-        $entry->a = request::post('a');
-        $dict->saveEntry($entry);
-        $storage->saveDict($dict);
+        getThe()->updateEntry($id, request::post('q'), request::post('a'));
         send(response::make('ok'));
     });
 

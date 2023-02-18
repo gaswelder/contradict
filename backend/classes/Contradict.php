@@ -1,5 +1,9 @@
 <?php
 
+class DictNotFound extends Exception
+{
+}
+
 class Contradict
 {
     /**
@@ -20,6 +24,18 @@ class Contradict
     {
         $fs = new LocalFS(__DIR__ . "/../database-$userID.json");
         $this->storage = new Dictionaries($fs);
+    }
+
+    function updateDict(string $dict_id, array $data)
+    {
+        $storage = $this->storage;
+        $dict = $storage->dict($dict_id);
+        if (!$dict) {
+            throw new DictNotFound();
+        }
+        $dict->name = $data['name'] ?? $dict->name;
+        $dict->lookupURLTemplate = $data['lookupURLTemplate'] ?? $dict->lookupURLTemplate;
+        $storage->saveDict($dict);
     }
 
     function generateTest(string $dict_id): Test
@@ -77,7 +93,6 @@ class Contradict
     {
         $storage = $this->storage;
         $dict = $storage->dict($dict_id);
-        var_dump($dict);
 
         $questions = [];
         $correct = [];
@@ -197,6 +212,39 @@ class Contradict
         }
         $e->touched = true;
         $dict->saveEntry($e);
+        $storage->saveDict($dict);
+    }
+
+    function getEntry(string $id)
+    {
+        foreach ($this->storage->dicts() as $d) {
+            $e = $d->entry($id);
+            if ($e) {
+                return $e;
+            }
+        }
+        return null;
+    }
+
+    function updateEntry($id, $q, $a)
+    {
+        $storage = $this->storage;
+        $dict_id = '';
+        foreach ($storage->dicts() as $d) {
+            $e = $d->entry($id);
+            if ($e) {
+                $dict_id = $d->id;
+                break;
+            }
+        }
+        $dict = $storage->dict($dict_id);
+
+        // Save the entry.
+        $entry = new Entry;
+        $entry->id = $id;
+        $entry->q = $q;
+        $entry->a = $a;
+        $dict->saveEntry($entry);
         $storage->saveDict($dict);
     }
 }
