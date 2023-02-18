@@ -56,9 +56,6 @@ function Stats(props) {
 
         <dt>Touched</dt>
         <dd>{touched}</dd>
-
-        <dt>Success rate</dt>
-        <dd>{(stats.successRate * 100).toFixed(1)} %</dd>
       </dl>
       <ColumnMeter
         inQueue={pairs - touched}

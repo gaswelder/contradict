@@ -273,7 +273,6 @@ class AppTest extends TestCase
                     'pairs' => 2.0,
                     'finished' => 0,
                     'touched' => 0.0,
-                    'successRate' => 0.3333333333333333,
                 ),
             ),
         ));

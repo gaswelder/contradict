@@ -63,18 +63,6 @@ class Dict
         $this->data['scores'][$score->id] = $score->format();
     }
 
-    function getSuccessRate(): float
-    {
-        $scores = $this->lastScores();
-        $total = 0;
-        $n = 0;
-        foreach ($scores as $score) {
-            $n++;
-            $total += $score->right / ($score->right + $score->wrong);
-        }
-        return $n > 0 ? $total / $n : 1;
-    }
-
     function allEntries(): array
     {
         $entries = [];

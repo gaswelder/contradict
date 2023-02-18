@@ -84,7 +84,6 @@ class Contradict
                     'pairs' => floatval($totalEntries),
                     'finished' => $finished,
                     'touched' => floatval($touched),
-                    'successRate' => $dict->getSuccessRate()
                 ]
             ]);
         }
