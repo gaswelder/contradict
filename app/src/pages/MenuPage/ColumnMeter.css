@@ -5,9 +5,11 @@
 
 .column-meter > div {
   overflow: hidden;
-  font-size: 8pt;
+  font-size: 10pt;
   text-indent: 2px;
   white-space: nowrap;
+  text-align: right;
+  padding: 4px 0;
 }
 
 .column-meter .finished {
