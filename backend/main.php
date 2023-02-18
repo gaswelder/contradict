@@ -165,6 +165,10 @@ function main()
         send(response::make('ok'));
     });
 
+    $router->add('get', '/', function () {
+        send(response::make(file_get_contents(__DIR__ . '/../public/index.html')));
+    });
+
     try {
         $router->dispatch();
     } catch (RouteNotFound $e) {
@@ -198,8 +202,4 @@ main();
 
 // $app->get('/backup', function () {
 //     return response::staticFile(__DIR__ . '/dict.sqlite')->downloadAs('dict.sqlite');
-// });
-
-// $app->get('/', function () {
-//     return file_get_contents(__DIR__ . '/../public/index.html');
 // });
