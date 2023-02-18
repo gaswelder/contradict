@@ -97,8 +97,7 @@ class request
 		} else {
 			$protocol = "http";
 		}
-		$domain = $protocol . '://' . $_SERVER['HTTP_HOST'];
-		return new url($domain . $_SERVER['REQUEST_URI']);
+		return new url("$protocol://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']);
 	}
 
 	/**
@@ -258,67 +257,19 @@ class upload
 	}
 
 	/**
-	 * Saves the uploaded file to the given directory,
-	 * automatically generating a filename. Returns the
-	 * resulting file path.
-	 *
-	 * @param string $dir
-	 * @return string
-	 */
-	function saveToDir($dir)
-	{
-		if (substr($dir, -1) != '/') {
-			$dir .= '/';
-		}
-
-		if (!is_dir($dir) && !@mkdir($dir, 0777, true)) {
-			throw new Exception("could not create upload directory '$dir'");
-		}
-
-		$path = $dir . $this->newname();
-		if (!move_uploaded_file($this->info['tmp_name'], $path)) {
-			throw new Exception("could not move uploaded file " . $this->info['tmp_name']);
-		}
-
-		return $path;
-	}
-
-	/**
 	 * Saves the uploaded file to the given path.
 	 *
 	 * @param string $path
 	 */
-	function saveTo($path)
+	function saveTo(string $path)
 	{
 		$dir = dirname($path);
 		if (!file_exists($dir)) {
 			mkdir($dir, 0777, true);
 		}
-
 		if (!move_uploaded_file($this->info['tmp_name'], $path)) {
 			throw new Exception("could not move uploaded file " . $this->info['tmp_name']);
 		}
-
-		return $path;
-	}
-
-	private function newname()
-	{
-		$file = $this->info;
-		$ext = mime::ext($file['type']);
-		if ($ext === null) {
-			warning("Unknown uploaded file type: $file[type]");
-			$ext = self::ext($file['name']);
-		}
-		if ($ext == '' && strpos($file['name'], '.') !== false) {
-			warning("File '$file[name]' uploaded as octet-stream");
-			$ext = self::ext($file['name']);
-		}
-		if ($ext == '.php') {
-			warning(".php file uploaded");
-			$ext .= '.txt';
-		}
-		return uniqid() . $ext;
 	}
 
 	/**
@@ -351,39 +302,5 @@ class upload
 			return -1;
 		}
 		return $m[1] * $units[$u];
-	}
-
-	private static function ext($filename)
-	{
-		$ext = pathinfo($filename, PATHINFO_EXTENSION);
-		if ($ext != '') $ext = '.' . $ext;
-		return strtolower($ext);
-	}
-
-	private static function noext($filename)
-	{
-		return pathinfo($filename, PATHINFO_FILENAME);
-	}
-
-	private static function errstr($errno)
-	{
-		switch ($errno) {
-			case UPLOAD_ERR_OK:
-				return "no error";
-			case UPLOAD_ERR_INI_SIZE:
-				return "the file exceeds the 'upload_max_filesize' limit";
-			case UPLOAD_ERR_FORM_SIZE:
-				return "the file exceeds the 'MAX_FILE_SIZE' directive that was specified in the HTML form";
-			case UPLOAD_ERR_PARTIAL:
-				return "the file was only partially uploaded";
-			case UPLOAD_ERR_NO_FILE:
-				return "no file was uploaded";
-			case UPLOAD_ERR_NO_TMP_DIR:
-				return "missing temporary folder";
-			case UPLOAD_ERR_CANT_WRITE:
-				return "failed to write file to disk";
-			default:
-				return "unknown error ($errno)";
-		}
 	}
 }
