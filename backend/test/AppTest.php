@@ -131,12 +131,8 @@ class AppTest extends TestCase
         // pre: app with one entry
         $app = new Contradict(uniqid("test"));
         $d = $app->addDict('dict');
-        $entry = new Entry;
-        $entry->id = '1';
-        $entry->dict_id = $d->id;
-        $entry->q = 'q';
-        $entry->a = 'a';
-        $app->appendWords($d->id, [$entry]);
+        $r = $app->appendWords($d->id, [['q', 'a']]);
+        $id = $r['ids'][0];
 
         // action: generate a test
         $test = $app->generateTest($d->id);
@@ -147,7 +143,7 @@ class AppTest extends TestCase
             array(
                 0 =>
                 array(
-                    'id' => '1',
+                    'id' => $id,
                     'q' => 'q',
                     'a' => 'a',
                     'times' => 0,
@@ -160,7 +156,7 @@ class AppTest extends TestCase
             array(
                 0 =>
                 array(
-                    'id' => '1',
+                    'id' => $id,
                     'q' => 'a',
                     'a' => 'q',
                     'times' => 0,

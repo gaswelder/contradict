@@ -95,29 +95,9 @@ function main()
         send(response::make(200));
     });
 
-    /**
-     * Adds words to a dictionary.
-     */
-    $router->add('post', '/api/{\d+}/add', function ($dict_id) {
-        $the = getThe();
-        // Parse words posted as text file
-        // to array of [word, translation] pairs.
-        $str = request::post('words');
-        $lines = array_map('trim', explode("\n", $str));
-        $lines = array_filter($lines, 'strlen');
-        $lines = array_map(function ($line) {
-            return preg_split('/\s+-\s+/', $line, 2);
-        }, $lines);
 
-        $entries = [];
-        foreach ($lines as $tuple) {
-            $entry = new Entry;
-            $entry->dict_id = $dict_id;
-            $entry->q = $tuple[0];
-            $entry->a = $tuple[1];
-            $entries[] = $entry;
-        }
-        send(response::json($the->appendWords($dict_id, $entries)));
+    $router->add('post', '/api/{\d+}/add', function ($dict_id) {
+        send(response::json(getThe()->appendWords($dict_id, request::json()['entries'])));
     });
 
     $router->add('get', '/api/{\d+}/test', function ($dict_id) {

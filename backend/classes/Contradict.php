@@ -285,21 +285,30 @@ class Contradict
         ];
     }
 
-    function appendWords(string $dict_id, array $entries): array
+    /**
+     * Adds words to a dictionary.
+     */
+    function appendWords(string $dict_id, array $lines)
     {
         $dict = $this->getDict($dict_id);
         $added = 0;
         $skipped = 0;
-        foreach ($entries as $entry) {
-            if (!$dict->hasEntry($entry)) {
-                $dict->saveEntry($entry);
-                $added++;
-            } else {
+        $ids = [];
+        foreach ($lines as $tuple) {
+            $entry = new Entry;
+            $entry->dict_id = $dict_id;
+            $entry->q = $tuple[0];
+            $entry->a = $tuple[1];
+            if ($dict->hasEntry($entry)) {
                 $skipped++;
+                continue;
             }
+            $dict->saveEntry($entry);
+            $added++;
+            $ids[] = $entry->id;
         }
         $this->saveDict($dict);
-        return compact('added', 'skipped');
+        return compact('added', 'skipped', 'ids');
     }
 
     function markTouch($id, $dir, $success)
