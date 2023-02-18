@@ -128,24 +128,7 @@ function main()
     });
 
     $router->add('get', '/api/{\d+}/test', function ($dict_id) {
-        $the = getThe();
-        $test = $the->generateTest($dict_id);
-        $hints1 = [];
-        $hints2 = [];
-        foreach ($test->tuples1 as $q) {
-            $hints1[] = $q->hint();
-        }
-        foreach ($test->tuples2 as $q) {
-            $hints2[] = $q->hint();
-        }
-        $f = $test->format();
-        foreach ($f['tuples1'] as $k => $tuple) {
-            $f['tuples1'][$k]['hint'] = $hints1[$k];
-        }
-        foreach ($f['tuples2'] as $k => $tuple) {
-            $f['tuples2'][$k]['hint'] = $hints2[$k];
-        }
-        send(response::json($f));
+        send(response::json(getThe()->generateTest($dict_id)));
     });
 
     /**

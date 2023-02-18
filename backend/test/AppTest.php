@@ -134,6 +134,52 @@ class AppTest extends TestCase
         $this->assertEquals('2', $e->id);
     }
 
+    function testGenerate()
+    {
+        // pre: app with one entry
+        $app = new Contradict(uniqid("test"));
+        $d = $app->addDict('dict');
+        $entry = new Entry;
+        $entry->id = '1';
+        $entry->dict_id = $d->id;
+        $entry->q = 'q';
+        $entry->a = 'a';
+        $app->appendWords($d->id, [$entry]);
+
+        // action: generate a test
+        $test = $app->generateTest($d->id);
+
+        // post: valid test
+        $this->assertEquals($test, array(
+            'tuples1' =>
+            array(
+                0 =>
+                array(
+                    'id' => '1',
+                    'q' => 'q',
+                    'a' => 'a',
+                    'times' => 0,
+                    'wikiURL' => NULL,
+                    'dir' => 0,
+                    'hint' => NULL,
+                ),
+            ),
+            'tuples2' =>
+            array(
+                0 =>
+                array(
+                    'id' => '1',
+                    'q' => 'a',
+                    'a' => 'q',
+                    'times' => 0,
+                    'wikiURL' => NULL,
+                    'dir' => 1,
+                    'hint' => NULL,
+                ),
+            ),
+        ));
+    }
+
     function test()
     {
         // pre: app with some words

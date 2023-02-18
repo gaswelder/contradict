@@ -88,6 +88,16 @@ class Contradict
         $this->saveDict($dict);
     }
 
+    function addDict($name)
+    {
+        $d = new Dict;
+        $d->name = $name;
+        $d->id = uniqid();
+        $this->data['dicts'][$d->id] = $d->format();
+        $this->flush();
+        return $d;
+    }
+
     /**
      * Creates or updates a dict.
      */
@@ -129,13 +139,42 @@ class Contradict
         $this->saveDict($dict);
     }
 
-    function generateTest(string $dict_id): Test
+    function generateTest(string  $dict_id)
     {
-        $dict = $this->getDict($dict_id);
         $size = 20;
+        $dict = $this->getDict($dict_id);
         $entries = $dict->allEntries();
         $pick1 = $this->pick($entries, $size, 0);
         $pick2 = $this->pick($entries, $size, 1);
+
+        $f = [
+            'tuples1' => [],
+            'tuples2' => [],
+        ];
+        foreach ($pick1 as $i => $entry) {
+            $tuple = new Question($dict, $entry, false);
+            $f['tuples1'][$i] = [
+                'id' => $entry->id,
+                'q' => $entry->q,
+                'a' => $entry->a,
+                'times' => $entry->answers1,
+                'wikiURL' => $dict->wikiURL($entry->q),
+                'dir' => 0,
+                'hint' => $tuple->hint()
+            ];
+        }
+        foreach ($pick2 as $entry) {
+            $tuple = new Question($dict, $entry, true);
+            $f['tuples2'][$i] = [
+                'id' => $entry->id,
+                'q' => $entry->a,
+                'a' => $entry->q,
+                'times' => $entry->answers2,
+                'wikiURL' => $dict->wikiURL($entry->q),
+                'dir' => 1,
+                'hint' => $tuple->hint()
+            ];
+        }
 
         // Mark the entries as touched.
         foreach (array_merge($pick1, $pick2) as $e) {
@@ -145,18 +184,9 @@ class Contradict
             }
         }
         $this->saveDict($dict);
-
-        $questions1 = [];
-        foreach ($pick1 as $entry) {
-            $questions1[] = new Question($dict, $entry, false);
-        }
-        $questions2 = [];
-        foreach ($pick2 as $entry) {
-            $questions2[] = new Question($dict, $entry, true);
-        }
-
-        return new Test($questions1, $questions2);
+        return $f;
     }
+
 
     private function pick(array $entries, int $size, $dir): array
     {
