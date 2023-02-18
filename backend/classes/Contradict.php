@@ -301,29 +301,14 @@ class Contradict
 
     function markTouch($id, $dir, $success)
     {
-        $dict_id = '';
-        $e = null;
-        foreach ($this->dicts() as $d) {
-            $e = $d->entry($id);
-            if ($e) {
-                $dict_id = $d->id;
-                break;
-            }
-        }
-        $dict = $this->getDict($dict_id);
-        $new = function ($v) use ($success) {
-            if ($success) {
-                return $v + 1;
-            } else {
-                return max($v - 1, 0);
-            }
-        };
-        if ($dir == 0) {
-            $e->answers1 = $new($e->answers1);
-        } else {
-            $e->answers2 = $new($e->answers2);
-        }
-        $e->touched = true;
+        clg($id, $dir, $success);
+        var_dump("touch", $id, $dir, $success);
+        $reverse = $dir == 1;
+
+        $e = $this->getEntry($id);
+        $e->touch($reverse, $success);
+
+        $dict = $this->getDict($e->dict_id);
         $dict->saveEntry($e);
         $this->saveDict($dict);
     }

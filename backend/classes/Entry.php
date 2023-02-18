@@ -17,6 +17,23 @@ class Entry
         return $row;
     }
 
+    function touch(bool $reverse, bool $success)
+    {
+        $new = function ($v) use ($success) {
+            if ($success) {
+                return $v + 1;
+            } else {
+                return max($v - 1, 0);
+            }
+        };
+        if ($reverse) {
+            $this->answers2 = $new($this->answers2);
+        } else {
+            $this->answers1 = $new($this->answers1);
+        }
+        $this->touched = true;
+    }
+
     static function parse(array $row): self
     {
         $keys = ['id', 'q', 'a', 'answers1', 'answers2', 'dict_id', 'touched'];
