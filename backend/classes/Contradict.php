@@ -301,8 +301,6 @@ class Contradict
 
     function markTouch($id, $dir, $success)
     {
-        clg($id, $dir, $success);
-        var_dump("touch", $id, $dir, $success);
         $reverse = $dir == 1;
 
         $e = $this->getEntry($id);
