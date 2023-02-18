@@ -54,15 +54,14 @@ function main()
 {
     $router = new router();
 
-    $router->add('options', '/api/', function () {
-        clg("ok?");
+    if (request::method() == "OPTIONS") {
         $r = new response;
         $r->setHeader('Access-Control-Allow-Origin', 'http://localhost:1234');
         $r->setHeader('Access-Control-Allow-Credentials', 'true');
         $r->setHeader('Access-Control-Allow-Headers', 'Content-Type');
         $r->flush();
-        clg("ok");
-    });
+        return;
+    }
 
     $router->add('post', '/api/login', function () {
         $name = request::post('login');
@@ -220,6 +219,12 @@ function main()
         $entry->a = request::post('a');
         $dict->saveEntry($entry);
         $storage->saveDict($dict);
+        send(response::make('ok'));
+    });
+
+    $router->add('post', '/api/touches/{\d+}', function ($id) {
+        $body = json_decode(request::body(), true);
+        getThe()->markTouch($id, $body['dir'], $body['success']);
         send(response::make('ok'));
     });
 

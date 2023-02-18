@@ -44,7 +44,6 @@ class router
         if (!isset($resource[$method])) {
             throw new MethodNotAllowed();
         }
-        clg("dispatch", $method, $url, $resource[$method], $args);
         return call_user_func_array($resource[$method], $args);
     }
 

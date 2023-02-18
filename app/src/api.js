@@ -3,7 +3,7 @@ const backend = process.env.BACKEND_URL || "http://localhost:8080/api";
 async function authFetch(url, options = {}) {
   const r = await fetch(backend + url, {
     credentials: "include",
-    ...options
+    ...options,
   });
   if (r.status == 401) {
     const e = new Error("unauthorized");
@@ -36,9 +36,9 @@ async function post(url, data) {
   const r = await authFetch(url, {
     method: "POST",
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: postData(data)
+    body: postData(data),
   });
   return r;
 }
@@ -47,9 +47,9 @@ function postJSON(url, data) {
   return authFetch(url, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 }
 
@@ -63,7 +63,7 @@ export default {
   },
 
   logout() {
-    return post("/logout", {}).then(r => r.text());
+    return post("/logout", {}).then((r) => r.text());
   },
 
   dicts() {
@@ -72,7 +72,7 @@ export default {
 
   async dict(id) {
     const dicts = await this.dicts();
-    return dicts.find(d => d.id == id);
+    return dicts.find((d) => d.id == id);
   },
 
   updateDict(id, body) {
@@ -93,7 +93,7 @@ export default {
     //   ["dir[]", "0"],
     //   ["a[]", ""]
     // ];
-    return post(`/${dictID}/test`, entries).then(r => r.json());
+    return post(`/${dictID}/test`, entries).then((r) => r.json());
   },
 
   entry(id) {
@@ -105,10 +105,11 @@ export default {
   },
 
   addEntries(dictID, entries) {
-    const string = entries.map(e => `${e.q} - ${e.a}`).join("\n");
-    return post(`/${dictID}/add`, { words: string }).then(r => r.json());
+    const string = entries.map((e) => `${e.q} - ${e.a}`).join("\n");
+    return post(`/${dictID}/add`, { words: string }).then((r) => r.json());
   },
 
   dump: () => getJSON("/export"),
-  load: data => postJSON("/export", data)
+  load: (data) => postJSON("/export", data),
+  touchCard: (id, dir, success) => postJSON(`/touches/${id}`, { dir, success }),
 };

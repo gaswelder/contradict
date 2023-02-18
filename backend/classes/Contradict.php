@@ -164,4 +164,34 @@ class Contradict
         $stats->successRate = $dict->getSuccessRate();
         return $stats;
     }
+
+    function markTouch($id, $dir, $success)
+    {
+        $storage = $this->storage;
+        $dict_id = '';
+        $e = null;
+        foreach ($storage->dicts() as $d) {
+            $e = $d->entry($id);
+            if ($e) {
+                $dict_id = $d->id;
+                break;
+            }
+        }
+        $dict = $storage->dict($dict_id);
+        $new = function ($v) use ($success) {
+            if ($success) {
+                return $v + 1;
+            } else {
+                return max($v - 1, 0);
+            }
+        };
+        if ($dir == 0) {
+            $e->answers1 = $new($e->answers1);
+        } else {
+            $e->answers2 = $new($e->answers2);
+        }
+        $e->touched = true;
+        $dict->saveEntry($e);
+        $storage->saveDict($dict);
+    }
 }

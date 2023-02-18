@@ -9,6 +9,7 @@ import Export from "./pages/Export";
 import DictPage from "./pages/DictPage";
 import { ResultsPage } from "./pages/ResultsPage";
 import { Page } from "./components/Page";
+import { RepetitionsPage } from "./pages/RepetitionsPage";
 
 function page(Component, header = true) {
   const wrappedPage = (props) => (
@@ -26,6 +27,7 @@ class Main extends React.Component {
         <Switch>
           <Route exact path="/" component={page(MenuPage)} />
           <Route path="/:id/test" component={page(TestPage)} />
+          <Route path="/:id/repetitions" component={page(RepetitionsPage)} />
           <Route path="/:id/results" component={page(ResultsPage)} />
           <Route path="/:id/add" component={page(AddEntriesPage)} />
           <Route path="/dicts/:id" component={page(DictPage)} />

@@ -35,6 +35,7 @@ function Dictionary({ dict }) {
       <Stats stats={dict.stats} />
       <div style={{ marginTop: "0.5em" }}>
         <ButtonLink to={`/${dict.id}/test`}>Do a test</ButtonLink>{" "}
+        <ButtonLink to={`/${dict.id}/repetitions`}>Do repetitions</ButtonLink>{" "}
       </div>
     </Container>
   );
