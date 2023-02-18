@@ -1,5 +1,7 @@
 <?php
 
+namespace gaswelder;
+
 class Env
 {
     /**

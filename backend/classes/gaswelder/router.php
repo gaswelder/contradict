@@ -1,10 +1,12 @@
 <?php
 
-class MethodNotAllowed extends Exception
+namespace gaswelder;
+
+class MethodNotAllowed extends \Exception
 {
 }
 
-class RouteNotFound extends Exception
+class RouteNotFound extends \Exception
 {
 }
 
@@ -32,7 +34,7 @@ class router
         }
         $_method = strtolower(trim($method));
         if (isset($this->routes[$pattern][$_method])) {
-            throw new Exception("route $method $pattern is already defined");
+            throw new \Exception("route $method $pattern is already defined");
         }
         $this->routes[$pattern][$_method] = $func;
         return $this;
@@ -162,7 +164,7 @@ class expr
             }
         }
 
-        throw new Exception("Couldn't find suitable delimiter for regular expression: $s");
+        throw new \Exception("Couldn't find suitable delimiter for regular expression: $s");
     }
 
     private function read()

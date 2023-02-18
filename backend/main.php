@@ -2,15 +2,21 @@
 require __DIR__ . '/../vendor/autoload.php';
 
 spl_autoload_register(function ($cn) {
-    $path = __DIR__ . "/classes/$cn.php";
+    $path = str_replace('//', '/', __DIR__ . "/classes/" . str_replace('\\', '//', $cn) . ".php");
+    error_log($path);
     if (file_exists($path)) {
         require_once $path;
     }
 });
 
 if (file_exists(__DIR__ . '/.env')) {
-    Env::parse(__DIR__ . '/.env');
+    gaswelder\Env::parse(__DIR__ . '/.env');
 }
+
+use gaswelder\MethodNotAllowed;
+use gaswelder\request;
+use gaswelder\RouteNotFound;
+use gaswelder\router;
 
 function getThe()
 {

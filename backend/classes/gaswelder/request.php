@@ -1,5 +1,9 @@
 <?php
 
+namespace gaswelder;
+
+use \Exception;
+
 class request
 {
 	private static $init = false;
