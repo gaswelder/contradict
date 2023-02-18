@@ -16,7 +16,7 @@ class Contradict
      * This limit is applied separately for both directions,
      * so the actual pool limit is twice this value.
      */
-    const WINDOW = 200;
+    const WINDOW = 100;
 
     private $touched = false;
     private $dataPath;
