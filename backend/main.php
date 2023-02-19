@@ -11,13 +11,17 @@ use gaswelder\request;
 use gaswelder\RouteNotFound;
 use gaswelder\router;
 
+class Unauthorized extends Exception
+{
+}
+
 function getThe()
 {
     $auth = new CookieAuth(getenv('COOKIE_KEY'));
     $token = $_COOKIE['token'] ?? '';
     $userID = $auth->checkToken($token);
     if (!$userID) {
-        throw response::make(response::STATUS_UNAUTHORIZED);
+        throw new Unauthorized;
     }
     return new Contradict($userID);
 }
@@ -100,6 +104,9 @@ try {
 } catch (RouteNotFound $e) {
     error_log("route not found: " . request::url());
     send(response::make(404)->setContent("route not found: " . request::url()));
+} catch (Unauthorized $e) {
+    error_log("unauthorized");
+    send(response::make(response::STATUS_UNAUTHORIZED));
 } catch (Exception $e) {
     error_log(get_class($e) . ': ' . $e->getMessage());
     send(response::make(500));
