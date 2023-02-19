@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
-import api from "../api";
+import api, { ROOT_PATH } from "../api";
 
 const HeaderContainer = styled.header`
   background-color: #204c72;
@@ -33,7 +33,7 @@ export const Page = ({ children, header }) => {
   async function logout() {
     try {
       await api.logout();
-      history.push("/login");
+      history.push(ROOT_PATH + "login");
     } catch (err) {
       alert("failed to log out: " + err);
     }
@@ -43,7 +43,7 @@ export const Page = ({ children, header }) => {
     <>
       {header && (
         <HeaderContainer>
-          <Link to="/">Dict</Link>
+          <Link to={ROOT_PATH}>Dict</Link>
           <button className="logout" onClick={logout}>
             Logout
           </button>

@@ -1,4 +1,5 @@
 import React from "react";
+import { ROOT_PATH } from "../../api";
 import { ButtonLink } from "../../components/ButtonLink";
 import { CorrectTable } from "./CorrectTable";
 import { Fail } from "./Fail";
@@ -17,8 +18,8 @@ export const ResultsPage = ({ match }) => {
       <>
         <p>No results</p>
         <nav>
-          <ButtonLink to={`test`}>New test</ButtonLink>
-          <ButtonLink to="/">Home</ButtonLink>
+          <ButtonLink to={`${ROOT_PATH}test`}>New test</ButtonLink>
+          <ButtonLink to={ROOT_PATH}>Home</ButtonLink>
         </nav>
       </>
     );
@@ -50,8 +51,8 @@ export const ResultsPage = ({ match }) => {
       <CorrectTable results={ok} />
 
       <nav>
-        <ButtonLink to={`/${dictID}/test`}>New test</ButtonLink>
-        <ButtonLink to="/">Home</ButtonLink>
+        <ButtonLink to={`${ROOT_PATH}${dictID}/test`}>New test</ButtonLink>
+        <ButtonLink to={ROOT_PATH}>Home</ButtonLink>
       </nav>
     </React.Fragment>
   );

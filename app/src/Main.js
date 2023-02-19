@@ -10,6 +10,7 @@ import { ResultsPage } from "./pages/ResultsPage";
 import { Page } from "./components/Page";
 import { RepetitionsPage } from "./pages/RepetitionsPage";
 import { DictPage } from "./pages/DictPage";
+import { ROOT_PATH } from "./api";
 
 function page(Component, header = true) {
   const wrappedPage = (props) => (
@@ -22,18 +23,22 @@ function page(Component, header = true) {
 
 class Main extends React.Component {
   render() {
+    const R = ROOT_PATH;
     return (
       <BrowserRouter>
         <Switch>
-          <Route exact path="/" component={page(MenuPage)} />
-          <Route path="/:id/test" component={page(TestPage)} />
-          <Route path="/:id/repetitions" component={page(RepetitionsPage)} />
-          <Route path="/:id/results" component={page(ResultsPage)} />
-          <Route path="/:id/add" component={page(AddEntriesPage)} />
-          <Route path="/dicts/:id" component={page(DictPage)} />
-          <Route path="/entries/:id" component={page(EntryPage)} />
-          <Route path="/login" component={page(LoginPage, false)} />
-          <Route path="/export" component={page(Export)} />
+          <Route exact path={`${R}`} component={page(MenuPage)} />
+          <Route path={`${R}:id/test`} component={page(TestPage)} />
+          <Route
+            path={`${R}:id/repetitions`}
+            component={page(RepetitionsPage)}
+          />
+          <Route path={`${R}:id/results`} component={page(ResultsPage)} />
+          <Route path={`${R}:id/add`} component={page(AddEntriesPage)} />
+          <Route path={`${R}dicts/:id`} component={page(DictPage)} />
+          <Route path={`${R}entries/:id`} component={page(EntryPage)} />
+          <Route path={`${R}login`} component={page(LoginPage, false)} />
+          <Route path={`${R}export`} component={page(Export)} />
           <Route component={page(() => "Not Found")} />
         </Switch>
       </BrowserRouter>

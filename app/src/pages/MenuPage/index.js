@@ -3,6 +3,7 @@ import Dictionary from "./Dictionary";
 import Resource from "../../components/Resource";
 import withAPI from "../../components/withAPI";
 import { Link } from "react-router-dom";
+import { ROOT_PATH } from "../../api";
 
 const MenuPage = ({ api }) => {
   return (
@@ -15,7 +16,7 @@ const MenuPage = ({ api }) => {
           return data.map((d) => <Dictionary key={d.id} dict={d} />);
         }}
       </Resource>
-      <Link to="/export" className="import">
+      <Link to={`${ROOT_PATH}export`} className="import">
         Export/Import
       </Link>
     </>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { ROOT_PATH } from "../../api";
 import { ButtonLink } from "../../components/ButtonLink";
 import "./ColumnMeter.css";
 
@@ -33,8 +34,8 @@ function Dictionary({ dict }) {
     <RootDiv>
       <HeaderDiv>
         <h3>{dict.name}</h3>
-        <Link to={`dicts/${dict.id}`}>Edit</Link>
-        <Link to={`/${dict.id}/add`}>Add words</Link>
+        <Link to={`${ROOT_PATH}dicts/${dict.id}`}>Edit</Link>
+        <Link to={`${ROOT_PATH}${dict.id}/add`}>Add words</Link>
       </HeaderDiv>
       <div className="column-meter">
         <div
@@ -56,8 +57,10 @@ function Dictionary({ dict }) {
         </div>
       </div>
       <div style={{ marginTop: "0.5em" }}>
-        <ButtonLink to={`/${dict.id}/test`}>Do a test</ButtonLink>{" "}
-        <ButtonLink to={`/${dict.id}/repetitions`}>Do repetitions</ButtonLink>{" "}
+        <ButtonLink to={`${ROOT_PATH}${dict.id}/test`}>Do a test</ButtonLink>{" "}
+        <ButtonLink to={`${ROOT_PATH}${dict.id}/repetitions`}>
+          Do repetitions
+        </ButtonLink>{" "}
       </div>
     </RootDiv>
   );

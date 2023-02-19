@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "parcel app/index.html",
-    "build": "BACKEND_URL=/api parcel build app/index.html"
+    "build": "ROOT_PATH=/contradict/ BACKEND_URL=/contradict/api parcel build --public-url /contradict/ app/index.html"
   },
   "dependencies": {
     "babel-eslint": "^10.0.1",

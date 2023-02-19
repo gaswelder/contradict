@@ -1,4 +1,5 @@
 const backend = process.env.BACKEND_URL || "http://localhost:8080/api";
+export const ROOT_PATH = process.env.ROOT_PATH || "/";
 
 async function authFetch(url, options = {}) {
   const r = await fetch(backend + url, {
