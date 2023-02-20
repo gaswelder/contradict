@@ -90,7 +90,7 @@ class AppTest extends TestCase
         $app->updateEntry('2', 'qqq', 'aaa');
 
         // post: entry updated
-        $e = $app->getEntry('2');
+        [, $e] = $app->getEntry('2');
         $this->assertEquals('qqq', $e->q);
         $this->assertEquals('aaa', $e->a);
     }
@@ -105,8 +105,8 @@ class AppTest extends TestCase
         $app->markTouch('2', 1, false);
 
         // post: counters updated correctly
-        $e1 = $app->getEntry('1');
-        $e2 = $app->getEntry('2');
+        [, $e1] = $app->getEntry('1');
+        [, $e2] = $app->getEntry('2');
         $this->assertEquals($e1->touched, true);
         $this->assertEquals($e1->answers1, 2);
         $this->assertEquals($e2->touched, true);
@@ -119,7 +119,7 @@ class AppTest extends TestCase
         $app = $this->app();
 
         // action: get entry 1
-        $e = $app->getEntry('2');
+        [, $e] = $app->getEntry('2');
 
         // post: success
         $this->assertEquals('2', $e->id);

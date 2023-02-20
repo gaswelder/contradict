@@ -155,10 +155,10 @@ class Contradict
         foreach ($this->dicts() as $d) {
             $e = $d->entry($id);
             if ($e) {
-                return $e;
+                return [$d, $e];
             }
         }
-        return null;
+        return [null, null];
     }
 
     function updateEntry($id, $q, $a)
@@ -304,7 +304,6 @@ class Contradict
         $ids = [];
         foreach ($lines as $tuple) {
             $entry = new Entry;
-            $entry->dict_id = $dict_id;
             $entry->q = $tuple[0];
             $entry->a = $tuple[1];
             if ($dict->hasEntry($entry)) {
@@ -322,11 +321,8 @@ class Contradict
     function markTouch($id, $dir, $success)
     {
         $reverse = $dir == 1;
-
-        $e = $this->getEntry($id);
+        [$dict, $e] = $this->getEntry($id);
         $e->touch($reverse, $success);
-
-        $dict = $this->getDict($e->dict_id);
         $dict->saveEntry($e);
         $this->saveDict($dict);
     }

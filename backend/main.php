@@ -61,7 +61,7 @@ $router = router::make()
         return response::json($results);
     })
     ->add('get', '/api/entries/{\w+}', function ($id) {
-        $e = getThe()->getEntry($id);
+        [, $e] = getThe()->getEntry($id);
         if ($e) {
             return response::json(['entry' => $e->format()]);
         } else {
