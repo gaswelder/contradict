@@ -46,21 +46,21 @@ $router = router::make()
     ->add('get', '/api/', function () {
         return response::json(getThe()->getDicts());
     })
-    ->add('post', '/api/{\d+}', function ($dict_id) {
+    ->add('post', '/api/{\w+}', function ($dict_id) {
         getThe()->updateDict($dict_id, request::json());
         return response::make(200);
     })
-    ->add('post', '/api/{\d+}/add', function ($dict_id) {
+    ->add('post', '/api/{\w+}/add', function ($dict_id) {
         return response::json(getThe()->appendWords($dict_id, request::json()['entries']));
     })
-    ->add('get', '/api/{\d+}/test', function ($dict_id) {
+    ->add('get', '/api/{\w+}/test', function ($dict_id) {
         return response::json(getThe()->generateTest($dict_id));
     })
-    ->add('post', '/api/{\d+}/test', function ($dict_id) {
+    ->add('post', '/api/{\w+}/test', function ($dict_id) {
         $results = getThe()->submitTest($dict_id, request::post('dir'), request::post('q'), request::post('a'));
         return response::json($results);
     })
-    ->add('get', '/api/entries/{\d+}', function ($id) {
+    ->add('get', '/api/entries/{\w+}', function ($id) {
         $e = getThe()->getEntry($id);
         if ($e) {
             return response::json(['entry' => $e->format()]);
@@ -68,7 +68,7 @@ $router = router::make()
             return response::json(null);
         }
     })
-    ->add('post', '/api/entries/{\d+}', function ($id) {
+    ->add('post', '/api/entries/{\w+}', function ($id) {
         getThe()->updateEntry($id, request::post('q'), request::post('a'));
         return response::make('ok');
     })
