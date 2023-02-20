@@ -17,76 +17,20 @@ class Dict
         return $d;
     }
 
-    function format(): array
-    {
-        return array_merge($this->data, [
-            'id' => $this->id,
-            'name' => $this->name,
-            'lookupURLTemplates' => $this->lookupURLTemplates
-        ]);
-    }
-
-    function wikiURLs(string $entryText): array
-    {
-        $words = explode(' ', $entryText);
-        if (empty($words)) {
-            return [];
-        }
-        if (in_array(strtolower($words[0]), ['das', 'die', 'der', 'to'])) {
-            array_shift($words);
-        }
-        if (count($words) != 1) {
-            return [];
-        }
-        $word = $words[0];
-        return array_map(function ($template) use ($word) {
-            return str_replace('{{word}}', urlencode($word), $template);
-        }, $this->lookupURLTemplates);
-    }
-
-    function allEntries(): array
-    {
-        $entries = [];
-        foreach ($this->data['words'] as $row) {
-            $entries[] = Entry::parse($row);
-        }
-        return $entries;
-    }
-
-    function hasEntry(Entry $e): bool
-    {
-        foreach ($this->allEntries() as $entry) {
-            if ($entry->q == $e->q && $entry->a == $e->a) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     function saveEntry(Entry $e): Entry
     {
         if (!$e->id) {
             $e->id = uniqid();
         }
-        $this->data['words'][$e->id] = $e->format();
+        $this->data['words'][$e->id] = [
+            'q' => $e->q,
+            'a' => $e->a,
+            'answers1' => $e->answers1,
+            'answers2' => $e->answers2,
+            'id' => $e->id,
+            'dict_id' => $e->dict_id,
+            'touched' => $e->touched ? 1 : 0,
+        ];
         return $e;
-    }
-
-    function entry(string $id): ?Entry
-    {
-        $e = $this->data['words'][$id] ?? null;
-        if (!$e) {
-            return $e;
-        }
-        return Entry::parse($this->data['words'][$id]);
-    }
-
-    function entries(array $ids): array
-    {
-        $entries = [];
-        foreach ($ids as $id) {
-            $entries[] = $this->entry($id);
-        }
-        return $entries;
     }
 }

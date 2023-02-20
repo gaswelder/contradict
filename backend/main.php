@@ -61,12 +61,19 @@ $router = router::make()
         return response::json($results);
     })
     ->add('get', '/api/entries/{\w+}', function ($id) {
-        [, $e] = getThe()->getEntry($id);
-        if ($e) {
-            return response::json(['entry' => $e->format()]);
-        } else {
+        $e = getThe()->getEntry($id);
+        if (!$e) {
             return response::json(null);
         }
+        return response::json(['entry' => [
+            'q' => $e->q,
+            'a' => $e->a,
+            'answers1' => $e->answers1,
+            'answers2' => $e->answers2,
+            'id' => $e->id,
+            'dict_id' => $e->dict_id,
+            'touched' => $e->touched ? 1 : 0,
+        ]]);
     })
     ->add('post', '/api/entries/{\w+}', function ($id) {
         getThe()->updateEntry($id, request::post('q'), request::post('a'));

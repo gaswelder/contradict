@@ -45,9 +45,10 @@ class AppTest extends TestCase
         $app->import(testData());
 
         // post: app has 1 dict with 2 entries
-        $dicts = $app->dicts();
+        $dicts = $app->getDicts();
         $this->assertEquals(count($dicts), 1);
-        $this->assertEquals(count($dicts[0]->allEntries()), 2);
+        $entries = $app->getEntries($dicts[0]['id']);
+        $this->assertEquals(count($entries), 2);
     }
 
     function testExport()
@@ -78,7 +79,7 @@ class AppTest extends TestCase
         $app->updateDict('1', ['name' => 'foo']);
 
         // post: dictionary renamed
-        $this->assertEquals($app->getDict('1')->name, 'foo');
+        $this->assertEquals($app->getDict('1')['name'], 'foo');
     }
 
     function testUpdateEntry()
@@ -90,7 +91,7 @@ class AppTest extends TestCase
         $app->updateEntry('2', 'qqq', 'aaa');
 
         // post: entry updated
-        [, $e] = $app->getEntry('2');
+        $e = $app->getEntry('2');
         $this->assertEquals('qqq', $e->q);
         $this->assertEquals('aaa', $e->a);
     }
@@ -105,8 +106,8 @@ class AppTest extends TestCase
         $app->markTouch('2', 1, false);
 
         // post: counters updated correctly
-        [, $e1] = $app->getEntry('1');
-        [, $e2] = $app->getEntry('2');
+        $e1 = $app->getEntry('1');
+        $e2 = $app->getEntry('2');
         $this->assertEquals($e1->touched, true);
         $this->assertEquals($e1->answers1, 2);
         $this->assertEquals($e2->touched, true);
@@ -119,7 +120,7 @@ class AppTest extends TestCase
         $app = $this->app();
 
         // action: get entry 1
-        [, $e] = $app->getEntry('2');
+        $e = $app->getEntry('2');
 
         // post: success
         $this->assertEquals('2', $e->id);
@@ -129,12 +130,12 @@ class AppTest extends TestCase
     {
         // pre: app with one entry
         $app = new Contradict(uniqid("test"));
-        $d = $app->addDict('dict');
-        $r = $app->appendWords($d->id, [['q', 'a']]);
+        $dictID = $app->addDict('dict');
+        $r = $app->appendWords($dictID, [['q', 'a']]);
         $id = $r['ids'][0];
 
         // action: generate a test
-        $test = $app->generateTest($d->id);
+        $test = $app->generateTest($dictID);
 
         // post: valid test
         $this->assertEquals($test, array(
@@ -216,40 +217,16 @@ class AppTest extends TestCase
         // post: correct list
         $this->assertEquals($r, array(
             0 =>
-            array(
+            [
                 'id' => '1',
                 'name' => 'Sample dict',
-                'words' =>
-                array(
-                    1 =>
-                    [
-                        'id' => '1',
-                        'dict_id' => '1',
-                        'q' => 'q',
-                        'a' => 'a',
-                        'touched' => 0,
-                        'answers1' => 1,
-                        'answers2' => 2,
-                    ],
-                    2 =>
-                    [
-                        'id' => '2',
-                        'dict_id' => '1',
-                        'q' => 'x',
-                        'a' => 'y',
-                        'touched' => 0,
-                        'answers1' => 3,
-                        'answers2' => 4,
-                    ],
-                ),
                 'lookupURLTemplates' => [],
-                'stats' =>
-                array(
+                'stats' => [
                     'pairs' => 2.0,
                     'finished' => 0,
                     'touched' => 0.0,
-                ),
-            ),
+                ],
+            ],
         ));
     }
 }
