@@ -98,6 +98,7 @@ try {
         $r->setHeader('Access-Control-Allow-Origin', 'http://localhost:1234');
         $r->setHeader('Access-Control-Allow-Credentials', 'true');
         $r->setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        $r->setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
         $r->flush();
     } else {
         throw $e;
