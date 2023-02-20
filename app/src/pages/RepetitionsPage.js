@@ -19,6 +19,7 @@ export const RepetitionsPage = withRouter(
     const dictId = match.params.id;
     const [cards, setCards] = useState([]);
     const [show, setShow] = useState(false);
+    const [yes, setYes] = useState(false);
 
     const nextBatch = async () => {
       const r = await api.test(dictId);
@@ -27,6 +28,7 @@ export const RepetitionsPage = withRouter(
 
     const next = async () => {
       setShow(false);
+      setYes(false);
       if (cards.length == 1) {
         await nextBatch();
       } else {
@@ -52,10 +54,27 @@ export const RepetitionsPage = withRouter(
               return;
             }
             setShow(true);
-            api.touchCard(card.id, card.reverse, true);
+            api.touchCard(card.id, card.reverse, false);
           }}
         />
-        {show && <button onClick={next}>Next</button>}
+        {show && (
+          <>
+            {yes && (
+              <>
+                <button
+                  onClick={() => {
+                    api.touchCard(card.id, card.reverse, false);
+                    api.touchCard(card.id, card.reverse, false);
+                    next();
+                  }}
+                >
+                  Oops, wrong guess
+                </button>{" "}
+              </>
+            )}
+            <button onClick={next}>Next</button>
+          </>
+        )}
         {!show && (
           <>
             <button
@@ -63,13 +82,14 @@ export const RepetitionsPage = withRouter(
               onClick={() => {
                 api.touchCard(card.id, card.reverse, true);
                 setShow(true);
+                setYes(true);
               }}
             >
               Yes, know it
             </button>{" "}
             <button
               onClick={async () => {
-                api.touchCard(card.id, card.reverse, true);
+                api.touchCard(card.id, card.reverse, false);
                 setShow(true);
               }}
             >
