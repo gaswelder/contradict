@@ -23,7 +23,9 @@ export const RepetitionsPage = withRouter(
 
     const nextBatch = async () => {
       const r = await api.test(dictId);
-      setCards(shuffle([...r.tuples1, ...r.tuples2]));
+      setCards(
+        shuffle([...r.tuples1, ...r.tuples2.slice(0, r.tuples2.legth / 3)])
+      );
     };
 
     const next = async () => {
