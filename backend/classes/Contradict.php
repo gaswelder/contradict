@@ -21,9 +21,9 @@ class Contradict
     private $dataPath;
     private $data = [];
 
-    function __construct(string $userID)
+    function __construct(string $dataPath)
     {
-        $this->dataPath = __DIR__ . "/../database-$userID.json";
+        $this->dataPath = $dataPath;
         $this->load();
     }
 

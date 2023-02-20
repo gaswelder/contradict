@@ -39,7 +39,7 @@ class AppTest extends TestCase
     function testImport()
     {
         // pre: empty app
-        $app = new Contradict("test");
+        $app = new Contradict("testdata");
 
         // action: import data
         $app->import(testData());
@@ -65,7 +65,7 @@ class AppTest extends TestCase
 
     private function app(): Contradict
     {
-        $app = new Contradict("test");
+        $app = new Contradict("testdata");
         $app->import(testData());
         return $app;
     }
@@ -129,7 +129,7 @@ class AppTest extends TestCase
     function testGenerate()
     {
         // pre: app with one entry
-        $app = new Contradict(uniqid("test"));
+        $app = new Contradict(uniqid("testdata"));
         $dictID = $app->addDict('dict');
         $r = $app->appendWords($dictID, [['q', 'a']]);
         $id = $r['ids'][0];

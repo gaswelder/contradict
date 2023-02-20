@@ -23,7 +23,9 @@ function getThe()
     if (!$userID) {
         throw new Unauthorized;
     }
-    return new Contradict($userID);
+    $dir = getenv("DATABASE_DIR") ?? __DIR__ . "/../";
+    $dataPath = $dir . "$userID.json.gz";
+    return new Contradict($dataPath);
 }
 
 $router = router::make()
