@@ -1,5 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { ROOT_PATH } from "../api";
 
 const CardDiv = styled.div`
   padding: 40px;
@@ -21,6 +23,13 @@ const CardDiv = styled.div`
     top: 10px;
     font-size: 90%;
   }
+  & .left-corner {
+    position: absolute;
+    opacity: 0.7;
+    left: 10px;
+    top: 10px;
+    font-size: 90%;
+  }
 `;
 
 const urlTitle = (url) => {
@@ -34,6 +43,11 @@ export const Card = ({ card, show, onShow }) => {
   return (
     <CardDiv reverse={card.reverse} onClick={onShow}>
       <div className="corner">{card.times}</div>
+      {show && (
+        <div className="left-corner">
+          <Link to={`${ROOT_PATH}entries/${card.id}`}>Edit</Link>
+        </div>
+      )}
       <div>
         {card.q}
         {card.hint && ` (${card.hint})`}
