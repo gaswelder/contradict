@@ -1,17 +1,18 @@
 <?php
 
+use gaswelder\RouteNotFound;
 use gaswelder\router;
 
 class RouterTest extends TestCase
 {
-    function testFoo()
+    function testRoot()
     {
-        $r = new router();
         $n = 0;
-        $r->add('get', '/', function () use (&$n) {
-            $n++;
-        });
-        $r->dispatch('GET', '/');
+        router::make()
+            ->add('get', '/', function () use (&$n) {
+                $n++;
+            })
+            ->dispatch('GET', '/');
         $this->assertEquals($n, 1);
     }
 
@@ -22,26 +23,38 @@ class RouterTest extends TestCase
             $n++;
         });
         $r->dispatch('GET', '/api/');
-        $this->assertEquals($n, 1);
+        $r->dispatch('GET', '/api');
+        $this->assertEquals($n, 2);
     }
 
     function testArgs()
     {
-        $r = new router();
-        $n = 0;
         $arg = 0;
-        $r->add('get', '/', function () use (&$n) {
-            $n++;
-        })->add('get', '/x/{\d+}', function ($val) use (&$arg) {
-            $arg = $val;
-        });
-        $r->dispatch('GET', '/');
-        $r->dispatch('get', '/x/123');
-        $this->assertEquals($n, 1);
+        router::make()
+            ->add('get', '/x/{\w+}', function ($val) use (&$arg) {
+                $arg = $val;
+            })
+            ->dispatch('get', '/x/123');
         $this->assertEquals($arg, 123);
     }
 
-    function testR0()
+    function testPatterns()
+    {
+        $arg = 0;
+        $r = router::make()
+            ->add('get', '/x/abc{\d+}z', function ($val) use (&$arg) {
+                $arg = $val;
+            });
+        $r->dispatch('get', '/x/abc123z');
+        try {
+            $r->dispatch('get', '/x/abcabcz');
+            throw new Exception("should have thrown a RouteNotFound");
+        } catch (RouteNotFound $e) {
+            //
+        }
+    }
+
+    function testRegression1()
     {
         $r = router::make()
             ->add('get', '/api/{\d+}/test', function ($dict_id) {
@@ -53,7 +66,7 @@ class RouterTest extends TestCase
         $this->assertEquals($r->dispatch('GET', '/api/123/test'), 123);
     }
 
-    function testR1()
+    function testRegression2()
     {
         $r = router::make()
             ->add('post', '/api/{\d+}/add', function ($dict_id) {

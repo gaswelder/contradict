@@ -40,9 +40,8 @@ class router
         return $this;
     }
 
-    function dispatch(string $method, string $url)
+    function dispatch(string $method, string $path)
     {
-        $path = parse_url($url)['path'];
         $match = null;
         foreach ($this->routes as $pattern => $res) {
             $p = new router_pattern($pattern);
@@ -70,7 +69,8 @@ class router
 
     function run()
     {
-        return $this->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+        $path = parse_url($_SERVER['REQUEST_URI'])['path'];
+        return $this->dispatch($_SERVER['REQUEST_METHOD'], $path);
     }
 }
 
@@ -83,108 +83,73 @@ class router_pattern
     function __construct($pattern)
     {
         $this->pattern = $pattern;
-        $s = 1;
+        $specificity = 1;
         foreach (explode('/', trim($pattern, '/')) as $part) {
-            $expr = new expr($part);
-            $this->parts[] = $expr;
-            $s += 100 + $expr->specificity();
+            $p = self::parse_part($part);
+            $this->parts[] = $p;
+            $specificity += 100 + $p['specificity'];
         }
-        $this->specificity = $s;
+        $this->specificity = $specificity;
     }
 
     function match(string $url)
     {
-        $parts = array_map('urldecode', explode('/', trim($url, '/')));
-        if (count($parts) != count($this->parts)) {
+        $urlParts = array_map('urldecode', explode('/', trim($url, '/')));
+        if (count($urlParts) != count($this->parts)) {
             return [false, []];
         }
         // Every path part may produce 0, 1 or more matched params.
         // They are all collected in a single serial list.
         $allArgs = [];
-        foreach ($parts as $i => $part) {
-            [$ok, $params] = $this->parts[$i]->match($part);
-            if (!$ok) {
+        foreach ($urlParts as $i => $urlPart) {
+            $patternPart = $this->parts[$i];
+            $m = [];
+            if (!preg_match($patternPart['regexp'], $urlPart, $m)) {
                 return [false, []];
             }
-            $allArgs = array_merge($allArgs, $params);
+            $allArgs = array_merge($allArgs, array_slice($m, 1));
         }
         return [true, $allArgs];
     }
-}
 
-class expr
-{
-    private $s;
-    private $toks = [];
-
-    function __construct($s)
+    private static function parse_part($s)
     {
-        $this->s = $s;
-        while (strlen($this->s) > 0) {
-            $this->read();
+        $toks = [];
+        while (strlen($s) > 0) {
+            if ($s[0] == '{') {
+                $p = strpos($s, '}');
+                if ($p) {
+                    $tok = ['pat', substr($s, 1, $p - 1)];
+                    $s = substr($s, $p + 1);
+                    $toks[] = $tok;
+                    continue;
+                }
+            }
+            $p = strpos($s, '{');
+            if (!$p) {
+                $p = strlen($s);
+            }
+            $tok = ['lit', substr($s, 0, $p)];
+            $s = substr($s, $p);
+            $toks[] = $tok;
         }
-    }
 
-    function match(string $s)
-    {
-        $p = $this->toPCRE();
-        $m = [];
-        if (!preg_match($p, $s, $m)) {
-            return [false, []];
-        }
-        return [true, array_slice($m, 1)];
-    }
-
-    function specificity()
-    {
-        $s = 0;
-        foreach ($this->toks as $tok) {
-            if ($tok[0] == 'lit') $s += 10;
-            else $s += 1;
-        }
-        return $s;
-    }
-
-    function toPCRE()
-    {
-        $s = '';
-        foreach ($this->toks as $tok) {
+        $regexp = '/^';
+        foreach ($toks as $tok) {
             if ($tok[0] == 'lit') {
-                $s .= preg_quote($tok[1]);
+                $regexp .= preg_quote($tok[1]);
             } else {
-                $s .= "($tok[1])";
+                $regexp .= "($tok[1])";
             }
         }
+        $regexp .= '$/';
 
-        $delims = ['/', '@'];
-
-        foreach ($delims as $delim) {
-            if (strpos($s, $delim) === false) {
-                return $delim . '^' . $s . '$' . $delim;
-            }
+        $specificity = 0;
+        foreach ($toks as $tok) {
+            if ($tok[0] == 'lit') $specificity += 10;
+            else $specificity += 1;
         }
 
-        throw new \Exception("Couldn't find suitable delimiter for regular expression: $s");
-    }
-
-    private function read()
-    {
-        if ($this->s[0] == '{') {
-            $p = strpos($this->s, '}');
-            if ($p) {
-                $tok = ['pat', substr($this->s, 1, $p - 1)];
-                $this->s = substr($this->s, $p + 1);
-                $this->toks[] = $tok;
-                return;
-            }
-        }
-
-        $p = strpos($this->s, '{');
-        if (!$p) {
-            $p = strlen($this->s);
-        }
-        $tok = ['lit', substr($this->s, 0, $p)];
-        $this->s = substr($this->s, $p);
-        $this->toks[] = $tok;
+        return compact('regexp', 'specificity');
     }
 }
