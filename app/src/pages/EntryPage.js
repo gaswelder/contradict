@@ -30,12 +30,12 @@ const EntryPage = ({ match, api, history }) => {
       {(entry) => (
         <Form method="post" onSubmit={submit}>
           <div>
-            <label>Q</label>
+            <label>Word</label>
             <input name="q" defaultValue={entry.q} required />
           </div>
           <div>
-            <label>A</label>
-            <input name="a" defaultValue={entry.a} required />
+            <label>Explanation</label>
+            <textarea name="a" defaultValue={entry.a}></textarea>
           </div>
           <button disabled={saving}>Save</button>
         </Form>
