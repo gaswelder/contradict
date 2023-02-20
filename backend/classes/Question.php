@@ -13,23 +13,6 @@ class Question
 		$this->e = $e;
 	}
 
-	function hint()
-	{
-		$q = $this;
-		$entry = $q->e;
-		$sim = $q->dict->similars($entry, $q->reverse);
-		if (count($sim) == 0) {
-			return null;
-		}
-		$field = $q->reverse ? 'q' : 'a';
-		$values = [];
-		foreach ($sim as $entry) {
-			$values[] = $entry->$field;
-		}
-		$hint = h($q->e->$field, $values);
-		return preg_replace('/\*+/', '...', $hint);
-	}
-
 	/**
 	 * Returns true if the given answer is correct for this question.
 	 */

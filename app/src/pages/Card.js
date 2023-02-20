@@ -50,7 +50,6 @@ export const Card = ({ card, show, onShow }) => {
       )}
       <div>
         {card.q}
-        {card.hint && ` (${card.hint})`}
         {show && (
           <>
             <p>{card.a}</p>

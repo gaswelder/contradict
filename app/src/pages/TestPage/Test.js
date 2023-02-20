@@ -12,7 +12,7 @@ export function TestSection(props) {
           <label>
             {question.q} <small>({question.times})</small>
           </label>
-          <input name="a[]" autoComplete="off" placeholder={question.hint} />
+          <input name="a[]" autoComplete="off" />
         </div>
       ))}
     </section>

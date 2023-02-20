@@ -203,7 +203,6 @@ class Contradict
                 'times' => $entry->answers1,
                 'urls' => $dict->wikiURLs($entry->q),
                 'reverse' => false,
-                'hint' => $tuple->hint()
             ];
         }
         foreach ($pick2 as $i => $entry) {
@@ -215,7 +214,6 @@ class Contradict
                 'times' => $entry->answers2,
                 'urls' => $dict->wikiURLs($entry->q),
                 'reverse' => true,
-                'hint' => $tuple->hint()
             ];
         }
 

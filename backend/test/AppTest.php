@@ -148,7 +148,6 @@ class AppTest extends TestCase
                     'times' => 0,
                     'urls' => [],
                     'reverse' => false,
-                    'hint' => NULL,
                 ),
             ),
             'tuples2' =>
@@ -161,7 +160,6 @@ class AppTest extends TestCase
                     'times' => 0,
                     'urls' => [],
                     'reverse' => true,
-                    'hint' => NULL,
                 ),
             ),
         ));

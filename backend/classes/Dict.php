@@ -89,17 +89,4 @@ class Dict
         }
         return $entries;
     }
-
-    function similars(Entry $e, bool $reverse): array
-    {
-        $ee = $this->allEntries();
-        $sim = [];
-        foreach ($ee as $entry) {
-            if ($entry->id == $e->id) continue;
-            if ($reverse && $entry->a != $e->a) continue;
-            if (!$reverse && $entry->q != $e->q) continue;
-            $sim[] = $entry;
-        }
-        return $sim;
-    }
 }
