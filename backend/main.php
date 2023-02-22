@@ -15,25 +15,61 @@ class Unauthorized extends Exception
 {
 }
 
+class Auth
+{
+    static function login(string $name, string $password): string
+    {
+        if (strlen($name) == 0 && strlen($password) == 0) {
+            return '';
+        }
+        $userID = '';
+        if ($name == 'gas' && $password == '123') {
+            $userID = "04ba5320cd6c8888402047bc9e6bcf1584c4cd8a";
+        }
+        if (!$userID) {
+            return '';
+        }
+        $token = bin2hex(random_bytes(20));
+        $tokenPath = getDataDir() . "token-$token.json";
+        file_put_contents($tokenPath, json_encode(['userID' => $userID]));
+        return $token;
+    }
+
+    static function checkToken(string $token): string
+    {
+        if (preg_match('/[^\w]/', $token)) {
+            return '';
+        }
+        $tokenPath = getDataDir() . "token-$token.json";
+        if (!file_exists($tokenPath)) {
+            return '';
+        }
+        $data = json_decode(file_get_contents($tokenPath), true);
+        return $data['userID'];
+    }
+}
+
+function getDataDir()
+{
+    return getenv("DATABASE_DIR") ?? __DIR__ . "/../";
+}
+
 function getThe()
 {
-    $auth = new CookieAuth(getenv('COOKIE_KEY'));
+    $dir = getDataDir();
     $token = $_COOKIE['token'] ?? '';
-    $userID = $auth->checkToken($token);
+    $userID = Auth::checkToken($token);
     if (!$userID) {
         throw new Unauthorized;
     }
-    $dir = getenv("DATABASE_DIR") ?? __DIR__ . "/../";
-    $dataPath = $dir . "$userID.json.gz";
-    return new Contradict($dataPath);
+    return new Contradict($dir . "$userID.json.gz");
 }
 
 $router = router::make()
     ->add('post', '/api/login', function () {
         $name = request::post('login');
         $password = request::post('password');
-        $auth = new CookieAuth(getenv('COOKIE_KEY'));
-        $token = $auth->login($name, $password);
+        $token = Auth::login($name, $password);
         if ($token) {
             setcookie('token', $token, time() + 3600 * 24);
             return response::make(201);
