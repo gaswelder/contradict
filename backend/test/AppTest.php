@@ -102,8 +102,8 @@ class AppTest extends TestCase
         $app = $this->app();
 
         // action: touch two entries
-        $app->markTouch('1', 0, true);
-        $app->markTouch('2', 1, false);
+        $app->markTouch('1', '1', 0, true);
+        $app->markTouch('1', '2', 1, false);
 
         // post: counters updated correctly
         $e1 = $app->getEntry('1');

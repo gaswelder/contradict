@@ -16,13 +16,13 @@ const shuffle = (xs) =>
 
 export const RepetitionsPage = withRouter(
   withAPI(({ api, match, busy }) => {
-    const dictId = match.params.id;
+    const dictID = match.params.id;
     const [cards, setCards] = useState([]);
     const [show, setShow] = useState(false);
     const [yes, setYes] = useState(false);
 
     const nextBatch = async () => {
-      const r = await api.test(dictId);
+      const r = await api.test(dictID);
       setCards(
         shuffle([...r.tuples1, ...r.tuples2.slice(0, r.tuples2.legth / 3)])
       );
@@ -56,7 +56,7 @@ export const RepetitionsPage = withRouter(
               return;
             }
             setShow(true);
-            api.touchCard(card.id, card.reverse, false);
+            api.touchCard(dictID, card.id, card.reverse, false);
           }}
         />
         {show && (
@@ -65,8 +65,8 @@ export const RepetitionsPage = withRouter(
               <>
                 <button
                   onClick={() => {
-                    api.touchCard(card.id, card.reverse, false);
-                    api.touchCard(card.id, card.reverse, false);
+                    api.touchCard(dictID, card.id, card.reverse, false);
+                    api.touchCard(dictID, card.id, card.reverse, false);
                     next();
                   }}
                 >
@@ -82,7 +82,7 @@ export const RepetitionsPage = withRouter(
             <button
               disabled={busy}
               onClick={() => {
-                api.touchCard(card.id, card.reverse, true);
+                api.touchCard(dictID, card.id, card.reverse, true);
                 setShow(true);
                 setYes(true);
               }}
@@ -91,7 +91,7 @@ export const RepetitionsPage = withRouter(
             </button>{" "}
             <button
               onClick={async () => {
-                api.touchCard(card.id, card.reverse, false);
+                api.touchCard(dictID, card.id, card.reverse, false);
                 setShow(true);
               }}
             >

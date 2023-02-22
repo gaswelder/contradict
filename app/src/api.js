@@ -112,5 +112,6 @@ export default {
 
   dump: () => getJSON("/export"),
   load: (data) => postJSON("/export", data),
-  touchCard: (id, dir, success) => postJSON(`/touches/${id}`, { dir, success }),
+  touchCard: (dictID, entryID, dir, success) =>
+    postJSON(`/touch/${dictID}/${entryID}`, { dir, success }),
 };

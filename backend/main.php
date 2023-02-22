@@ -81,9 +81,9 @@ $router = router::make()
         getThe()->updateEntry($id, request::post('q'), request::post('a'));
         return response::make('ok');
     })
-    ->add('post', '/api/touches/{\w+}', function ($id) {
+    ->add('post', '/api/touch/{\w+}/{\w+}', function ($dictID, $entryID) {
         $body = request::json();
-        getThe()->markTouch($id, $body['dir'], $body['success']);
+        getThe()->markTouch($dictID, $entryID, $body['dir'], $body['success']);
         return response::make('ok');
     })
     ->add('get', '/', function () {

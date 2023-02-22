@@ -291,11 +291,10 @@ class Contradict
         return compact('added', 'skipped', 'ids');
     }
 
-    function markTouch($id, $dir, $success)
+    function markTouch(string $dictID, string $entryID, $dir, $success)
     {
-        $dictID = $this->_getEntryDict($id);
         $reverse = $dir == 1;
-        $e = $this->_getentry($dictID, $id);
+        $e = $this->_getentry($dictID, $entryID);
         $new = function ($v) use ($success) {
             if ($success) {
                 return $v + 1;
@@ -311,7 +310,7 @@ class Contradict
         } else {
             $upd['answers1'] = $new($e->answers1);
         }
-        $this->begin()->updateEntry($dictID, $id, $upd)->commit();
+        $this->begin()->updateEntry($dictID, $entryID, $upd)->commit();
     }
 
     private function hasEntry($dictId, $q, $a): bool
