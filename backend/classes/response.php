@@ -1,5 +1,7 @@
 <?php
 
+use gaswelder\request;
+
 class response
 {
 	const STATUS_OK = 200;
@@ -39,6 +41,105 @@ class response
 	);
 
 	/**
+	 * Returns a status response with generic content.
+	 */
+	static function status(int $code)
+	{
+		$r = new self();
+		$r->setStatus($code);
+		$r->setContent('text/plain', self::$codes[$code] ?? $code);
+		return $r;
+	}
+
+	/**
+	 * Creates a response with JSON content.
+	 *
+	 * @param mixed $data JSON-encodable data
+	 * @return self
+	 */
+	static function json($data)
+	{
+		$r = new self();
+		$r->setContent('application/json;charset=utf-8', json_encode($data));
+		return $r;
+	}
+
+	/**
+	 * Creates a redirection response.
+	 *
+	 * @param string $url
+	 * @param int $code
+	 * @return self
+	 */
+	static function redirect(string $url, int $code = 302)
+	{
+		$r = new self();
+		$r->setHeader('Location', $url);
+		$r->setStatus($code);
+		return $r;
+	}
+
+	/**
+	 * Returns response that serves static file from the given filesystem path.
+	 *
+	 * @param string $type MIME type
+	 * @param string $path Path to the file
+	 * @return self
+	 */
+	static function staticFile(string $type, string $path)
+	{
+		$etag = md5_file($path);
+		$r = new self();
+		$r->setHeader('Content-Length', filesize($path));
+		$r->setHeader('ETag', $etag);
+
+		if (self::cacheValid($path, $etag)) {
+			$r->setStatus(self::STATUS_NOT_MODIFIED);
+			return $r;
+		}
+		$r->setContent($type, fopen($path, 'rb'));
+		return $r;
+	}
+
+	private static function cacheValid($path, $etag)
+	{
+		$sum = request::header('If-None-Match');
+		$date = request::header('If-Modified-Since');
+		if (!$sum && !$date) {
+			return false;
+		}
+		if ($sum) {
+			$sums = array_map('trim', explode(',', $sum));
+			if (!in_array($etag, $sums)) {
+				return false;
+			}
+		}
+		if ($date) {
+			$t = strtotime($date);
+			if (filemtime($path) > $t) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Creates a download response.
+	 *
+	 * @param string $name File name for the user agent.
+	 * @param string $type MIME type of the file. If omitted, will be inferred from the file name.
+	 * @param mixed $content
+	 * @return self
+	 */
+	static function download(string $type, string $filename, $content)
+	{
+		$r = new self();
+		$r->setHeader('Content-Disposition', 'attachment;filename="' . urlencode($filename) . '"');
+		$r->setContent($type, $content);
+		return $r;
+	}
+
+	/**
 	 * Sets the response's status.
 	 *
 	 * @param int $code HTTP status code
@@ -72,8 +173,9 @@ class response
 	 * @param string|resource $content
 	 * @return self
 	 */
-	function setContent($content)
+	function setContent(string $type, $content)
 	{
+		$this->setHeader('Content-Type', $type);
 		$this->content = $content;
 		return $this;
 	}
@@ -82,153 +184,22 @@ class response
 	{
 		$code = $this->status;
 		$str = self::$codes[$code];
-
 		header("$_SERVER[SERVER_PROTOCOL] $code $str");
 		foreach ($this->headers as $name => $value) {
 			header("$name: $value");
 		}
-
 		if ($this->content === null) {
 			return;
 		}
-
 		if (is_resource($this->content)) {
 			fpassthru($this->content);
 			fclose($this->content);
 			return;
 		}
-
 		if (is_string($this->content)) {
 			echo $this->content;
 			return;
 		}
-
 		throw new Exception('Unknown type of content: ' . gettype($this->content));
-	}
-
-	/**
-	 * Creates a response with JSON content.
-	 *
-	 * @param mixed $data JSON-encodable data
-	 * @return self
-	 */
-	static function json($data)
-	{
-		$r = new self();
-		$r->setContent(json_encode($data));
-		$r->setHeader('Content-Type', 'application/json; charset=utf-8');
-		return $r;
-	}
-
-	/**
-	 * Create a redirection response.
-	 *
-	 * @param string $url
-	 * @param int $code
-	 * @return self
-	 */
-	static function redirect($url, $code = 302)
-	{
-		$r = new self();
-		$r->setHeader('Location', $url);
-		$r->setStatus($code);
-		return $r;
-	}
-
-	/**
-	 * Returns response that serves static file from the given filesystem path.
-	 *
-	 * @param string $type MIME type
-	 * @param string $path Path to the file
-	 * @return self
-	 */
-	static function staticFile($type, $path)
-	{
-		$etag = md5_file($path);
-		$r = new self();
-		$r->setHeader('Content-Length', filesize($path));
-		$r->setHeader('ETag', $etag);
-		$r->setHeader('Content-Type', $type);
-
-		if (self::cacheValid($path, $etag)) {
-			$r->setStatus(self::STATUS_NOT_MODIFIED);
-			return $r;
-		}
-
-		$r->setContent(fopen($path, 'rb'));
-		return $r;
-	}
-
-	private static function cacheValid($path, $etag)
-	{
-		$sum = request::header('If-None-Match');
-		$date = request::header('If-Modified-Since');
-		if (!$sum && !$date) {
-			return false;
-		}
-
-		if ($sum) {
-			$sums = array_map('trim', explode(',', $sum));
-			if (!in_array($etag, $sums)) {
-				return false;
-			}
-		}
-
-		if ($date) {
-			$t = strtotime($date);
-			if (filemtime($path) > $t) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Adds headers making the response download as a file.
-	 *
-	 * @param string $name File name for the user agent.
-	 * @param string $type MIME type of the file. If omitted, will be inferred from the file name.
-	 * @return self
-	 */
-	function downloadAs($name, $type)
-	{
-		$s = 'attachment;filename="' . $name . '"';
-		$this->setHeader('Content-Disposition', $s);
-		$this->setHeader('Content-Type', $type);
-		return $this;
-	}
-
-	/**
-	 * Converts loose return value to a response object.
-	 *
-	 * @param mixed $val Value to return to the client
-	 * @return self
-	 */
-	static function make($val)
-	{
-		if ($val instanceof response) {
-			return $val;
-		}
-		if (is_array($val)) {
-			return self::json($val);
-		}
-		$r = new response();
-		if ($val === null) {
-			return $r;
-		}
-
-		// If an HTTP code is returned from the handler,
-		// return a generic text response.
-		if (is_int($val) && isset(self::$codes[$val])) {
-			$r->setStatus($val);
-			$r->setContent(self::$codes[$val]);
-			return $r;
-		}
-		if (is_string($val) || is_resource($val)) {
-			$r->setContent($val);
-			return $r;
-		}
-
-		throw new Exception("Unknown response value type: " . gettype($val));
 	}
 }

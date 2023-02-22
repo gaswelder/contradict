@@ -68,21 +68,21 @@ $router = router::make()
         $token = Auth::login($name, $password);
         if ($token) {
             setcookie('token', $token, time() + 3600 * 24);
-            return response::make(201);
+            return response::status(201);
         } else {
-            return response::make('Invalid login/password')->setStatus(403);
+            return response::status(403)->setContent('text/plain', 'Invalid login/password');
         }
     })
     ->add('post', '/api/logout', function () {
         setcookie('token', '');
-        return response::make(200);
+        return response::status(200);
     })
     ->add('get', '/api/', function () {
         return response::json(getThe()->getDicts());
     })
     ->add('post', '/api/{\w+}', function ($dict_id) {
         getThe()->updateDict($dict_id, request::json());
-        return response::make(200);
+        return response::status(200);
     })
     ->add('post', '/api/{\w+}/add', function ($dict_id) {
         return response::json(getThe()->appendWords($dict_id, request::json()['entries']));
@@ -111,15 +111,15 @@ $router = router::make()
     })
     ->add('post', '/api/entries/{\w+}', function ($id) {
         getThe()->updateEntry($id, request::post('q'), request::post('a'));
-        return response::make('ok');
+        return response::status(200);
     })
     ->add('post', '/api/touch/{\w+}/{\w+}', function ($dictID, $entryID) {
         $body = request::json();
         getThe()->markTouch($dictID, $entryID, $body['dir'], $body['success']);
-        return response::make('ok');
+        return response::status(200);
     })
     ->add('get', '/', function () {
-        return response::make(file_get_contents(__DIR__ . '/../public/index.html'));
+        return response::staticFile('text/html', __DIR__ . '/../public/index.html');
     });
 
 
@@ -146,13 +146,13 @@ try {
     }
 } catch (RouteNotFound $e) {
     error_log("route not found: " . request::url());
-    send(response::make(404)->setContent("route not found: " . request::url()));
+    send(response::status(404)->setContent('text/html', "route not found: " . request::url()));
 } catch (Unauthorized $e) {
     error_log("unauthorized");
-    send(response::make(response::STATUS_UNAUTHORIZED));
+    send(response::status(response::STATUS_UNAUTHORIZED));
 } catch (Exception $e) {
     error_log(get_class($e) . ': ' . $e->getMessage());
-    send(response::make(500));
+    send(response::status(500));
 }
 
 
