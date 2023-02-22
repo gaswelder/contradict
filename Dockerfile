@@ -9,4 +9,5 @@ FROM base
 COPY . /usr/src/myapp
 WORKDIR /usr/src/myapp
 RUN composer update; yarn; NODE_OPTIONS=--no-experimental-fetch yarn build
+ENV DATABASE_DIR /usr/src/myapp/data-mounted/
 CMD [ "php", "-S", "0:8081", "-t", "public" ]
