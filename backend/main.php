@@ -19,16 +19,12 @@ class Auth
 {
     static function login(string $name, string $password): string
     {
-        if (strlen($name) == 0 && strlen($password) == 0) {
+        $db = json_decode(file_get_contents(getDataDir() . 'users.json'), true);
+        $rec = $db[$name] ?? null;
+        if (!$rec || !password_verify($password, $rec['hash'])) {
             return '';
         }
-        $userID = '';
-        if ($name == 'gas' && $password == '123') {
-            $userID = "04ba5320cd6c8888402047bc9e6bcf1584c4cd8a";
-        }
-        if (!$userID) {
-            return '';
-        }
+        $userID = $rec['id'];
         $token = bin2hex(random_bytes(20));
         $tokenPath = getDataDir() . "token-$token.json";
         file_put_contents($tokenPath, json_encode(['userID' => $userID]));
