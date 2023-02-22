@@ -1,3 +1,7 @@
+.git
 .parcel-cache
+data
+dist
 node_modules
+public
 vendor

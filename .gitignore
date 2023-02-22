@@ -1,11 +1,9 @@
-_/
-vendor/
-*.sqlite
-.env
-/public
 .parcel-cache
-node_modules
-dist
-*.json
 data/
+dist/
+node_modules/
+/public
+vendor/
 testdata*
+.env
+*.json
