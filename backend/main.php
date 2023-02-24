@@ -145,8 +145,12 @@ try {
         throw $e;
     }
 } catch (RouteNotFound $e) {
-    error_log("route not found: " . request::url());
-    send(response::status(404)->setContent('text/html', "route not found: " . request::url()));
+    if (request::method() == "GET") {
+        send(response::staticFile('text/html', __DIR__ . '/../public/index.html'));
+    } else {
+        error_log("route not found: " . request::url());
+        send(response::status(404)->setContent('text/html', "route not found: " . request::url()));
+    }
 } catch (Unauthorized $e) {
     error_log("unauthorized");
     send(response::status(response::STATUS_UNAUTHORIZED));
