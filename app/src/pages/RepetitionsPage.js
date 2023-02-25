@@ -61,6 +61,7 @@ export const RepetitionsPage = withRouter(
         />
         {show && (
           <>
+            <button onClick={next}>Next</button>{" "}
             {yes && (
               <>
                 <button
@@ -71,10 +72,9 @@ export const RepetitionsPage = withRouter(
                   }}
                 >
                   Oops, wrong guess
-                </button>{" "}
+                </button>
               </>
             )}
-            <button onClick={next}>Next</button>
           </>
         )}
         {!show && (
