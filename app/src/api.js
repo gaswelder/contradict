@@ -97,13 +97,9 @@ export default {
     return post(`/${dictID}/test`, entries).then((r) => r.json());
   },
 
-  entry(id) {
-    return getJSON(`/entries/${id}`);
-  },
-
-  updateEntry(id, entry) {
-    return post(`/entries/${id}`, { q: entry.q, a: entry.a });
-  },
+  entry: (dictID, id) => getJSON(`/entries/${dictID}/${id}`),
+  updateEntry: (dictID, id, entry) =>
+    post(`/entries/${dictID}/${id}`, { q: entry.q, a: entry.a }),
 
   addEntries: (dictID, entries) =>
     postJSON(`/${dictID}/add`, {

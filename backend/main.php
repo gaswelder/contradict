@@ -94,8 +94,8 @@ $router = router::make()
         $results = getThe()->submitTest($dict_id, request::post('dir'), request::post('q'), request::post('a'));
         return response::json($results);
     })
-    ->add('get', '/api/entries/{\w+}', function ($id) {
-        $e = getThe()->getEntry($id);
+    ->add('get', '/api/entries/{\w+}/{\w+}', function ($dictID, $id) {
+        $e = getThe()->getEntry($dictID, $id);
         if (!$e) {
             return response::json(null);
         }
@@ -109,8 +109,8 @@ $router = router::make()
             'touched' => $e->touched ? 1 : 0,
         ]]);
     })
-    ->add('post', '/api/entries/{\w+}', function ($id) {
-        getThe()->updateEntry($id, request::post('q'), request::post('a'));
+    ->add('post', '/api/entries/{\w+}/{\w+}', function ($dictID, $id) {
+        getThe()->updateEntry($dictID, $id, request::post('q'), request::post('a'));
         return response::status(200);
     })
     ->add('post', '/api/touch/{\w+}/{\w+}', function ($dictID, $entryID) {

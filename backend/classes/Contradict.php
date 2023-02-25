@@ -123,15 +123,13 @@ class Contradict
         return $list;
     }
 
-    function getEntry(string $id)
+    function getEntry(string $dictID, string $id)
     {
-        $dictID = $this->_getEntryDict($id);
         return $this->_getentry($dictID, $id);
     }
 
-    function updateEntry(string $id, string $q, string $a)
+    function updateEntry(string $dictID, string $id, string $q, string $a)
     {
-        $dictID = $this->_getEntryDict($id);
         $this->begin()->updateEntry($dictID, $id, compact('q', 'a'))->commit();
     }
 
@@ -339,16 +337,6 @@ class Contradict
     private function _getDict(string $id): Dict
     {
         return Dict::parse($this->data['dicts'][$id]);
-    }
-
-    private function _getEntryDict($entryID)
-    {
-        foreach ($this->data['dicts'] as $dictID => $drow) {
-            if (array_key_exists($entryID, $drow['words'])) {
-                return $dictID;
-            }
-        }
-        return null;
     }
 
     private function _getEntries($dictId)

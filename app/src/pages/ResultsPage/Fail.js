@@ -1,6 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { ROOT_PATH } from "../../api";
 
 export function Fail(props) {
   const { question, answer } = props;
@@ -12,7 +10,6 @@ export function Fail(props) {
         <br />
         <span className="strike">{answer}</span>
       </p>
-      <Link to={`${ROOT_PATH}entries/${question.id}`}>Edit</Link>{" "}
       {question.urls.map((url) => (
         <a key={url} href={url} target="_blank" rel="noopener noreferrer">
           {url}

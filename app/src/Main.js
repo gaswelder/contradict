@@ -1,7 +1,6 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import AddEntriesPage from "./pages/AddEntriesPage";
-import EntryPage from "./pages/EntryPage";
 import LoginPage from "./pages/LoginPage";
 import MenuPage from "./pages/MenuPage";
 import TestPage from "./pages/TestPage/TestPage";
@@ -36,7 +35,6 @@ class Main extends React.Component {
           <Route path={`${R}:id/results`} component={page(ResultsPage)} />
           <Route path={`${R}:id/add`} component={page(AddEntriesPage)} />
           <Route path={`${R}dicts/:id`} component={page(DictPage)} />
-          <Route path={`${R}entries/:id`} component={page(EntryPage)} />
           <Route path={`${R}login`} component={page(LoginPage, false)} />
           <Route path={`${R}export`} component={page(Export)} />
           <Route component={page(() => "Not Found")} />
