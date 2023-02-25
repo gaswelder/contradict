@@ -70,12 +70,12 @@ class Contradict
             $finished = 0;
             $touched = 0;
             foreach ($entries as $e) {
-                $isfinished = $e->answers1 >= self::GOAL && $e->answers2 >= self::GOAL;
+                $isfinished = $e['answers1'] >= self::GOAL && $e['answers2'] >= self::GOAL;
                 if ($isfinished) {
                     $finished++;
                     continue;
                 }
-                if ($e->touched) {
+                if ($e['touched']) {
                     $touched++;
                 }
             }
@@ -117,7 +117,7 @@ class Contradict
         $list = [];
         foreach ($this->_getEntries($dictID) as $e) {
             $list[] = [
-                'id' => $e->id
+                'id' => $e['id']
             ];
         }
         return $list;
@@ -146,29 +146,27 @@ class Contradict
         ];
         foreach ($pick1 as $i => $entry) {
             $f['tuples1'][$i] = [
-                'id' => $entry->id,
-                'q' => $entry->q,
-                'a' => $entry->a,
-                'times' => $entry->answers1,
-                'urls' => $this->wikiURLs($dict_id, $entry->q),
+                'id' => $entry['id'],
+                'q' => $entry['q'],
+                'a' => $entry['a'],
+                'times' => $entry['answers1'],
+                'urls' => $this->wikiURLs($dict_id, $entry['q']),
                 'reverse' => false,
             ];
         }
         foreach ($pick2 as $i => $entry) {
             $f['tuples2'][$i] = [
-                'id' => $entry->id,
-                'q' => $entry->a,
-                'a' => $entry->q,
-                'times' => $entry->answers2,
-                'urls' => $this->wikiURLs($dict_id, $entry->q),
+                'id' => $entry['id'],
+                'q' => $entry['a'],
+                'a' => $entry['q'],
+                'times' => $entry['answers2'],
+                'urls' => $this->wikiURLs($dict_id, $entry['q']),
                 'reverse' => true,
             ];
         }
         // Mark the entries as touched.
         foreach (array_merge($pick1, $pick2) as $e) {
-            if (!$e->touched) {
-                $writer->updateEntry($dict_id, $e->id, ['touched' => 1]);
-            }
+            $writer->updateEntry($dict_id, $e['id'], ['touched' => $e['touched'] + 1]);
         }
         $writer->commit();
         return $f;
@@ -178,16 +176,16 @@ class Contradict
     {
         $unfinished = [];
         foreach ($entries as $e) {
-            if ($dir == 0 && $e->answers1 >= self::GOAL) {
+            if ($dir == 0 && $e['answers1'] >= self::GOAL) {
                 continue;
             }
-            if ($dir == 1 && $e->answers2 >= self::GOAL) {
+            if ($dir == 1 && $e['answers2'] >= self::GOAL) {
                 continue;
             }
             $unfinished[] = $e;
         }
         usort($unfinished, function ($a, $b) {
-            return $b->touched <=> $a->touched;
+            return $b['touched'] <=> $a['touched'];
         });
         $unfinished = array_slice($unfinished, 0, self::WINDOW);
         shuffle($unfinished);
@@ -218,11 +216,11 @@ class Contradict
                 // Update correct answer counters
                 // For all questions that are correct, increment the corresponding counter (dir 0/1) and save.
                 if ($reverse) {
-                    $writer->updateEntry($dict_id, $entryID, ['answers2' => $entry->answers2 + 1]);
-                    $entry->answers2++;
+                    $writer->updateEntry($dict_id, $entryID, ['answers2' => $entry['answers2'] + 1]);
+                    $entry['answers2']++;
                 } else {
-                    $writer->updateEntry($dict_id, $entryID, ['answers1' => $entry->answers1 + 1]);
-                    $entry->answers1++;
+                    $writer->updateEntry($dict_id, $entryID, ['answers1' => $entry['answers1'] + 1]);
+                    $entry['answers1']++;
                 }
             } else {
                 $wrong++;
@@ -233,7 +231,7 @@ class Contradict
                     'id' => $entryID,
                     'q' => $reverse ? $entryRow['a'] : $entryRow['q'],
                     'a' => $reverse ? $entryRow['q'] : $entryRow['a'],
-                    'times' => $reverse ? $entry->answers2 : $entry->answers1,
+                    'times' => $reverse ? $entry['answers2'] : $entry['answers1'],
                     'urls' => $this->wikiURLs($dict_id, $entryRow['q']),
                     'dir' => $reverse ? 1 : 0
                 ],
@@ -304,9 +302,9 @@ class Contradict
             'touched' => true,
         ];
         if ($reverse) {
-            $upd['answers2'] = $new($e->answers2);
+            $upd['answers2'] = $new($e['answers2']);
         } else {
-            $upd['answers1'] = $new($e->answers1);
+            $upd['answers1'] = $new($e['answers1']);
         }
         $this->begin()->updateEntry($dictID, $entryID, $upd)->commit();
     }
@@ -314,7 +312,7 @@ class Contradict
     private function hasEntry($dictId, $q, $a): bool
     {
         foreach ($this->_getEntries($dictId) as $entry) {
-            if ($entry->q == $q && $entry->a == $a) {
+            if ($entry['q'] == $q && $entry['a'] == $a) {
                 return true;
             }
         }
@@ -343,32 +341,26 @@ class Contradict
     {
         $entries = [];
         foreach ($this->data['dicts'][$dictId]['words'] as $row) {
-            $e = new Entry;
-            $e->id = $row['id'];
-            $e->q = $row['q'];
-            $e->a = $row['a'];
-            $e->answers1 = intval($row['answers1']);
-            $e->answers2 = intval($row['answers2']);
-            $e->touched = !!$row['touched'];
-            $entries[] = $e;
+            $entries[] = self::_parseEntry($row);
         }
         return $entries;
     }
 
-    private function _getentry(string $dict_id, string $id): ?Entry
+    private function _getentry(string $dict_id, string $id)
     {
         $row = $this->data['dicts'][$dict_id]['words'][$id] ?? null;
         if (!$row) {
             return null;
         }
-        $e = new Entry;
-        $e->id = $row['id'];
-        $e->q = $row['q'];
-        $e->a = $row['a'];
-        $e->answers1 = intval($row['answers1']);
-        $e->answers2 = intval($row['answers2']);
-        $e->touched = !!$row['touched'];
-        return $e;
+        return self::_parseEntry($row);
+    }
+
+    private static function _parseEntry($row)
+    {
+        $row['answers1'] = intval($row['answers1']);
+        $row['answers2'] = intval($row['answers2']);
+        $row['touched'] = intval($row['touched']);
+        return $row;
     }
 }
 

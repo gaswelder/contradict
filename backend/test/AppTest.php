@@ -92,8 +92,8 @@ class AppTest extends TestCase
 
         // post: entry updated
         $e = $app->getEntry('1', '2');
-        $this->assertEquals('qqq', $e->q);
-        $this->assertEquals('aaa', $e->a);
+        $this->assertEquals('qqq', $e['q']);
+        $this->assertEquals('aaa', $e['a']);
     }
 
     function testTouch()
@@ -108,10 +108,10 @@ class AppTest extends TestCase
         // post: counters updated correctly
         $e1 = $app->getEntry('1', '1');
         $e2 = $app->getEntry('1', '2');
-        $this->assertEquals($e1->touched, true);
-        $this->assertEquals($e1->answers1, 2);
-        $this->assertEquals($e2->touched, true);
-        $this->assertEquals($e2->answers2, 3);
+        $this->assertEquals($e1['touched'], true);
+        $this->assertEquals($e1['answers1'], 2);
+        $this->assertEquals($e2['touched'], true);
+        $this->assertEquals($e2['answers2'], 3);
     }
 
     function testGetEntry()
@@ -123,7 +123,7 @@ class AppTest extends TestCase
         $e = $app->getEntry('1', '2');
 
         // post: success
-        $this->assertEquals('2', $e->id);
+        $this->assertEquals('2', $e['id']);
     }
 
     function testGenerate()
