@@ -58,6 +58,10 @@ export const RepetitionsPage = withRouter(
             setShow(true);
             api.touchCard(dictID, card.id, card.reverse, false);
           }}
+          onChange={(newContent) => {
+            api.updateEntry(card.id, { q: card.q, a: newContent });
+            setCards([{ ...card, a: newContent }, ...cards.slice(1)]);
+          }}
         />
         {show && (
           <>

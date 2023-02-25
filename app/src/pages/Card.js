@@ -1,10 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { ROOT_PATH } from "../api";
+import { Editable } from "./Editable";
 
 const CardDiv = styled.div`
-  padding: 40px;
+  padding: 20px;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   max-width: 20em;
@@ -14,6 +13,7 @@ const CardDiv = styled.div`
   position: relative;
   min-height: 6em;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   & .corner {
@@ -23,12 +23,12 @@ const CardDiv = styled.div`
     top: 10px;
     font-size: 90%;
   }
-  & .left-corner {
-    position: absolute;
-    opacity: 0.7;
-    left: 10px;
-    top: 10px;
-    font-size: 90%;
+  & li {
+    font-size: 10pt;
+    display: inline-block;
+  }
+  & li + li {
+    margin-left: 0.5em;
   }
 `;
 
@@ -39,32 +39,25 @@ const urlTitle = (url) => {
     .join(".");
 };
 
-export const Card = ({ card, show, onShow }) => {
+export const Card = ({ card, show, onShow, onChange }) => {
   return (
     <CardDiv reverse={card.reverse} onClick={onShow}>
       <div className="corner">{card.times}</div>
+      <p>{card.q}</p>
       {show && (
-        <div className="left-corner">
-          <Link to={`${ROOT_PATH}entries/${card.id}`}>Edit</Link>
-        </div>
+        <>
+          <Editable content={card.a} onChange={onChange} />
+          <ul>
+            {card.urls.map((url) => (
+              <li key={url}>
+                <a target="_blank" rel="noreferrer" href={url}>
+                  {urlTitle(url)}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
-      <div>
-        {card.q}
-        {show && (
-          <>
-            <p>{card.a}</p>
-            <ul>
-              {card.urls.map((url) => (
-                <li key={url}>
-                  <a target="_blank" rel="noreferrer" href={url}>
-                    {urlTitle(url)}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </div>
     </CardDiv>
   );
 };
