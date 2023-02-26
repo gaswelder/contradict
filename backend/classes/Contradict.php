@@ -135,7 +135,6 @@ class Contradict
 
     function generateTest(string $dict_id)
     {
-        $writer = $this->begin();
         $size = 20;
         $entries = $this->_getEntries($dict_id);
         $pick1 = $this->pick($entries, $size, 0);
@@ -149,7 +148,7 @@ class Contradict
                 'id' => $entry['id'],
                 'q' => $entry['q'],
                 'a' => $entry['a'],
-                'times' => $entry['answers1'],
+                'times' => $entry['touched'],
                 'urls' => $this->wikiURLs($dict_id, $entry['q']),
                 'reverse' => false,
             ];
@@ -159,14 +158,22 @@ class Contradict
                 'id' => $entry['id'],
                 'q' => $entry['a'],
                 'a' => $entry['q'],
-                'times' => $entry['answers2'],
+                'times' => $entry['touched'],
                 'urls' => $this->wikiURLs($dict_id, $entry['q']),
                 'reverse' => true,
             ];
         }
         // Mark the entries as touched.
+        // mark all as touched
+        $writer = $this->begin();
+        $marked = [];
         foreach (array_merge($pick1, $pick2) as $e) {
-            $writer->updateEntry($dict_id, $e['id'], ['touched' => $e['touched'] + 1]);
+            $id = $e['id'];
+            if (array_key_exists($id, $marked)) {
+                continue;
+            }
+            $marked[$id] = true;
+            $writer->updateEntry($dict_id, $id, ['touched' => $e['touched'] + 1]);
         }
         $writer->commit();
         return $f;
@@ -174,23 +181,33 @@ class Contradict
 
     private function pick(array $entries, int $size, $dir): array
     {
-        $unfinished = [];
-        foreach ($entries as $e) {
-            if ($dir == 0 && $e['answers1'] >= self::GOAL) {
-                continue;
-            }
-            if ($dir == 1 && $e['answers2'] >= self::GOAL) {
-                continue;
-            }
-            $unfinished[] = $e;
-        }
-        usort($unfinished, function ($a, $b) {
-            return $b['touched'] <=> $a['touched'];
+        // Remove entries that have already been finished.
+        $entries = array_filter($entries, function ($e) use ($dir) {
+            $score = $dir == 0 ? $e['answers1'] : $e['answers2'];
+            return $score < self::GOAL;
         });
-        $unfinished = array_slice($unfinished, 0, self::WINDOW);
-        shuffle($unfinished);
-        $entries = array_slice($unfinished, 0, $size);
-        return $entries;
+
+        // Get N least recently touched.
+        $r = array_filter($entries, function ($e) {
+            return $e['touched'] > 0;
+        });
+        usort($r, function ($a, $b) {
+            return $a['touched'] <=> $b['touched'];
+        });
+        $r = array_slice($r, $size);
+
+        // If total is less than N, add random untouched.
+        $n = $size - count($r);
+        if ($n > 0) {
+            $untouched = array_filter($entries, function ($e) {
+                return !$e['touched'];
+            });
+            $r = array_merge($r, array_slice($untouched, 0, $n));
+        }
+
+        // shuffle just because why not
+        shuffle($r);
+        return $r;
     }
 
     function submitTest(string $dict_id, array $directions, array $ids, array $aa): array
