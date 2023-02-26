@@ -14,6 +14,19 @@ const shuffle = (xs) =>
     .sort((a, b) => a[0] - b[0])
     .map((x) => x[1]);
 
+const ClipDiv = styled.div`
+  margin-top: 1em;
+  & span {
+    display: inline-block;
+    border: thin solid #cce;
+    border-radius: 2px;
+    padding: 4px;
+    font-size: 8pt;
+    line-height: 8px;
+    margin: 2px;
+  }
+`;
+
 export const RepetitionsPage = withRouter(
   withAPI(({ api, match, busy }) => {
     const dictID = match.params.id;
@@ -48,6 +61,11 @@ export const RepetitionsPage = withRouter(
     }
     return (
       <ContainerDiv>
+        <ClipDiv>
+          {cards.map((card) => (
+            <span key={card.id}> {card.score} </span>
+          ))}
+        </ClipDiv>
         <Card
           card={card}
           show={show}
