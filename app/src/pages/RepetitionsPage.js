@@ -75,8 +75,7 @@ export const RepetitionsPage = withRouter(
                   }}
                 >
                   Oops, wrong guess
-                </button>
-                <br />
+                </button>{" "}
               </>
             )}
             <button onClick={next}>Next</button>
@@ -91,8 +90,7 @@ export const RepetitionsPage = withRouter(
               }}
             >
               No, forgot it
-            </button>
-            <br />
+            </button>{" "}
             <button
               disabled={busy}
               onClick={() => {
