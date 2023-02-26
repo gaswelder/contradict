@@ -316,9 +316,7 @@ class Contradict
                 return max($v - 1, 0);
             }
         };
-        $upd = [
-            'touched' => true,
-        ];
+        $upd = [];
         if ($reverse) {
             $upd['answers2'] = $new($e['answers2']);
         } else {

@@ -108,9 +108,7 @@ class AppTest extends TestCase
         // post: counters updated correctly
         $e1 = $app->getEntry('1', '1');
         $e2 = $app->getEntry('1', '2');
-        $this->assertEquals($e1['touched'], true);
         $this->assertEquals($e1['answers1'], 2);
-        $this->assertEquals($e2['touched'], true);
         $this->assertEquals($e2['answers2'], 3);
     }
 
