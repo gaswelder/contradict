@@ -196,7 +196,7 @@ class Contradict
         usort($r, function ($a, $b) {
             return $a['touched'] <=> $b['touched'];
         });
-        $r = array_slice($r, $size);
+        $r = array_slice($r, 0, $size);
 
         // If total is less than N, add random untouched.
         $n = $size - count($r);
@@ -206,7 +206,6 @@ class Contradict
             });
             $r = array_merge($r, array_slice($untouched, 0, $n));
         }
-
         // shuffle just because why not
         shuffle($r);
         return $r;
