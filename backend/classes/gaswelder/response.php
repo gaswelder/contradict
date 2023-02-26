@@ -1,6 +1,8 @@
 <?php
 
-use gaswelder\request;
+namespace gaswelder;
+
+use Exception;
 
 class response
 {

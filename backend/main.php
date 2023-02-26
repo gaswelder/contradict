@@ -8,6 +8,7 @@ if (file_exists(__DIR__ . '/.env')) {
 
 use gaswelder\MethodNotAllowed;
 use gaswelder\request;
+use gaswelder\response;
 use gaswelder\RouteNotFound;
 use gaswelder\router;
 
