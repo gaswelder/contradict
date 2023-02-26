@@ -137,7 +137,7 @@ class AppTest extends TestCase
         // action: generate a test
         $test = $app->generateTest($dictID);
 
-        // post: valid test
+        // post: valid test, entry marked as touched.
         $this->assertEquals($test, array(
             'tuples1' =>
             array(
@@ -166,6 +166,9 @@ class AppTest extends TestCase
                 ),
             ),
         ));
+        $this->assertEquals(1, $app->getEntry($dictID, $id)['touched']);
+        $app->generateTest($dictID);
+        $this->assertEquals(2, $app->getEntry($dictID, $id)['touched']);
     }
 
     function test()
