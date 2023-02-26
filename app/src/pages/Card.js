@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import styled from "styled-components";
 import { LinkButton } from "../components/LinkButton";
 
@@ -23,6 +23,9 @@ const CardDiv = styled.div`
     top: 10px;
     font-size: 90%;
   }
+  & ul {
+    padding: 0;
+  }
   & li {
     font-size: 10pt;
     display: inline-block;
@@ -43,8 +46,8 @@ export const Card = ({ card, show, onShow, onChange }) => {
   const [state, setState] = useState({ editing: false, q: "", a: "" });
   return (
     <CardDiv reverse={card.reverse} onClick={onShow}>
-      <div className="corner">
-        {card.times} s={card.score}
+      <div className="corner" title="score">
+        {card.score}
       </div>
       <p>{card.q}</p>
       {show && (
@@ -75,7 +78,12 @@ export const Card = ({ card, show, onShow, onChange }) => {
             </>
           ) : (
             <>
-              {card.a}
+              {card.a.split("\n").map((line, i) => (
+                <Fragment key={i}>
+                  {line}
+                  <br />
+                </Fragment>
+              ))}
               <LinkButton
                 onClick={() => {
                   setState({ editing: true, q: card.q, a: card.a });
