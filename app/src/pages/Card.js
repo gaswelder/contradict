@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { Editable } from "./Editable";
+import { LinkButton } from "../components/LinkButton";
 
 const CardDiv = styled.div`
   padding: 20px;
@@ -40,13 +40,49 @@ const urlTitle = (url) => {
 };
 
 export const Card = ({ card, show, onShow, onChange }) => {
+  const [state, setState] = useState({ editing: false, q: "", a: "" });
   return (
     <CardDiv reverse={card.reverse} onClick={onShow}>
       <div className="corner">{card.times}</div>
       <p>{card.q}</p>
       {show && (
         <>
-          <Editable content={card.a} onChange={onChange} />
+          {state.editing ? (
+            <>
+              <input
+                value={state.q}
+                onChange={(e) => {
+                  setState({ ...state, q: e.target.value });
+                }}
+              />
+              <br />
+              <textarea
+                value={state.a}
+                onChange={(e) => {
+                  setState({ ...state, a: e.target.value });
+                }}
+              />
+              <LinkButton
+                onClick={() => {
+                  onChange({ ...card, q: state.q, a: state.a });
+                  setState({ ...state, editing: false });
+                }}
+              >
+                Save
+              </LinkButton>
+            </>
+          ) : (
+            <>
+              {card.a}
+              <LinkButton
+                onClick={() => {
+                  setState({ editing: true, q: card.q, a: card.a });
+                }}
+              >
+                Edit
+              </LinkButton>
+            </>
+          )}
           <ul>
             {card.urls.map((url) => (
               <li key={url}>

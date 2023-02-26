@@ -58,14 +58,13 @@ export const RepetitionsPage = withRouter(
             setShow(true);
             api.touchCard(dictID, card.id, card.reverse, false);
           }}
-          onChange={(newContent) => {
-            api.updateEntry(dictID, card.id, { q: card.q, a: newContent });
-            setCards([{ ...card, a: newContent }, ...cards.slice(1)]);
+          onChange={(newCard) => {
+            api.updateEntry(dictID, card.id, { q: newCard.q, a: newCard.a });
+            setCards([newCard, ...cards.slice(1)]);
           }}
         />
         {show && (
           <>
-            <button onClick={next}>Next</button>{" "}
             {yes && (
               <>
                 <button
@@ -77,12 +76,23 @@ export const RepetitionsPage = withRouter(
                 >
                   Oops, wrong guess
                 </button>
+                <br />
               </>
             )}
+            <button onClick={next}>Next</button>
           </>
         )}
         {!show && (
           <>
+            <button
+              onClick={async () => {
+                api.touchCard(dictID, card.id, card.reverse, false);
+                setShow(true);
+              }}
+            >
+              No, forgot it
+            </button>
+            <br />
             <button
               disabled={busy}
               onClick={() => {
@@ -92,14 +102,6 @@ export const RepetitionsPage = withRouter(
               }}
             >
               Yes, know it
-            </button>{" "}
-            <button
-              onClick={async () => {
-                api.touchCard(dictID, card.id, card.reverse, false);
-                setShow(true);
-              }}
-            >
-              No, forgot it
             </button>
           </>
         )}
