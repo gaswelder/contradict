@@ -43,7 +43,9 @@ export const Card = ({ card, show, onShow, onChange }) => {
   const [state, setState] = useState({ editing: false, q: "", a: "" });
   return (
     <CardDiv reverse={card.reverse} onClick={onShow}>
-      <div className="corner">{card.times}</div>
+      <div className="corner">
+        {card.times} s={card.score}
+      </div>
       <p>{card.q}</p>
       {show && (
         <>

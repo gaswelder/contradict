@@ -149,6 +149,7 @@ class Contradict
                 'q' => $entry['q'],
                 'a' => $entry['a'],
                 'times' => $entry['touched'],
+                'score' => $entry['answers1'],
                 'urls' => $this->wikiURLs($dict_id, $entry['q']),
                 'reverse' => false,
             ];
@@ -159,6 +160,7 @@ class Contradict
                 'q' => $entry['a'],
                 'a' => $entry['q'],
                 'times' => $entry['touched'],
+                'score' => $entry['answers2'],
                 'urls' => $this->wikiURLs($dict_id, $entry['q']),
                 'reverse' => true,
             ];
