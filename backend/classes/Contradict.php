@@ -84,6 +84,7 @@ class Contradict
                 'name' => $row['name'],
                 'lookupURLTemplates' => $row['lookupURLTemplates'] ?? [],
                 'stats' => [
+                    'transitions' => $row['stats'],
                     'pairs' => floatval($totalEntries),
                     'finished' => $finished,
                     'touched' => floatval($touched),
@@ -342,7 +343,7 @@ class Contradict
 
     private function _getDicts()
     {
-        return $this->data['dicts'];
+        return array_map([self::class, '_parseDict'], $this->data['dicts']);
     }
 
     /**
@@ -358,6 +359,7 @@ class Contradict
         $d['id'] = $row['id'];
         $d['name'] = $row['name'];
         $d['lookupURLTemplates'] = $row['lookupURLTemplates'] ?? [];
+        $d['stats'] = $row['stats'] ?? [];
         return $d;
     }
 
@@ -444,6 +446,10 @@ class writer
     function updateEntry($dictID, $id, $data)
     {
         foreach ($data as $k => $v) {
+            if ($k == 'answers1') {
+                $v1 = $this->data['dicts'][$dictID]['words'][$id][$k];
+                $this->data['dicts'][$dictID]['stats']["$v1-$v"] = ($this->data['dicts'][$dictID]['stats']["$v1-$v"] ?? 0) + 1;
+            }
             $this->data['dicts'][$dictID]['words'][$id][$k] = $v;
         }
         $this->touched = true;

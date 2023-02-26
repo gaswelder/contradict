@@ -218,18 +218,19 @@ class AppTest extends TestCase
         $r = $app->getDicts();
 
         // post: correct list
-        $this->assertEquals($r, array(
+        $this->assertEquals($r, [
             0 =>
             [
                 'id' => '1',
                 'name' => 'Sample dict',
                 'lookupURLTemplates' => [],
                 'stats' => [
+                    'transitions' => [],
                     'pairs' => 2.0,
                     'finished' => 0,
                     'touched' => 0.0,
                 ],
             ],
-        ));
+        ]);
     }
 }
