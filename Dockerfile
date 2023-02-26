@@ -6,9 +6,11 @@ RUN echo "deb [signed-by=/usr/share/keyrings/yarnkey.gpg] https://dl.yarnpkg.com
 RUN apt-get update; apt-get install -y nodejs yarn
 
 FROM base
-COPY . /usr/src/myapp
 WORKDIR /usr/src/myapp
-RUN composer update; yarn; NODE_OPTIONS=--no-experimental-fetch yarn build
+COPY package.json yarn.lock composer.json composer.lock ./
+RUN composer update; yarn
+COPY . ./
+RUN NODE_OPTIONS=--no-experimental-fetch yarn build
 ENV DATABASE_DIR /usr/src/myapp/data-mounted/
 RUN echo "<?php" > public/index.php; echo "require '../backend/main.php';" >> public/index.php
 CMD [ "php", "-S", "0:8081", "-t", "public" ]
