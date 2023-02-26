@@ -96,7 +96,7 @@ class Contradict
     function getDict(string $id)
     {
         return [
-            'name' => $this->_getDict($id)->name
+            'name' => $this->_getDict($id)['name']
         ];
     }
 
@@ -279,7 +279,7 @@ class Contradict
         $dict = $this->_getDict($dictID);
         return array_map(function ($template) use ($word) {
             return str_replace('{{word}}', urlencode($word), $template);
-        }, $dict->lookupURLTemplates);
+        }, $dict['lookupURLTemplates']);
     }
 
     /**
@@ -350,9 +350,17 @@ class Contradict
     /**
      * Returns a saved dict with the given id.
      */
-    private function _getDict(string $id): Dict
+    private function _getDict(string $id)
     {
-        return Dict::parse($this->data['dicts'][$id]);
+        return self::_parseDict($this->data['dicts'][$id]);
+    }
+
+    private static function _parseDict($row)
+    {
+        $d['id'] = $row['id'];
+        $d['name'] = $row['name'];
+        $d['lookupURLTemplates'] = $row['lookupURLTemplates'] ?? [];
+        return $d;
     }
 
     private function _getEntries($dictId)
