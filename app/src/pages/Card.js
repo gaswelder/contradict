@@ -33,6 +33,9 @@ const CardDiv = styled.div`
   & li + li {
     margin-left: 0.5em;
   }
+  & .h {
+    font-weight: bold;
+  }
 `;
 
 const urlTitle = (url) => {
@@ -49,7 +52,7 @@ export const Card = ({ card, show, onShow, onChange }) => {
       <div className="corner" title="score">
         {card.score}
       </div>
-      <p>{card.q}</p>
+      <p className="h">{card.q}</p>
       {show && (
         <>
           {state.editing ? (
