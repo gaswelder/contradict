@@ -11,6 +11,7 @@ class AddEntriesPage extends React.Component {
       loading: false,
       entries: [{ number: 0, q: "", a: "" }],
       nextEntryNumber: 1,
+      lastResult: null,
     };
     this.handleSubmit = this.handleSubmit.bind(this);
     this.addMore = this.addMore.bind(this);
@@ -25,11 +26,11 @@ class AddEntriesPage extends React.Component {
       .map(({ q, a }) => ({ q, a }));
     this.setState({ loading: true });
     const { added, skipped } = await this.props.api.addEntries(dictID, data);
-    alert(`${added} added, ${skipped} skipped`);
-    this.setState({ loading: false });
     this.setState({
+      loading: false,
       entries: [{ number: 0, q: "", a: "" }],
       nextEntryNumber: 1,
+      lastResult: { added, skipped },
     });
   }
 
@@ -80,14 +81,17 @@ class AddEntriesPage extends React.Component {
   }
 
   render() {
-    const { loading, entries } = this.state;
+    const { loading, entries, lastResult } = this.state;
     return (
       <form method="post" onSubmit={this.handleSubmit}>
         <p>
-          <small>
-            Hint: pasting text lines in form &quot;q - a&quot; also works.
-          </small>
+          <small>You can paste text lines in form &quot;q - a&quot;.</small>
         </p>
+        {lastResult && (
+          <p style={{ color: "rgb(51, 109, 221)" }}>
+            {lastResult.added} added, {lastResult.skipped} skipped
+          </p>
+        )}
         {entries.map((entry) => (
           <div key={entry.number}>
             <input
