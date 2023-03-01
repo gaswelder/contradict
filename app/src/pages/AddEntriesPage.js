@@ -19,13 +19,13 @@ class AddEntriesPage extends React.Component {
   }
 
   async handleSubmit(e) {
-    const dictID = this.props.match.params.id;
+    const { api, dictID } = this.props;
     e.preventDefault();
     const data = this.state.entries
       .filter((e) => !empty(e))
       .map(({ q, a }) => ({ q, a }));
     this.setState({ loading: true });
-    const { added, skipped } = await this.props.api.addEntries(dictID, data);
+    const { added, skipped } = await api.addEntries(dictID, data);
     this.setState({
       loading: false,
       entries: [{ number: 0, q: "", a: "" }],

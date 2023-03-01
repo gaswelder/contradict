@@ -23,57 +23,56 @@ const Form = styled.form`
   }
 `;
 
-const TestPage = ({ api, match, busy, history }) => {
-  const handleSubmit = async (entries) => {
-    const id = match.params.id;
-    const results = await api.submitAnswers(id, entries);
-    localStorage.setItem(`results-${id}`, JSON.stringify(results));
-    history.push(`results`);
-  };
+export default withRouter(
+  withAPI(({ api, busy, history, dictID }) => {
+    const handleSubmit = async (entries) => {
+      const results = await api.submitAnswers(dictID, entries);
+      localStorage.setItem(`results-${dictID}`, JSON.stringify(results));
+      history.push(`results`);
+    };
 
-  const focused = useRef(false);
+    const focused = useRef(false);
 
-  return (
-    <Resource getPromise={() => api.test(match.params.id)}>
-      {(data) => (
-        <Form
-          ref={(form) => {
-            if (!form) {
-              return;
-            }
-            if (focused.current) {
-              return;
-            }
-            focused.current = true;
-            form.querySelector('input[name="a[]"]').focus();
-          }}
-          method="post"
-          className="test-form"
-          onFocus={(e) => {
-            e.target.scrollIntoView({ behavior: "smooth", block: "center" });
-          }}
-          onSubmit={(e) => {
-            e.preventDefault();
-            const r = [...e.target.querySelectorAll("input")].map((input) => [
-              input.name,
-              input.value,
-            ]);
-            handleSubmit(r);
-          }}
-        >
-          <div>
-            <TestSection tuples={data.tuples1} dir="0" />
-          </div>
-          <div>
-            <TestSection tuples={data.tuples2} dir="1" />
-          </div>
-          <button type="submit" disabled={busy}>
-            Submit
-          </button>
-        </Form>
-      )}
-    </Resource>
-  );
-};
-
-export default withRouter(withAPI(TestPage));
+    return (
+      <Resource getPromise={() => api.test(dictID)}>
+        {(data) => (
+          <Form
+            ref={(form) => {
+              if (!form) {
+                return;
+              }
+              if (focused.current) {
+                return;
+              }
+              focused.current = true;
+              form.querySelector('input[name="a[]"]').focus();
+            }}
+            method="post"
+            className="test-form"
+            onFocus={(e) => {
+              e.target.scrollIntoView({ behavior: "smooth", block: "center" });
+            }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              const r = [...e.target.querySelectorAll("input")].map((input) => [
+                input.name,
+                input.value,
+              ]);
+              handleSubmit(r);
+            }}
+          >
+            <div>
+              <TestSection tuples={data.tuples1} dir="0" />
+            </div>
+            <div>
+              <TestSection tuples={data.tuples2} dir="1" />
+            </div>
+            <button type="submit" disabled={busy}>
+              Submit
+            </button>
+          </Form>
+        )}
+      </Resource>
+    );
+  })
+);

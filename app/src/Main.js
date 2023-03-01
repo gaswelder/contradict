@@ -27,14 +27,36 @@ class Main extends React.Component {
       <BrowserRouter>
         <Switch>
           <Route exact path={`${R}`} component={page(MenuPage)} />
-          <Route path={`${R}:id/test`} component={page(TestPage)} />
+          <Route
+            path={`${R}:id/test`}
+            component={page(({ match }) => {
+              return <TestPage dictID={match.params.id} />;
+            })}
+          />
           <Route
             path={`${R}:id/repetitions`}
-            component={page(RepetitionsPage)}
+            component={page(({ match }) => {
+              return <RepetitionsPage dictID={match.params.id} />;
+            })}
           />
-          <Route path={`${R}:id/results`} component={page(ResultsPage)} />
-          <Route path={`${R}:id/add`} component={page(AddEntriesPage)} />
-          <Route path={`${R}dicts/:id`} component={page(DictPage)} />
+          <Route
+            path={`${R}:id/results`}
+            component={page(({ match }) => {
+              return <ResultsPage id={match.params.id} />;
+            })}
+          />
+          <Route
+            path={`${R}:id/add`}
+            component={page(({ match }) => {
+              return <AddEntriesPage dictID={match.params.id} />;
+            })}
+          />
+          <Route
+            path={`${R}dicts/:id`}
+            component={page(({ match }) => {
+              return <DictPage dictID={match.params.id} />;
+            })}
+          />
           <Route path={`${R}login`} component={page(LoginPage, false)} />
           <Route path={`${R}export`} component={page(Export)} />
           <Route component={page(() => "Not Found")} />

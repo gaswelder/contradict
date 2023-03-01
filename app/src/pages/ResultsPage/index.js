@@ -4,8 +4,7 @@ import { ButtonLink } from "../../components/ButtonLink";
 import { CorrectTable } from "./CorrectTable";
 import { Fail } from "./Fail";
 
-export const ResultsPage = ({ match }) => {
-  const id = match.params.id;
+export const ResultsPage = ({ id }) => {
   let data = null;
   try {
     data = JSON.parse(localStorage.getItem(`results-${id}`));

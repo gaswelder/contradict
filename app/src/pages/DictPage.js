@@ -2,9 +2,9 @@ import React from "react";
 import Resource from "../components/Resource";
 import withAPI from "../components/withAPI";
 
-export const DictPage = withAPI(({ match, busy, api }) => {
+export const DictPage = withAPI(({ busy, api, dictID }) => {
   return (
-    <Resource getPromise={() => api.dict(match.params.id)}>
+    <Resource getPromise={() => api.dict(dictID)}>
       {(dict) => {
         if (!dict) {
           return "...";
