@@ -70,7 +70,7 @@ class Contradict
             $finished = 0;
             $touched = 0;
             foreach ($entries as $e) {
-                $isfinished = $e['answers1'] >= self::GOAL && $e['answers2'] >= self::GOAL;
+                $isfinished = $e['answers1'] >= self::GOAL;
                 if ($isfinished) {
                     $finished++;
                     continue;
