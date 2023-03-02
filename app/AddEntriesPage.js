@@ -1,5 +1,5 @@
 import React from "react";
-import withAPI from "../components/withAPI";
+import withAPI from "./withAPI";
 
 // Tells if an entry is empty.
 const empty = (entry) => (entry.q + entry.a).trim() == "";

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Dictionary from "./Dictionary";
-import withAPI from "../../components/withAPI";
 import { Link } from "react-router-dom";
-import { ROOT_PATH } from "../../api";
+import { ROOT_PATH } from "./api";
+import Dictionary from "./Dictionary";
+import withAPI from "./withAPI";
 
 const MenuPage = ({ api }) => {
   const [state, setState] = useState(null);

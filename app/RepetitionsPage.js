@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import withAPI from "../components/withAPI";
+import withAPI from "./withAPI";
 import { Card } from "./Card";
 
 const ContainerDiv = styled.div`

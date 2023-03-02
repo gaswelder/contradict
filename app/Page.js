@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useHistory } from "react-router-dom";
 import styled from "styled-components";
-import api, { ROOT_PATH } from "../api";
+import api, { ROOT_PATH } from "./api";
 
 const HeaderContainer = styled.header`
   background-color: #204c72;

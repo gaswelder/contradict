@@ -1,14 +1,14 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import AddEntriesPage from "./pages/AddEntriesPage";
-import LoginPage from "./pages/LoginPage";
-import MenuPage from "./pages/MenuPage";
-import TestPage from "./pages/TestPage";
-import Export from "./pages/Export";
-import { ResultsPage } from "./pages/ResultsPage";
-import { Page } from "./components/Page";
-import { RepetitionsPage } from "./pages/RepetitionsPage";
-import { DictPage } from "./pages/DictPage";
+import AddEntriesPage from "./AddEntriesPage";
+import LoginPage from "./LoginPage";
+import MenuPage from "./MenuPage";
+import TestPage from "./TestPage";
+import Export from "./Export";
+import { ResultsPage } from "./ResultsPage";
+import { Page } from "./Page";
+import { RepetitionsPage } from "./RepetitionsPage";
+import { DictPage } from "./DictPage";
 import { ROOT_PATH } from "./api";
 
 function page(Component, header = true) {

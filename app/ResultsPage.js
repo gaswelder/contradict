@@ -1,6 +1,6 @@
 import React from "react";
-import { ROOT_PATH } from "../api";
-import { ButtonLink } from "../components/ButtonLink";
+import { ROOT_PATH } from "./api";
+import { ButtonLink } from "./ButtonLink";
 
 export const ResultsPage = ({ id }) => {
   let data = null;

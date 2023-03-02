@@ -1,5 +1,5 @@
 import React from "react";
-import api, { ROOT_PATH } from "../api";
+import api, { ROOT_PATH } from "./api";
 import { withRouter } from "react-router";
 
 function withAPI(Component) {

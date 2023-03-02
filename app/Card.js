@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from "react";
 import styled from "styled-components";
-import { LinkButton } from "../components/LinkButton";
+import { LinkButton } from "./LinkButton";
 
 const CardDiv = styled.div`
   padding: 20px;

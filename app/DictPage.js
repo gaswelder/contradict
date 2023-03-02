@@ -1,6 +1,6 @@
 import React from "react";
-import Resource from "../components/Resource";
-import withAPI from "../components/withAPI";
+import Resource from "./Resource";
+import withAPI from "./withAPI";
 
 export const DictPage = withAPI(({ busy, api, dictID }) => {
   return (

@@ -1,9 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { ROOT_PATH } from "../../api";
-import { ButtonLink } from "../../components/ButtonLink";
-import "./ColumnMeter.css";
+import { ROOT_PATH } from "./api";
+import { ButtonLink } from "./ButtonLink";
 
 const RootDiv = styled.section`
   padding: 1em;
@@ -26,6 +25,28 @@ const HeaderDiv = styled.div`
   }
 `;
 
+const ColumnMeterDiv = styled.div`
+  position: relative;
+  display: flex;
+  & > div {
+    overflow: hidden;
+    font-size: 10pt;
+    text-indent: 2px;
+    white-space: nowrap;
+    text-align: right;
+    padding: 4px 0;
+  }
+  & .finished {
+    background-color: #b0f1ff;
+  }
+  & .in-progress {
+    background-color: #b9de96;
+  }
+  & .in-queue {
+    background-color: #eee;
+  }
+`;
+
 function Dictionary({ dict }) {
   const { pairs, touched, finished } = dict.stats;
   const total = pairs + finished;
@@ -37,7 +58,7 @@ function Dictionary({ dict }) {
         <Link to={`${ROOT_PATH}dicts/${dict.id}`}>Edit</Link>
         <Link to={`${ROOT_PATH}${dict.id}/add`}>Add words</Link>
       </HeaderDiv>
-      <div className="column-meter">
+      <ColumnMeterDiv>
         <div
           className="finished"
           style={{ width: pos(finished) }}
@@ -55,7 +76,7 @@ function Dictionary({ dict }) {
         <div className="in-queue" style={{ width: pos(total) }} title="total">
           {total}
         </div>
-      </div>
+      </ColumnMeterDiv>
       <div style={{ marginTop: "0.5em" }}>
         <ButtonLink to={`${ROOT_PATH}${dict.id}/test`}>Do a test</ButtonLink>{" "}
         <ButtonLink to={`${ROOT_PATH}${dict.id}/repetitions`}>
