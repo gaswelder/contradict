@@ -38,6 +38,9 @@ class Contradict
             $data = gzuncompress($data);
         }
         $data = json_decode($data, true);
+        if (array_key_exists('', $data['dicts'])) {
+            unset($data['dicts']);
+        }
         foreach ($data['dicts'] as $id => $dict) {
             if (!array_key_exists('lookupURLTemplates', $dict)) {
                 $data['dicts'][$id]['lookupURLTemplates'] = [];
