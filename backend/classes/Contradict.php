@@ -35,12 +35,9 @@ class Contradict
         }
         $data = file_get_contents($this->dataPath);
         if (substr($data, 0, 1) != '{') {
-            $data = gzuncompress($data);
+            $data = gzdecode($data);
         }
         $data = json_decode($data, true);
-        if (array_key_exists('', $data['dicts'])) {
-            unset($data['dicts']);
-        }
         foreach ($data['dicts'] as $id => $dict) {
             if (!array_key_exists('lookupURLTemplates', $dict)) {
                 $data['dicts'][$id]['lookupURLTemplates'] = [];
@@ -471,7 +468,7 @@ class writer
         if (!$this->touched) {
             return;
         }
-        file_put_contents($this->dataPath, gzcompress(json_encode($this->data)));
+        file_put_contents($this->dataPath, gzencode(json_encode($this->data)));
         $this->touched = false;
     }
 }
