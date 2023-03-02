@@ -81,6 +81,10 @@ $router = router::make()
     ->add('get', '/api/', function () {
         return response::json(getThe()->getDicts());
     })
+    ->add('post', '/api/', function () {
+        getThe()->addDict(request::json()['name']);
+        return response::status(200);
+    })
     ->add('post', '/api/{\w+}', function ($dict_id) {
         getThe()->updateDict($dict_id, request::json());
         return response::status(200);

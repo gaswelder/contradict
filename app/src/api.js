@@ -70,6 +70,7 @@ export default {
   dicts() {
     return getJSON("/");
   },
+  createDict: (name) => postJSON(`/`, { name }),
 
   async dict(id) {
     const dicts = await this.dicts();

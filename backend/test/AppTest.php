@@ -70,6 +70,30 @@ class AppTest extends TestCase
         return $app;
     }
 
+    function testCreateDict()
+    {
+        // pre: empty app
+        $app = new Contradict(uniqid('testdata'));
+
+        // action: add a dict
+        $id = $app->addDict('foo');
+
+        // post: dict added
+        $this->assertEquals($app->getDicts(), [
+            [
+                'id' => $id,
+                'name' => 'foo',
+                'lookupURLTemplates' => [],
+                'stats' => [
+                    'transitions' => [],
+                    'pairs' => 0,
+                    'finished' => 0,
+                    'touched' => 0
+                ]
+            ]
+        ]);
+    }
+
     function testUpdateDict()
     {
         // pre: app with data
