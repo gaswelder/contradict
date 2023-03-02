@@ -1,8 +1,6 @@
 import React from "react";
-import { ROOT_PATH } from "../../api";
-import { ButtonLink } from "../../components/ButtonLink";
-import { CorrectTable } from "./CorrectTable";
-import { Fail } from "./Fail";
+import { ROOT_PATH } from "../api";
+import { ButtonLink } from "../components/ButtonLink";
 
 export const ResultsPage = ({ id }) => {
   let data = null;
@@ -44,10 +42,39 @@ export const ResultsPage = ({ id }) => {
       </section>
 
       {fail.map((r, i) => (
-        <Fail question={r.question} answer={r.answer} key={i} />
+        <article className="fail-card" key={i}>
+          <h3>{r.question.q}</h3>
+          <p>
+            {r.question.a}
+            <br />
+            <span className="strike">{r.answer}</span>
+          </p>
+          {r.question.urls.map((url) => (
+            <a key={url} href={url} target="_blank" rel="noopener noreferrer">
+              {url}
+            </a>
+          ))}
+        </article>
       ))}
 
-      <CorrectTable results={ok} />
+      <table>
+        <thead>
+          <tr>
+            <th>Q</th>
+            <th>A</th>
+            <th />
+          </tr>
+        </thead>
+        <tbody>
+          {ok.map((r) => (
+            <tr key={r.question.id}>
+              <td>{r["question"]["q"]}</td>
+              <td>{r["question"]["a"]}</td>
+              <td>ok</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
       <nav>
         <ButtonLink to={`${ROOT_PATH}${dictID}/test`}>New test</ButtonLink>
