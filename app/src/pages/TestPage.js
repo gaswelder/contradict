@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 import { withRouter } from "react-router";
 import styled from "styled-components";
-import Resource from "../../components/Resource";
-import withAPI from "../../components/withAPI";
+import Resource from "../components/Resource";
+import withAPI from "../components/withAPI";
 
 const Form = styled.form`
   & > div {

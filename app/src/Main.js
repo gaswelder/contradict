@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import AddEntriesPage from "./pages/AddEntriesPage";
 import LoginPage from "./pages/LoginPage";
 import MenuPage from "./pages/MenuPage";
-import TestPage from "./pages/TestPage/TestPage";
+import TestPage from "./pages/TestPage";
 import Export from "./pages/Export";
 import { ResultsPage } from "./pages/ResultsPage";
 import { Page } from "./components/Page";
