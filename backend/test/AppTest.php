@@ -17,7 +17,6 @@ function testData()
                         'a' => 'a',
                         'touched' => 0,
                         'answers1' => 1,
-                        'answers2' => 2,
                     ],
                     '2' => [
                         'id' => '2',
@@ -26,7 +25,6 @@ function testData()
                         'a' => 'y',
                         'touched' => 0,
                         'answers1' => 3,
-                        'answers2' => 4,
                     ]
                 ],
             ]
@@ -126,14 +124,12 @@ class AppTest extends TestCase
         $app = $this->app();
 
         // action: touch two entries
-        $app->markTouch('1', '1', 0, true);
-        $app->markTouch('1', '2', 1, false);
+        $app->markTouch('1', '1', true);
+        $app->markTouch('1', '2', false);
 
         // post: counters updated correctly
         $e1 = $app->getEntry('1', '1');
-        $e2 = $app->getEntry('1', '2');
         $this->assertEquals($e1['answers1'], 2);
-        $this->assertEquals($e2['answers2'], 3);
     }
 
     function testGetEntry()
@@ -160,11 +156,9 @@ class AppTest extends TestCase
         $test = $app->generateTest($dictID);
 
         // post: valid test, entry marked as touched.
-        $this->assertEquals($test, array(
-            'tuples1' =>
-            array(
-                0 =>
-                array(
+        $this->assertEquals($test, [
+            'tuples1' => [
+                0 => [
                     'id' => $id,
                     'q' => 'q',
                     'a' => 'a',
@@ -172,22 +166,9 @@ class AppTest extends TestCase
                     'score' => 0,
                     'urls' => [],
                     'reverse' => false,
-                ),
-            ),
-            'tuples2' =>
-            array(
-                0 =>
-                array(
-                    'id' => $id,
-                    'q' => 'a',
-                    'a' => 'q',
-                    'times' => 0,
-                    'score' => 0,
-                    'urls' => [],
-                    'reverse' => true,
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
         $this->assertEquals(1, $app->getEntry($dictID, $id)['touched']);
         $app->generateTest($dictID);
         $this->assertEquals(2, $app->getEntry($dictID, $id)['touched']);
@@ -199,7 +180,7 @@ class AppTest extends TestCase
         $app = $this->app();
 
         // action: submit answers, one correct, one incorrect.
-        $result = $app->submitTest('1', [0, 0], ['1', '2'], ['a', 'qq']);
+        $result = $app->submitTest('1', ['1', '2'], ['a', 'qq']);
 
         // post: result contains 2 results, 1 correct
         $this->assertEquals($result, [

@@ -96,7 +96,7 @@ $router = router::make()
         return response::json(getThe()->generateTest($dict_id));
     })
     ->add('post', '/api/{\w+}/test', function ($dict_id) {
-        $results = getThe()->submitTest($dict_id, request::post('dir'), request::post('q'), request::post('a'));
+        $results = getThe()->submitTest($dict_id, request::post('q'), request::post('a'));
         return response::json($results);
     })
     ->add('get', '/api/entries/{\w+}/{\w+}', function ($dictID, $id) {
@@ -112,7 +112,7 @@ $router = router::make()
     })
     ->add('post', '/api/touch/{\w+}/{\w+}', function ($dictID, $entryID) {
         $body = request::json();
-        getThe()->markTouch($dictID, $entryID, $body['dir'], $body['success']);
+        getThe()->markTouch($dictID, $entryID, $body['success']);
         return response::status(200);
     })
     ->add('get', '/', function () {

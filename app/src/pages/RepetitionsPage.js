@@ -7,12 +7,6 @@ const ContainerDiv = styled.div`
   text-align: center;
 `;
 
-const shuffle = (xs) =>
-  xs
-    .map((x) => [Math.random(), x])
-    .sort((a, b) => a[0] - b[0])
-    .map((x) => x[1]);
-
 const ClipDiv = styled.div`
   margin-top: 1em;
   & span {
@@ -33,9 +27,7 @@ export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
 
   const nextBatch = async () => {
     const r = await api.test(dictID);
-    setCards(
-      shuffle([...r.tuples1, ...r.tuples2.slice(0, r.tuples2.legth / 3)])
-    );
+    setCards(r.tuples1);
   };
 
   const next = async () => {

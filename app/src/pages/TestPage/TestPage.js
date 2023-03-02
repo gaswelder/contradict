@@ -3,7 +3,6 @@ import { withRouter } from "react-router";
 import styled from "styled-components";
 import Resource from "../../components/Resource";
 import withAPI from "../../components/withAPI";
-import { TestSection } from "./Test";
 
 const Form = styled.form`
   & > div {
@@ -62,10 +61,17 @@ export default withRouter(
             }}
           >
             <div>
-              <TestSection tuples={data.tuples1} dir="0" />
-            </div>
-            <div>
-              <TestSection tuples={data.tuples2} dir="1" />
+              <section>
+                {data.tuples1.map((question) => (
+                  <div key={question.id}>
+                    <input type="hidden" name="q[]" value={question.id} />
+                    <label>
+                      {question.q} <small>({question.times})</small>
+                    </label>
+                    <input name="a[]" autoComplete="off" />
+                  </div>
+                ))}
+              </section>
             </div>
             <button type="submit" disabled={busy}>
               Submit

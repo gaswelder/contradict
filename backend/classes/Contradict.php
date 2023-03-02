@@ -138,14 +138,11 @@ class Contradict
     {
         $size = 20;
         $entries = $this->_getEntries($dict_id);
-        $pick1 = $this->pick($entries, $size, 0);
-        $pick2 = $this->pick($entries, $size, 1);
-        $f = [
-            'tuples1' => [],
-            'tuples2' => [],
-        ];
-        foreach ($pick1 as $i => $entry) {
-            $f['tuples1'][$i] = [
+        $pick1 = $this->pick($entries, $size);
+        $tuples = [];
+        $writer = $this->begin();
+        foreach ($pick1 as $entry) {
+            $tuples[] = [
                 'id' => $entry['id'],
                 'q' => $entry['q'],
                 'a' => $entry['a'],
@@ -154,40 +151,17 @@ class Contradict
                 'urls' => $this->wikiURLs($dict_id, $entry['q']),
                 'reverse' => false,
             ];
-        }
-        foreach ($pick2 as $i => $entry) {
-            $f['tuples2'][$i] = [
-                'id' => $entry['id'],
-                'q' => $entry['a'],
-                'a' => $entry['q'],
-                'times' => $entry['touched'],
-                'score' => $entry['answers2'],
-                'urls' => $this->wikiURLs($dict_id, $entry['q']),
-                'reverse' => true,
-            ];
-        }
-        // Mark the entries as touched.
-        // mark all as touched
-        $writer = $this->begin();
-        $marked = [];
-        foreach (array_merge($pick1, $pick2) as $e) {
-            $id = $e['id'];
-            if (array_key_exists($id, $marked)) {
-                continue;
-            }
-            $marked[$id] = true;
-            $writer->updateEntry($dict_id, $id, ['touched' => $e['touched'] + 1]);
+            $writer->updateEntry($dict_id, $entry['id'], ['touched' => $entry['touched'] + 1]);
         }
         $writer->commit();
-        return $f;
+        return ['tuples1' => $tuples];
     }
 
-    private function pick(array $entries, int $size, $dir): array
+    private function pick(array $entries, int $size): array
     {
         // Remove entries that have already been finished.
-        $entries = array_filter($entries, function ($e) use ($dir) {
-            $score = $dir == 0 ? $e['answers1'] : $e['answers2'];
-            return $score < self::GOAL;
+        $entries = array_filter($entries, function ($e) {
+            return $e['answers1'] < self::GOAL;
         });
 
         // Get N least recently touched.
@@ -212,7 +186,7 @@ class Contradict
         return $r;
     }
 
-    function submitTest(string $dict_id, array $directions, array $ids, array $aa): array
+    function submitTest(string $dict_id, array $ids, array $aa): array
     {
         $writer = $this->begin();
         $results = [];
@@ -220,27 +194,20 @@ class Contradict
         $wrong = 0;
         foreach ($aa as $i => $answer) {
             $entryID = $ids[$i];
-            $reverse = $directions[$i] == 1;
             $entryRow = $this->data['dicts'][$dict_id]['words'][$entryID];
 
             $entry = $this->_getentry($dict_id, $entryID);
             if (!$entry) {
                 throw new Exception("couldn't find entry $dict_id/$entryID");
             }
-            $realAnswer = $reverse ? $entryRow['q'] : $entryRow['a'];
-            $ok = mb_strtolower($realAnswer) == mb_strtolower($answer);
+            $ok = mb_strtolower($entryRow['a']) == mb_strtolower($answer);
 
             if ($ok) {
                 $right++;
                 // Update correct answer counters
                 // For all questions that are correct, increment the corresponding counter (dir 0/1) and save.
-                if ($reverse) {
-                    $writer->updateEntry($dict_id, $entryID, ['answers2' => $entry['answers2'] + 1]);
-                    $entry['answers2']++;
-                } else {
-                    $writer->updateEntry($dict_id, $entryID, ['answers1' => $entry['answers1'] + 1]);
-                    $entry['answers1']++;
-                }
+                $writer->updateEntry($dict_id, $entryID, ['answers1' => $entry['answers1'] + 1]);
+                $entry['answers1']++;
             } else {
                 $wrong++;
             }
@@ -248,11 +215,11 @@ class Contradict
                 "answer" => $answer,
                 "question" => [
                     'id' => $entryID,
-                    'q' => $reverse ? $entryRow['a'] : $entryRow['q'],
-                    'a' => $reverse ? $entryRow['q'] : $entryRow['a'],
-                    'times' => $reverse ? $entry['answers2'] : $entry['answers1'],
+                    'q' => $entryRow['q'],
+                    'a' => $entryRow['a'],
+                    'times' => $entry['answers1'],
                     'urls' => $this->wikiURLs($dict_id, $entryRow['q']),
-                    'dir' => $reverse ? 1 : 0
+                    'dir' => 0
                 ],
                 "correct" => $ok
             ];
@@ -306,22 +273,14 @@ class Contradict
         return compact('added', 'skipped', 'ids');
     }
 
-    function markTouch(string $dictID, string $entryID, $dir, $success)
+    function markTouch(string $dictID, string $entryID, bool $success)
     {
-        $reverse = $dir == 1;
         $e = $this->_getentry($dictID, $entryID);
-        $new = function ($v) use ($success) {
-            if ($success) {
-                return $v + 1;
-            } else {
-                return max($v - 1, 0);
-            }
-        };
-        $upd = [];
-        if ($reverse) {
-            $upd['answers2'] = $new($e['answers2']);
+        $upd = ['answers1' => $e['answers1']];
+        if ($success) {
+            $upd['answers1']++;
         } else {
-            $upd['answers1'] = $new($e['answers1']);
+            $upd['answers1'] = max($upd['answers1'] - 1, 0);
         }
         $this->begin()->updateEntry($dictID, $entryID, $upd)->commit();
     }
@@ -384,7 +343,6 @@ class Contradict
     private static function _parseEntry($row)
     {
         $row['answers1'] = intval($row['answers1']);
-        $row['answers2'] = intval($row['answers2']);
         $row['touched'] = intval($row['touched']);
         return $row;
     }
@@ -436,7 +394,6 @@ class writer
             'q' => $data['q'],
             'a' => $data['a'],
             'answers1' => 0,
-            'answers2' => 0,
             'touched' => 0,
         ];
         $this->touched = true;
