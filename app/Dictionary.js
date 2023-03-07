@@ -82,6 +82,9 @@ function Dictionary({ dict }) {
         <ButtonLink to={`${ROOT_PATH}${dict.id}/repetitions`}>
           Do repetitions
         </ButtonLink>{" "}
+        <ButtonLink to={`${ROOT_PATH}${dict.id}/sheet`}>
+          Random sheet
+        </ButtonLink>{" "}
       </div>
     </RootDiv>
   );

@@ -11,9 +11,8 @@ async function authFetch(url, options = {}) {
     e.unauthorized = true;
     throw e;
   }
-  if (Math.floor(r.status / 100) != 2) {
-    const e = new Error(await r.text());
-    throw e;
+  if (r.status != 200) {
+    throw new Error(`${url}: status ${r.status}: ${await r.text()}`);
   }
   return r;
 }
@@ -81,9 +80,7 @@ export default {
     return postJSON(`/${id}`, body);
   },
 
-  test(dictID) {
-    return getJSON(`/${dictID}/test`);
-  },
+  test: (dictID) => getJSON(`/${dictID}/test`),
 
   submitAnswers(dictID, entries) {
     // console.log(entries);

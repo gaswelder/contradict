@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from "react";
 import styled from "styled-components";
 import { LinkButton } from "./LinkButton";
+import { urlTitle } from "./url-title";
 
 const CardDiv = styled.div`
   padding: 20px;
@@ -37,13 +38,6 @@ const CardDiv = styled.div`
     font-weight: bold;
   }
 `;
-
-const urlTitle = (url) => {
-  return new URL(url).hostname
-    .split(".")
-    .filter((x) => x != "www" && x != "com" && x != "org")
-    .join(".");
-};
 
 export const Card = ({ card, show, onShow, onChange }) => {
   const [state, setState] = useState({ editing: false, q: "", a: "" });

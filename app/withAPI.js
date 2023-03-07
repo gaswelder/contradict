@@ -1,6 +1,26 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import api, { ROOT_PATH } from "./api";
 import { withRouter } from "react-router";
+
+export const useAPI = () => {
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(0);
+  const thisapi = useRef({}).current;
+  Object.keys(api).forEach((func) => {
+    thisapi[func] = async (...args) => {
+      setBusy((n) => n + 1);
+      try {
+        return await api[func](...args);
+      } catch (error) {
+        setError(error);
+        throw error;
+      } finally {
+        setBusy((n) => n - 1);
+      }
+    };
+  });
+  return { api: thisapi, error, busy };
+};
 
 function withAPI(Component) {
   return withRouter(

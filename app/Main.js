@@ -1,15 +1,16 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import AddEntriesPage from "./AddEntriesPage";
+import { ROOT_PATH } from "./api";
+import { DictPage } from "./DictPage";
+import Export from "./Export";
 import LoginPage from "./LoginPage";
 import MenuPage from "./MenuPage";
-import TestPage from "./TestPage";
-import Export from "./Export";
-import { ResultsPage } from "./ResultsPage";
 import { Page } from "./Page";
 import { RepetitionsPage } from "./RepetitionsPage";
-import { DictPage } from "./DictPage";
-import { ROOT_PATH } from "./api";
+import { ResultsPage } from "./ResultsPage";
+import { SheetPage } from "./SheetPage";
+import TestPage from "./TestPage";
 
 function page(Component, header = true) {
   const wrappedPage = (props) => (
@@ -31,6 +32,12 @@ class Main extends React.Component {
             path={`${R}:id/test`}
             component={page(({ match }) => {
               return <TestPage dictID={match.params.id} />;
+            })}
+          />
+          <Route
+            path={`${R}:id/sheet`}
+            component={page(({ match }) => {
+              return <SheetPage dictID={match.params.id} />;
             })}
           />
           <Route
