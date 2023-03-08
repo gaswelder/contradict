@@ -24,6 +24,7 @@ export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
   const [cards, setCards] = useState([]);
   const [show, setShow] = useState(false);
   const [yes, setYes] = useState(false);
+  const [count, setCount] = useState(0);
 
   const nextBatch = async () => {
     const r = await api.test(dictID);
@@ -31,6 +32,7 @@ export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
   };
 
   const next = async () => {
+    setCount((x) => x + 1);
     setShow(false);
     setYes(false);
     if (cards.length == 1) {
@@ -50,6 +52,7 @@ export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
   }
   return (
     <ContainerDiv>
+      {count}
       <ClipDiv>
         {cards.map((card) => (
           <span key={card.id}> {card.score} </span>
