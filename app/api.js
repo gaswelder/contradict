@@ -11,7 +11,7 @@ async function authFetch(url, options = {}) {
     e.unauthorized = true;
     throw e;
   }
-  if (r.status != 200) {
+  if (r.status >= 400) {
     throw new Error(`${url}: status ${r.status}: ${await r.text()}`);
   }
   return r;
