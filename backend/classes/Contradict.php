@@ -138,14 +138,7 @@ class Contradict
     {
         $entries = $this->_getEntries($dict_id);
         usort($entries, function ($a, $b) {
-            $at = $a['touched'] > 0 ? 1 : 0;
-            $bt = $b['touched'] > 0 ? 1 : 0;
-            // Prefer touched entries over untouched.
-            if ($at != $bt) {
-                return $bt <=> $at;
-            }
-            // Prefer less answered over more answered.
-            return $a['answers1'] <=> $b['answers1'];
+            return [$a['answers1'], $b['touched']] <=> [$b['answers1'], $a['touched']];
         });
 
         $size = 100;
