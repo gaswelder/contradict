@@ -148,7 +148,7 @@ class Contradict
             return $a['answers1'] <=> $b['answers1'];
         });
 
-        $size = 20;
+        $size = 100;
         $r = [];
         foreach (array_slice($entries, 0, $size) as $e) {
             $r[] = [
