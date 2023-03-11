@@ -11,10 +11,10 @@ const ContainerDiv = styled.div`
 export const SheetPage = ({ dictID }) => {
   const { api } = useAPI();
   return (
-    <Resource getPromise={() => api.test(dictID)}>
+    <Resource getPromise={() => api.sheet(dictID)}>
       {(data) => (
         <ContainerDiv>
-          {data.tuples1.map((tuple) => {
+          {data.map((tuple) => {
             return (
               <article key={tuple.id}>
                 {tuple.q} - {tuple.a}

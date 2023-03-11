@@ -81,6 +81,7 @@ export default {
   },
 
   test: (dictID) => getJSON(`/${dictID}/test`),
+  sheet: (dictID) => getJSON(`/${dictID}/sheet`),
 
   submitAnswers(dictID, entries) {
     // console.log(entries);

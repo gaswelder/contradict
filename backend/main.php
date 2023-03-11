@@ -99,6 +99,9 @@ $router = router::make()
         $results = getThe()->submitTest($dict_id, request::post('q'), request::post('a'));
         return response::json($results);
     })
+    ->add('get', '/api/{\w+}/sheet', function ($dict_id) {
+        return response::json(getThe()->getSheet($dict_id));
+    })
     ->add('get', '/api/entries/{\w+}/{\w+}', function ($dictID, $id) {
         $e = getThe()->getEntry($dictID, $id);
         if (!$e) {

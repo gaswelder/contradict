@@ -174,7 +174,7 @@ class AppTest extends TestCase
         $this->assertEquals(2, $app->getEntry($dictID, $id)['touched']);
     }
 
-    function test()
+    function testSubmitAnswers()
     {
         // pre: app with some words
         $app = $this->app();
@@ -236,6 +236,32 @@ class AppTest extends TestCase
                     'touched' => 0.0,
                 ],
             ],
+        ]);
+    }
+
+    function testSheet()
+    {
+        // pre: app with a dict
+        $app = $this->app();
+        // action: get a sheet
+        $r = $app->getSheet('1');
+
+        // post: sheet returned
+        $this->assertEquals($r, [
+            [
+                'id' => '1',
+                'q' => 'q',
+                'a' => 'a',
+                'score' => 1,
+                'urls' => [],
+            ],
+            [
+                'id' => '2',
+                'q' => 'x',
+                'a' => 'y',
+                'score' => 3,
+                'urls' => [],
+            ]
         ]);
     }
 }

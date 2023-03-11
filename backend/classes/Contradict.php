@@ -134,6 +134,34 @@ class Contradict
         $this->begin()->updateEntry($dictID, $id, compact('q', 'a'))->commit();
     }
 
+    function getSheet(string $dict_id)
+    {
+        $entries = $this->_getEntries($dict_id);
+        usort($entries, function ($a, $b) {
+            $at = $a['touched'] > 0 ? 1 : 0;
+            $bt = $b['touched'] > 0 ? 1 : 0;
+            // Prefer touched entries over untouched.
+            if ($at != $bt) {
+                return $bt <=> $at;
+            }
+            // Prefer less answered over more answered.
+            return $a['answers1'] <=> $b['answers1'];
+        });
+
+        $size = 20;
+        $r = [];
+        foreach (array_slice($entries, 0, $size) as $e) {
+            $r[] = [
+                'id' => $e['id'],
+                'q' => $e['q'],
+                'a' => $e['a'],
+                'score' => $e['answers1'],
+                'urls' => $this->wikiURLs($dict_id, $e['q'])
+            ];
+        }
+        return $r;
+    }
+
     function generateTest(string $dict_id)
     {
         $size = 20;
