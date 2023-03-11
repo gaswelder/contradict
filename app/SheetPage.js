@@ -1,11 +1,17 @@
 import React from "react";
 import styled from "styled-components";
+import { Card } from "./Card";
 import Resource from "./Resource";
-import { urlTitle } from "./url-title";
 import { useAPI } from "./withAPI";
 
 const ContainerDiv = styled.div`
-  columns: 20em;
+  display: flex;
+  flex-wrap: wrap;
+  & > div {
+    flex-basis: 16em;
+    flex-grow: 1;
+    margin: 0;
+  }
 `;
 
 export const SheetPage = ({ dictID }) => {
@@ -14,22 +20,9 @@ export const SheetPage = ({ dictID }) => {
     <Resource getPromise={() => api.sheet(dictID)}>
       {(data) => (
         <ContainerDiv>
-          {data.map((tuple) => {
-            return (
-              <article key={tuple.id}>
-                {tuple.q} - {tuple.a}
-                <ul>
-                  {tuple.urls.map((url) => (
-                    <li key={url}>
-                      <a target="_blank" rel="noreferrer" href={url}>
-                        {urlTitle(url)}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </article>
-            );
-          })}
+          {data.map((tuple) => (
+            <Card card={tuple} show key={tuple.id} />
+          ))}
         </ContainerDiv>
       )}
     </Resource>
