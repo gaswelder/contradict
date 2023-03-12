@@ -1,7 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Card } from "./Card";
-import Resource from "./Resource";
 import { useAPI } from "./withAPI";
 
 const ContainerDiv = styled.div`
@@ -16,15 +15,34 @@ const ContainerDiv = styled.div`
 
 export const SheetPage = ({ dictID }) => {
   const { api } = useAPI();
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    api.sheet(dictID).then(setData).catch(setError);
+  }, []);
+  if (error) {
+    return error.message;
+  }
+  if (!data) {
+    return "loading";
+  }
   return (
-    <Resource getPromise={() => api.sheet(dictID)}>
-      {(data) => (
-        <ContainerDiv>
-          {data.map((tuple) => (
-            <Card card={tuple} show key={tuple.id} />
-          ))}
-        </ContainerDiv>
-      )}
-    </Resource>
+    <ContainerDiv>
+      {data.map((tuple) => (
+        <Card
+          card={tuple}
+          show
+          key={tuple.id}
+          onChange={(newCard) => {
+            api.updateEntry(dictID, tuple.id, { q: newCard.q, a: newCard.a });
+            setData(
+              data.map((x) =>
+                x.id == tuple.id ? { ...x, q: newCard.q, a: newCard.a } : x
+              )
+            );
+          }}
+        />
+      ))}
+    </ContainerDiv>
   );
 };
