@@ -12,16 +12,3 @@ export const usePromise = (getPromise) => {
   }, []);
   return { data, error, loading };
 };
-
-export const Resource = ({ getPromise, children }) => {
-  const { data, error, loading } = usePromise(getPromise);
-  if (loading) {
-    return "Loading";
-  }
-  if (error) {
-    return "Error: " + error.toString();
-  }
-  return children(data);
-};
-
-export default Resource;

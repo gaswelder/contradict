@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { withRouter } from "react-router";
 import styled from "styled-components";
-import Resource from "./Resource";
+import { usePromise } from "./Resource";
 import withAPI from "./withAPI";
 
 const Form = styled.form`
@@ -31,54 +31,56 @@ export default withRouter(
     };
 
     const focused = useRef(false);
-
+    const { data, error, loading } = usePromise(() => api.test(dictID));
+    if (loading) {
+      return "Loading";
+    }
+    if (error) {
+      return "Error: " + error.toString();
+    }
     return (
-      <Resource getPromise={() => api.test(dictID)}>
-        {(data) => (
-          <Form
-            ref={(form) => {
-              if (!form) {
-                return;
-              }
-              if (focused.current) {
-                return;
-              }
-              focused.current = true;
-              form.querySelector('input[name="a[]"]').focus();
-            }}
-            method="post"
-            className="test-form"
-            onFocus={(e) => {
-              e.target.scrollIntoView({ behavior: "smooth", block: "center" });
-            }}
-            onSubmit={(e) => {
-              e.preventDefault();
-              const r = [...e.target.querySelectorAll("input")].map((input) => [
-                input.name,
-                input.value,
-              ]);
-              handleSubmit(r);
-            }}
-          >
-            <div>
-              <section>
-                {data.tuples1.map((question) => (
-                  <div key={question.id}>
-                    <input type="hidden" name="q[]" value={question.id} />
-                    <label>
-                      {question.q} <small>({question.times})</small>
-                    </label>
-                    <input name="a[]" autoComplete="off" />
-                  </div>
-                ))}
-              </section>
-            </div>
-            <button type="submit" disabled={busy}>
-              Submit
-            </button>
-          </Form>
-        )}
-      </Resource>
+      <Form
+        ref={(form) => {
+          if (!form) {
+            return;
+          }
+          if (focused.current) {
+            return;
+          }
+          focused.current = true;
+          form.querySelector('input[name="a[]"]').focus();
+        }}
+        method="post"
+        className="test-form"
+        onFocus={(e) => {
+          e.target.scrollIntoView({ behavior: "smooth", block: "center" });
+        }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          const r = [...e.target.querySelectorAll("input")].map((input) => [
+            input.name,
+            input.value,
+          ]);
+          handleSubmit(r);
+        }}
+      >
+        <div>
+          <section>
+            {data.tuples1.map((question) => (
+              <div key={question.id}>
+                <input type="hidden" name="q[]" value={question.id} />
+                <label>
+                  {question.q} <small>({question.times})</small>
+                </label>
+                <input name="a[]" autoComplete="off" />
+              </div>
+            ))}
+          </section>
+        </div>
+        <button type="submit" disabled={busy}>
+          Submit
+        </button>
+      </Form>
     );
   })
 );
