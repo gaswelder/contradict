@@ -76,27 +76,10 @@ export default {
     return dicts.find((d) => d.id == id);
   },
 
-  updateDict(id, body) {
-    return postJSON(`/${id}`, body);
-  },
-
-  test: (dictID) => getJSON(`/${dictID}/test`),
+  updateDict: (id, body) => postJSON(`/${id}`, body),
   sheet: (dictID) => getJSON(`/${dictID}/sheet`),
-
-  submitAnswers(dictID, entries) {
-    // console.log(entries);
-    // [
-    //   ["q[]", "69"],
-    //   ["dir[]", "0"],
-    //   ["a[]", "hand"],
-    //   ["q[]", "496"],
-    //   ["dir[]", "0"],
-    //   ["a[]", ""]
-    // ];
-    return post(`/${dictID}/test`, entries).then((r) => r.json());
-  },
-
   entry: (dictID, id) => getJSON(`/entries/${dictID}/${id}`),
+
   updateEntry: (dictID, id, entry) =>
     post(`/entries/${dictID}/${id}`, { q: entry.q, a: entry.a }),
 

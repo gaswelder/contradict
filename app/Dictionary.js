@@ -78,7 +78,6 @@ function Dictionary({ dict }) {
         </div>
       </ColumnMeterDiv>
       <div style={{ marginTop: "0.5em" }}>
-        <ButtonLink to={`${ROOT_PATH}${dict.id}/test`}>Do a test</ButtonLink>{" "}
         <ButtonLink to={`${ROOT_PATH}${dict.id}/repetitions`}>
           Do repetitions
         </ButtonLink>{" "}
