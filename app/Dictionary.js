@@ -56,7 +56,6 @@ function Dictionary({ dict }) {
       <HeaderDiv>
         <h3>{dict.name}</h3>
         <Link to={`${ROOT_PATH}dicts/${dict.id}`}>Edit</Link>
-        <Link to={`${ROOT_PATH}${dict.id}/add`}>Add words</Link>
       </HeaderDiv>
       <ColumnMeterDiv>
         <div
@@ -79,11 +78,10 @@ function Dictionary({ dict }) {
       </ColumnMeterDiv>
       <div style={{ marginTop: "0.5em" }}>
         <ButtonLink to={`${ROOT_PATH}${dict.id}/repetitions`}>
-          Do repetitions
+          Repetitions
         </ButtonLink>{" "}
-        <ButtonLink to={`${ROOT_PATH}${dict.id}/sheet`}>
-          Random sheet
-        </ButtonLink>{" "}
+        <ButtonLink to={`${ROOT_PATH}${dict.id}/sheet`}>Sheet</ButtonLink>{" "}
+        <ButtonLink to={`${ROOT_PATH}${dict.id}/add`}>Add Cards</ButtonLink>
       </div>
     </RootDiv>
   );
