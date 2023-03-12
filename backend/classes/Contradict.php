@@ -13,10 +13,8 @@ class Contradict
 
     /**
      * How many entries are in the "learning pool".
-     * This limit is applied separately for both directions,
-     * so the actual pool limit is twice this value.
      */
-    const WINDOW = 100;
+    const WINDOW = 200;
 
     private $dataPath;
     private $data = [];
