@@ -78,6 +78,7 @@ export default {
 
   updateDict: (id, body) => postJSON(`/${id}`, body),
   sheet: (dictID) => getJSON(`/${dictID}/sheet`),
+  test: (dictID) => getJSON(`/${dictID}/test`),
   entry: (dictID, id) => getJSON(`/entries/${dictID}/${id}`),
 
   updateEntry: (dictID, id, entry) =>

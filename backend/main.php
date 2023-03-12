@@ -92,6 +92,9 @@ $router = router::make()
     ->add('post', '/api/{\w+}/add', function ($dict_id) {
         return response::json(getThe()->appendWords($dict_id, request::json()['entries']));
     })
+    ->add('get', '/api/{\w+}/test', function ($dict_id) {
+        return response::json(getThe()->generateTest($dict_id));
+    })
     ->add('get', '/api/{\w+}/sheet', function ($dict_id) {
         return response::json(getThe()->getSheet($dict_id));
     })

@@ -144,6 +144,36 @@ class AppTest extends TestCase
         $this->assertEquals('2', $e['id']);
     }
 
+    function testGenerate()
+    {
+        // pre: app with one entry
+        $app = new Contradict(uniqid("testdata"));
+        $dictID = $app->addDict('dict');
+        $r = $app->appendWords($dictID, [['q', 'a']]);
+        $id = $r['ids'][0];
+
+        // action: generate a test
+        $test = $app->generateTest($dictID);
+
+        // post: valid test, entry marked as touched.
+        $this->assertEquals($test, [
+            'tuples1' => [
+                0 => [
+                    'id' => $id,
+                    'q' => 'q',
+                    'a' => 'a',
+                    'times' => 0,
+                    'score' => 0,
+                    'urls' => [],
+                    'reverse' => false,
+                ],
+            ],
+        ]);
+        $this->assertEquals(1, $app->getEntry($dictID, $id)['touched']);
+        $app->generateTest($dictID);
+        $this->assertEquals(2, $app->getEntry($dictID, $id)['touched']);
+    }
+
     function testDicts()
     {
         // pre: app with some dicts

@@ -132,6 +132,58 @@ class Contradict
         $this->begin()->updateEntry($dictID, $id, compact('q', 'a'))->commit();
     }
 
+    function generateTest(string $dict_id)
+    {
+        $size = 20;
+        $entries = $this->_getEntries($dict_id);
+        $pick1 = $this->pick($entries, $size);
+        $tuples = [];
+        $writer = $this->begin();
+        foreach ($pick1 as $entry) {
+            $tuples[] = [
+                'id' => $entry['id'],
+                'q' => $entry['q'],
+                'a' => $entry['a'],
+                'times' => $entry['touched'],
+                'score' => $entry['answers1'],
+                'urls' => $this->wikiURLs($dict_id, $entry['q']),
+                'reverse' => false,
+            ];
+            $writer->updateEntry($dict_id, $entry['id'], ['touched' => $entry['touched'] + 1]);
+        }
+        $writer->commit();
+        return ['tuples1' => $tuples];
+    }
+
+    private function pick(array $entries, int $size): array
+    {
+        // Remove entries that have already been finished.
+        $entries = array_filter($entries, function ($e) {
+            return $e['answers1'] < self::GOAL;
+        });
+
+        // Get N least recently touched.
+        $r = array_filter($entries, function ($e) {
+            return $e['touched'] > 0;
+        });
+        usort($r, function ($a, $b) {
+            return $a['touched'] <=> $b['touched'];
+        });
+        $r = array_slice($r, 0, $size);
+
+        // If total is less than N, add random untouched.
+        $n = $size - count($r);
+        if ($n > 0) {
+            $untouched = array_filter($entries, function ($e) {
+                return !$e['touched'];
+            });
+            $r = array_merge($r, array_slice($untouched, 0, $n));
+        }
+        // shuffle just because why not
+        shuffle($r);
+        return $r;
+    }
+
     function getSheet(string $dict_id)
     {
         $entries = $this->_getEntries($dict_id);
