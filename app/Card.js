@@ -10,7 +10,7 @@ const CardDiv = styled.div`
   max-width: 20em;
   border: 1px solid #eef;
   margin: 2em auto;
-  background-color: ${(props) => (props.reverse ? "#ffd9e0" : "white")};
+  background-color: ${(props) => (props.inverse ? "#ffeed9" : "white")};
   position: relative;
   min-height: 6em;
   display: flex;
@@ -39,41 +39,38 @@ const CardDiv = styled.div`
   }
 `;
 
-export const Card = ({ card, show, onShow, onChange }) => {
+export const Card = ({ card, show, onShow, onChange, inverse }) => {
   const [editing, setEditing] = useState(false);
+  const title = <p className="h">{card.q}</p>;
+  const description = (
+    <>
+      {card.a.split("\n").map((line, i) => (
+        <Fragment key={i}>
+          {line}
+          <br />
+        </Fragment>
+      ))}
+    </>
+  );
   return (
-    <CardDiv reverse={card.reverse} onClick={onShow}>
+    <CardDiv inverse={inverse} onClick={onShow}>
       <div className="corner" title="score">
         {card.score}
       </div>
-      <p className="h">{card.q}</p>
+      {!inverse ? (
+        <>
+          {title}
+          {show && description}
+        </>
+      ) : (
+        <>
+          {show && title}
+          {description}
+        </>
+      )}
+
       {show && (
         <>
-          {editing ? (
-            <Editor
-              card={card}
-              onChange={(newCard) => {
-                onChange(newCard);
-                setEditing(false);
-              }}
-            />
-          ) : (
-            <>
-              {card.a.split("\n").map((line, i) => (
-                <Fragment key={i}>
-                  {line}
-                  <br />
-                </Fragment>
-              ))}
-              <LinkButton
-                onClick={() => {
-                  setEditing(true);
-                }}
-              >
-                Edit
-              </LinkButton>
-            </>
-          )}
           <ul>
             {card.urls.map((url) => (
               <li key={url}>
@@ -83,6 +80,23 @@ export const Card = ({ card, show, onShow, onChange }) => {
               </li>
             ))}
           </ul>
+          {editing ? (
+            <Editor
+              card={card}
+              onChange={(newCard) => {
+                onChange(newCard);
+                setEditing(false);
+              }}
+            />
+          ) : (
+            <LinkButton
+              onClick={() => {
+                setEditing(true);
+              }}
+            >
+              Edit
+            </LinkButton>
+          )}
         </>
       )}
     </CardDiv>

@@ -28,7 +28,7 @@ export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
 
   const nextBatch = async () => {
     const r = await api.test(dictID);
-    setCards(r.tuples1);
+    setCards(r.tuples1.map((c) => ({ ...c, inverse: Math.random() < 0.2 })));
   };
 
   const next = async () => {
@@ -61,6 +61,7 @@ export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
       <Card
         card={card}
         show={show}
+        inverse={card.inverse}
         onShow={() => {
           if (show) {
             return;
