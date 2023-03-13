@@ -14,7 +14,7 @@ class Contradict
     /**
      * How many entries are in the "learning pool".
      */
-    const WINDOW = 200;
+    const WINDOW = 400;
 
     private $dataPath;
     private $data = [];
