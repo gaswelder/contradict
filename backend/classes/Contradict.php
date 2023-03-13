@@ -134,7 +134,7 @@ class Contradict
 
     function generateTest(string $dict_id)
     {
-        $size = 20;
+        $size = 100;
         $entries = $this->_getEntries($dict_id);
         $pick1 = $this->pick($entries, $size);
         $tuples = [];
