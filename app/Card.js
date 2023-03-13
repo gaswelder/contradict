@@ -40,7 +40,7 @@ const CardDiv = styled.div`
 `;
 
 export const Card = ({ card, show, onShow, onChange }) => {
-  const [state, setState] = useState({ editing: false, q: "", a: "" });
+  const [editing, setEditing] = useState(false);
   return (
     <CardDiv reverse={card.reverse} onClick={onShow}>
       <div className="corner" title="score">
@@ -49,30 +49,14 @@ export const Card = ({ card, show, onShow, onChange }) => {
       <p className="h">{card.q}</p>
       {show && (
         <>
-          {state.editing ? (
-            <>
-              <input
-                value={state.q}
-                onChange={(e) => {
-                  setState({ ...state, q: e.target.value });
-                }}
-              />
-              <br />
-              <textarea
-                value={state.a}
-                onChange={(e) => {
-                  setState({ ...state, a: e.target.value });
-                }}
-              />
-              <LinkButton
-                onClick={() => {
-                  onChange({ ...card, q: state.q, a: state.a });
-                  setState({ ...state, editing: false });
-                }}
-              >
-                Save
-              </LinkButton>
-            </>
+          {editing ? (
+            <Editor
+              card={card}
+              onChange={(newCard) => {
+                onChange(newCard);
+                setEditing(false);
+              }}
+            />
           ) : (
             <>
               {card.a.split("\n").map((line, i) => (
@@ -83,7 +67,7 @@ export const Card = ({ card, show, onShow, onChange }) => {
               ))}
               <LinkButton
                 onClick={() => {
-                  setState({ editing: true, q: card.q, a: card.a });
+                  setEditing(true);
                 }}
               >
                 Edit
@@ -102,5 +86,34 @@ export const Card = ({ card, show, onShow, onChange }) => {
         </>
       )}
     </CardDiv>
+  );
+};
+
+const Editor = ({ card, onChange }) => {
+  const [q, setQ] = useState(card.q);
+  const [a, setA] = useState(card.a);
+  return (
+    <>
+      <input
+        value={q}
+        onChange={(e) => {
+          setQ(e.target.value);
+        }}
+      />
+      <br />
+      <textarea
+        value={a}
+        onChange={(e) => {
+          setA(e.target.value);
+        }}
+      />
+      <LinkButton
+        onClick={() => {
+          onChange({ ...card, q, a });
+        }}
+      >
+        Save
+      </LinkButton>
+    </>
   );
 };
