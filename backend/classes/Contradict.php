@@ -134,11 +134,21 @@ class Contradict
 
     function generateTest(string $dict_id)
     {
-        $entries = $this->_getEntries($dict_id);
-        $pick1 = $this->pick($entries, self::WINDOW);
+        // Remove finished entries.
+        $entries = array_filter($this->_getEntries($dict_id), function ($e) {
+            return $e['answers1'] < self::GOAL;
+        });
+        // The pool includes all touched and possibly some untouched.
+        usort($entries, function ($a, $b) {
+            return $b['touched'] <=> $a['touched'];
+        });
+        $entries = array_slice($entries, 0, self::WINDOW);
+
+        // Take random 100 from the pool.
+        shuffle($entries);
         $tuples = [];
         $writer = $this->begin();
-        foreach ($pick1 as $entry) {
+        foreach ($entries as $entry) {
             $tuples[] = [
                 'id' => $entry['id'],
                 'q' => $entry['q'],
@@ -152,35 +162,6 @@ class Contradict
         }
         $writer->commit();
         return ['tuples1' => $tuples];
-    }
-
-    private function pick(array $entries, int $size): array
-    {
-        // Remove entries that have already been finished.
-        $entries = array_filter($entries, function ($e) {
-            return $e['answers1'] < self::GOAL;
-        });
-
-        // Get N least recently touched.
-        $r = array_filter($entries, function ($e) {
-            return $e['touched'] > 0;
-        });
-        usort($r, function ($a, $b) {
-            return $a['touched'] <=> $b['touched'];
-        });
-        $r = array_slice($r, 0, $size);
-
-        // If total is less than N, add random untouched.
-        $n = $size - count($r);
-        if ($n > 0) {
-            $untouched = array_filter($entries, function ($e) {
-                return !$e['touched'];
-            });
-            $r = array_merge($r, array_slice($untouched, 0, $n));
-        }
-        // shuffle just because why not
-        shuffle($r);
-        return $r;
     }
 
     function getSheet(string $dict_id)
