@@ -12,6 +12,10 @@ export const useAPI = () => {
       try {
         return await api[func](...args);
       } catch (error) {
+        if (error.unauthorized) {
+          history.push(ROOT_PATH + "login");
+          return;
+        }
         setError(error);
         throw error;
       } finally {
