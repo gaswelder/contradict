@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import withAPI from "./withAPI";
 import { Card } from "./Card";
+import { useAPI } from "./withAPI";
 
 const ContainerDiv = styled.div`
   text-align: center;
@@ -20,17 +20,15 @@ const ClipDiv = styled.div`
   }
 `;
 
-export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
+export const RepetitionsPage = ({ dictID }) => {
+  const { api, busy } = useAPI();
   const [cards, setCards] = useState([]);
   const [show, setShow] = useState(false);
   const [yes, setYes] = useState(false);
   const [count, setCount] = useState(0);
-  const [loading, setLoading] = useState(false);
 
   const nextBatch = async () => {
-    setLoading(true);
     const r = await api.test(dictID);
-    setLoading(false);
     setCards(r.tuples1.map((c) => ({ ...c, inverse: Math.random() < 0.2 })));
   };
 
@@ -55,7 +53,7 @@ export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
         ))}
       </ClipDiv>
       {!cards.length && (
-        <button disabled={loading} onClick={nextBatch}>
+        <button disabled={busy} onClick={nextBatch}>
           Load Next Batch
         </button>
       )}
@@ -121,4 +119,4 @@ export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
       )}
     </ContainerDiv>
   );
-});
+};

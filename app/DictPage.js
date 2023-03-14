@@ -1,8 +1,9 @@
 import React from "react";
 import { usePromise } from "./Resource";
-import withAPI from "./withAPI";
+import { useAPI } from "./withAPI";
 
-export const DictPage = withAPI(({ busy, api, dictID }) => {
+export const DictPage = ({ dictID }) => {
+  const { api, busy } = useAPI();
   const { data, error, loading } = usePromise(() => api.dict(dictID));
   if (loading) {
     return "Loading";
@@ -49,4 +50,4 @@ export const DictPage = withAPI(({ busy, api, dictID }) => {
       </div>
     </form>
   );
-});
+};

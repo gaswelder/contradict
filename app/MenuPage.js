@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ROOT_PATH } from "./api";
 import Dictionary from "./Dictionary";
-import withAPI from "./withAPI";
+import { useAPI } from "./withAPI";
 
-const MenuPage = ({ api }) => {
+const MenuPage = () => {
+  const { api } = useAPI();
   const [state, setState] = useState(null);
   const [dicts, setDicts] = useState(null);
   const load = async () => {
@@ -62,4 +63,4 @@ const MenuPage = ({ api }) => {
   );
 };
 
-export default withAPI(MenuPage);
+export default MenuPage;
