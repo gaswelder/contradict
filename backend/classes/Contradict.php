@@ -146,6 +146,7 @@ class Contradict
 
         // Take random 100 from the pool.
         shuffle($entries);
+        $entries = array_slice($entries, 0, 100);
         $tuples = [];
         $writer = $this->begin();
         foreach ($entries as $entry) {
