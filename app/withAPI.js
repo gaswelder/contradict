@@ -13,7 +13,7 @@ export const useAPI = () => {
         return await api[func](...args);
       } catch (error) {
         if (error.unauthorized) {
-          history.push(ROOT_PATH + "login");
+          location.href = ROOT_PATH + "login";
           return;
         }
         setError(error);
