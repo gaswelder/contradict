@@ -25,9 +25,12 @@ export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
   const [show, setShow] = useState(false);
   const [yes, setYes] = useState(false);
   const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const nextBatch = async () => {
+    setLoading(true);
     const r = await api.test(dictID);
+    setLoading(false);
     setCards(r.tuples1.map((c) => ({ ...c, inverse: Math.random() < 0.2 })));
   };
 
@@ -35,11 +38,7 @@ export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
     setCount((x) => x + 1);
     setShow(false);
     setYes(false);
-    if (cards.length == 1) {
-      await nextBatch();
-    } else {
-      setCards(cards.slice(1));
-    }
+    setCards(cards.slice(1));
   };
 
   useEffect(() => {
@@ -47,71 +46,77 @@ export const RepetitionsPage = withAPI(({ api, busy, dictID }) => {
   }, []);
 
   const card = cards[0];
-  if (!card) {
-    return "loading";
-  }
   return (
     <ContainerDiv>
       {count}
       <ClipDiv>
         {cards.map((card) => (
-          <span key={card.id}> {card.score} </span>
+          <span key={card.id}>{card.score}</span>
         ))}
       </ClipDiv>
-      <Card
-        card={card}
-        show={show}
-        inverse={card.inverse}
-        onShow={() => {
-          if (show) {
-            return;
-          }
-          setShow(true);
-          api.touchCard(dictID, card.id, card.reverse, false);
-        }}
-        onChange={(newCard) => {
-          api.updateEntry(dictID, card.id, { q: newCard.q, a: newCard.a });
-          setCards([newCard, ...cards.slice(1)]);
-        }}
-      />
-      {show && (
+      {!cards.length && (
+        <button disabled={loading} onClick={nextBatch}>
+          Load Next Batch
+        </button>
+      )}
+      {card && (
         <>
-          {yes && (
+          <Card
+            card={card}
+            show={show}
+            inverse={card.inverse}
+            onShow={() => {
+              if (show) {
+                return;
+              }
+              setShow(true);
+              api.touchCard(dictID, card.id, card.reverse, false);
+            }}
+            onChange={(newCard) => {
+              api.updateEntry(dictID, card.id, { q: newCard.q, a: newCard.a });
+              setCards([newCard, ...cards.slice(1)]);
+            }}
+          />
+          {show && (
             <>
-              <button
-                onClick={() => {
-                  api.touchCard(dictID, card.id, card.reverse, false);
-                  api.touchCard(dictID, card.id, card.reverse, false);
-                  next();
-                }}
-              >
-                Oops, wrong guess
-              </button>{" "}
+              {yes && (
+                <>
+                  <button
+                    onClick={() => {
+                      api.touchCard(dictID, card.id, card.reverse, false);
+                      api.touchCard(dictID, card.id, card.reverse, false);
+                      next();
+                    }}
+                  >
+                    Oops, wrong guess
+                  </button>{" "}
+                </>
+              )}
+              <button onClick={next}>Next</button>
             </>
           )}
-          <button onClick={next}>Next</button>
-        </>
-      )}
-      {!show && (
-        <>
-          <button
-            onClick={async () => {
-              api.touchCard(dictID, card.id, card.reverse, false);
-              setShow(true);
-            }}
-          >
-            No, forgot it
-          </button>{" "}
-          <button
-            disabled={busy}
-            onClick={() => {
-              api.touchCard(dictID, card.id, card.reverse, true);
-              setShow(true);
-              setYes(true);
-            }}
-          >
-            Yes, know it
-          </button>
+          {!show && (
+            <>
+              <button
+                onClick={async () => {
+                  api.touchCard(dictID, card.id, card.reverse, false);
+                  setShow(true);
+                }}
+              >
+                No, forgot it
+              </button>{" "}
+              <button
+                disabled={busy}
+                onClick={() => {
+                  api.touchCard(dictID, card.id, card.reverse, true);
+                  setShow(true);
+                  setYes(true);
+                }}
+              >
+                Yes, know it
+              </button>
+            </>
+          )}
         </>
       )}
     </ContainerDiv>
