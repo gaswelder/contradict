@@ -10,6 +10,7 @@ import { Page } from "./Page";
 import { RepetitionsPage } from "./RepetitionsPage";
 import { ResultsPage } from "./ResultsPage";
 import { SheetPage } from "./SheetPage";
+import { StatsPage } from "./StatsPage";
 
 function page(Component, header = true) {
   const wrappedPage = (props) => (
@@ -31,6 +32,12 @@ class Main extends React.Component {
             path={`${R}:id/sheet`}
             component={page(({ match }) => {
               return <SheetPage dictID={match.params.id} />;
+            })}
+          />
+          <Route
+            path={`${R}stats/:id`}
+            component={page(({ match }) => {
+              return <StatsPage dictID={match.params.id} />;
             })}
           />
           <Route

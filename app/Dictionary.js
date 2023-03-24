@@ -55,6 +55,7 @@ function Dictionary({ dict }) {
     <RootDiv>
       <HeaderDiv>
         <h3>{dict.name}</h3>
+        <Link to={`${ROOT_PATH}stats/${dict.id}`}>Stats</Link>{" "}
         <Link to={`${ROOT_PATH}dicts/${dict.id}`}>Edit</Link>
       </HeaderDiv>
       <ColumnMeterDiv>
