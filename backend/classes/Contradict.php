@@ -7,14 +7,14 @@ class DictNotFound extends Exception
 class Contradict
 {
     /**
-     * How many correct answers needed for an entry to be "finished".
+     * How many correct answers are needed for an entry to be "finished".
      */
-    const GOAL = 10;
+    const GOAL = 6;
 
     /**
      * How many entries are in the "learning pool".
      */
-    const WINDOW = 400;
+    const WINDOW = 1000;
 
     private $dataPath;
     private $data = [];
