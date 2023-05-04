@@ -134,13 +134,15 @@ class Contradict
 
     function generateTest(string $dict_id)
     {
-        // Remove finished entries.
+        // Exclude finished entries.
         $entries = array_filter($this->_getEntries($dict_id), function ($e) {
             return $e['answers1'] < self::GOAL;
         });
         // The pool includes all touched and possibly some untouched.
+        // To add more time between displays of a single card, sort by "touched"
+        // in the ascending order.
         usort($entries, function ($a, $b) {
-            return $b['touched'] <=> $a['touched'];
+            return $a['touched'] <=> $b['touched'];
         });
         $entries = array_slice($entries, 0, self::WINDOW);
 
