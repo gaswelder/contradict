@@ -165,7 +165,6 @@ class AppTest extends TestCase
                     'times' => 0,
                     'score' => 0,
                     'urls' => [],
-                    'reverse' => false,
                 ],
             ],
         ]);

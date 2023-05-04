@@ -82,7 +82,7 @@ export const RepetitionsPage = ({ dictID }) => {
                 return;
               }
               setShow(true);
-              api.touchCard(dictID, card.id, card.reverse, false);
+              api.touchCard(dictID, card.id, false);
             }}
             onChange={(newCard) => {
               api.updateEntry(dictID, card.id, { q: newCard.q, a: newCard.a });
@@ -95,8 +95,8 @@ export const RepetitionsPage = ({ dictID }) => {
                 <>
                   <button
                     onClick={() => {
-                      api.touchCard(dictID, card.id, card.reverse, false);
-                      api.touchCard(dictID, card.id, card.reverse, false);
+                      api.touchCard(dictID, card.id, false);
+                      api.touchCard(dictID, card.id, false);
                       next();
                     }}
                   >
@@ -111,7 +111,7 @@ export const RepetitionsPage = ({ dictID }) => {
             <>
               <button
                 onClick={async () => {
-                  api.touchCard(dictID, card.id, card.reverse, false);
+                  api.touchCard(dictID, card.id, false);
                   setShow(true);
                 }}
               >
@@ -120,7 +120,7 @@ export const RepetitionsPage = ({ dictID }) => {
               <button
                 disabled={busy}
                 onClick={() => {
-                  api.touchCard(dictID, card.id, card.reverse, true);
+                  api.touchCard(dictID, card.id, true);
                   setShow(true);
                   setYes(true);
                 }}

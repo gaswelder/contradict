@@ -159,7 +159,6 @@ class Contradict
                 'times' => $entry['touched'],
                 'score' => $entry['answers1'],
                 'urls' => $this->wikiURLs($dict_id, $entry['q']),
-                'reverse' => false,
             ];
             $writer->updateEntry($dict_id, $entry['id'], ['touched' => $entry['touched'] + 1]);
         }
