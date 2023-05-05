@@ -196,10 +196,10 @@ class Contradict
         if (in_array(strtolower($words[0]), ['das', 'die', 'der', 'to'])) {
             array_shift($words);
         }
-        if (count($words) != 1) {
+        if (count($words) == 0) {
             return [];
         }
-        $word = $words[0];
+        $word = implode(' ', $words);
         $dict = $this->_getDict($dictID);
         return array_map(function ($template) use ($word) {
             return str_replace('{{word}}', urlencode($word), $template);
