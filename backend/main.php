@@ -68,7 +68,7 @@ $router = router::make()
         $password = request::post('password');
         $token = Auth::login($name, $password);
         if ($token) {
-            setcookie('token', $token, time() + 3600 * 24);
+            setcookie('token', $token, time() + 3600 * 24 * 30);
             return response::status(201);
         } else {
             return response::status(403)->setContent('text/plain', 'Invalid login/password');
