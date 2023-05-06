@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 export const ButtonLink = styled(Link)`
   display: inline-block;
+  font-family: sans-serif;
   font-size: 14px;
   padding: 6px 12px;
   border: 1px solid #e0e0e0;

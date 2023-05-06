@@ -4,7 +4,7 @@ import styled from "styled-components";
 import api, { ROOT_PATH } from "./api";
 
 const HeaderContainer = styled.header`
-  background-color: #204c72;
+  background-color: rgb(28, 100, 162);
   color: white;
   display: flex;
   align-items: center;
