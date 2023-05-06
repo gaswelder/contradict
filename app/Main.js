@@ -27,7 +27,17 @@ class Main extends React.Component {
     return (
       <BrowserRouter>
         <Switch>
-          <Route exact path={`${R}`} component={page(MenuPage)} />
+          <Route
+            exact
+            path={`${R}`}
+            component={(props) => {
+              return (
+                <Page back={<></>} header>
+                  <MenuPage {...props} />
+                </Page>
+              );
+            }}
+          />
           <Route
             path={`${R}:id/sheet`}
             component={page(({ match }) => {
