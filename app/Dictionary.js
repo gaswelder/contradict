@@ -37,10 +37,10 @@ const ColumnMeterDiv = styled.div`
     padding: 4px 0;
   }
   & .finished {
-    background-color: #b0f1ff;
+    background-color: #b9de96;
   }
   & .in-progress {
-    background-color: #b9de96;
+    background-color: #b0f1ff;
   }
   & .in-queue {
     background-color: #eee;
@@ -64,14 +64,14 @@ function Dictionary({ dict }) {
           style={{ width: pos(finished) }}
           title="finished"
         >
-          {finished}
+          &nbsp;
         </div>
         <div
           className="in-progress"
           style={{ width: pos(touched) }}
           title="touched"
         >
-          {finished + touched}
+          &nbsp;
         </div>
         <div className="in-queue" style={{ width: pos(total) }} title="total">
           {total}
