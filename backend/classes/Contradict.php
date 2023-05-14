@@ -138,16 +138,22 @@ class Contradict
         $entries = array_filter($this->_getEntries($dict_id), function ($e) {
             return $e['answers1'] < self::GOAL;
         });
-        // The pool includes all touched and possibly some untouched.
-        // To add more time between displays of a single card, sort by "touched"
-        // in the ascending order.
+
+        // Use a sliding window, include touched words first, then untouched.
         usort($entries, function ($a, $b) {
-            return $a['touched'] <=> $b['touched'];
+            return $b['touched'] <=> $a['touched'];
         });
         $entries = array_slice($entries, 0, self::WINDOW);
 
-        // Take random 100 from the pool.
-        shuffle($entries);
+        // The window includes all touched and possibly some untouched.
+        // To add more time between displays of a single card, sort by "touched"
+        // in the ascending order.
+        // Also, delay those with higher answer counts.
+        usort($entries, function ($a, $b) {
+            return [$a['touched'], $a['answers1'], rand()] <=> [$b['touched'], $b['answers1'], rand()];
+        });
+
+        // Take 100 from the ordered window.
         $entries = array_slice($entries, 0, 100);
         $tuples = [];
         $writer = $this->begin();
