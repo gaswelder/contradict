@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import styled from "styled-components";
-import { LinkButton } from "./LinkButton";
-import { urlTitle } from "./url-title";
+import { LinkButton } from "./lib/LinkButton";
+import { urlTitle } from "./lib/url-title";
 
 const CardDiv = styled.div`
   padding: 20px;

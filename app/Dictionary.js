@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { ROOT_PATH } from "./api";
-import { ButtonLink } from "./ButtonLink";
+import { ButtonLink } from "./lib/ButtonLink";
 
 const RootDiv = styled.section`
   padding: 1em;

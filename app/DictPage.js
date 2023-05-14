@@ -1,5 +1,5 @@
 import React from "react";
-import { usePromise } from "./Resource";
+import { usePromise } from "./lib/use-promise";
 import { useAPI } from "./withAPI";
 
 export const DictPage = ({ dictID }) => {
