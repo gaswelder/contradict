@@ -156,7 +156,6 @@ class Contradict
         // Take 100 from the ordered window.
         $entries = array_slice($entries, 0, 100);
         $tuples = [];
-        $writer = $this->begin();
         foreach ($entries as $entry) {
             $tuples[] = [
                 'id' => $entry['id'],
@@ -166,9 +165,7 @@ class Contradict
                 'score' => $entry['answers1'],
                 'urls' => $this->wikiURLs($dict_id, $entry['q']),
             ];
-            $writer->updateEntry($dict_id, $entry['id'], ['touched' => $entry['touched'] + 1]);
         }
-        $writer->commit();
         return ['tuples1' => $tuples];
     }
 
@@ -238,7 +235,10 @@ class Contradict
     function markTouch(string $dictID, string $entryID, bool $success)
     {
         $e = $this->_getentry($dictID, $entryID);
-        $upd = ['answers1' => $e['answers1']];
+        $upd = [
+            'answers1' => $e['answers1'],
+            'touched' => $e['touched'] + 1
+        ];
         if ($success) {
             $upd['answers1']++;
         } else {

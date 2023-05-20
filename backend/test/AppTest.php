@@ -130,6 +130,7 @@ class AppTest extends TestCase
         // post: counters updated correctly
         $e1 = $app->getEntry('1', '1');
         $this->assertEquals($e1['answers1'], 2);
+        $this->assertEquals($e1['touched'], 1);
     }
 
     function testGetEntry()
@@ -155,7 +156,7 @@ class AppTest extends TestCase
         // action: generate a test
         $test = $app->generateTest($dictID);
 
-        // post: valid test, entry marked as touched.
+        // post: valid test.
         $this->assertEquals($test, [
             'tuples1' => [
                 0 => [
@@ -168,9 +169,6 @@ class AppTest extends TestCase
                 ],
             ],
         ]);
-        $this->assertEquals(1, $app->getEntry($dictID, $id)['touched']);
-        $app->generateTest($dictID);
-        $this->assertEquals(2, $app->getEntry($dictID, $id)['touched']);
     }
 
     function testDicts()
