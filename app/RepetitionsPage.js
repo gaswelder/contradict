@@ -9,6 +9,8 @@ const ContainerDiv = styled.div`
 
 const ClipDiv = styled.div`
   margin-top: 1em;
+  display: flex;
+  overflow: hidden;
   & span {
     display: inline-block;
     border: thin solid #cce;
@@ -39,7 +41,6 @@ export const RepetitionsPage = ({ dictID }) => {
   );
   const [show, setShow] = useState(false);
   const [yes, setYes] = useState(false);
-  const [count, setCount] = useState(0);
 
   const nextBatch = async () => {
     const r = await api.test(dictID);
@@ -47,7 +48,6 @@ export const RepetitionsPage = ({ dictID }) => {
   };
 
   const next = async () => {
-    setCount((x) => x + 1);
     setShow(false);
     setYes(false);
     setCards(cards.slice(1));
@@ -60,7 +60,6 @@ export const RepetitionsPage = ({ dictID }) => {
   const card = cards[0];
   return (
     <ContainerDiv>
-      {count}
       <ClipDiv>
         {cards.map((card) => (
           <span key={card.id}>{card.score}</span>
