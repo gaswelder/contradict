@@ -84,9 +84,9 @@ class AppTest extends TestCase
                 'lookupURLTemplates' => [],
                 'stats' => [
                     'transitions' => [],
-                    'pairs' => 0,
+                    'total' => 0,
                     'finished' => 0,
-                    'touched' => 0
+                    'inProgress' => 0
                 ]
             ]
         ]);
@@ -188,9 +188,9 @@ class AppTest extends TestCase
                 'lookupURLTemplates' => [],
                 'stats' => [
                     'transitions' => [],
-                    'pairs' => 2.0,
+                    'total' => 2,
                     'finished' => 0,
-                    'touched' => 0.0,
+                    'inProgress' => 0,
                 ],
             ],
         ]);

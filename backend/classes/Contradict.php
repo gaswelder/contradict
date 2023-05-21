@@ -64,17 +64,15 @@ class Contradict
         $list = [];
         foreach ($this->_getDicts() as $row) {
             $entries = $this->_getEntries($row['id']);
-            $totalEntries = count($entries);
             $finished = 0;
-            $touched = 0;
+            $inProgress = 0;
             foreach ($entries as $e) {
-                $isfinished = $e['answers1'] >= self::GOAL;
-                if ($isfinished) {
+                if ($e['answers1'] >= self::GOAL) {
                     $finished++;
                     continue;
                 }
                 if ($e['touched']) {
-                    $touched++;
+                    $inProgress++;
                 }
             }
             $list[] = [
@@ -83,9 +81,9 @@ class Contradict
                 'lookupURLTemplates' => $row['lookupURLTemplates'] ?? [],
                 'stats' => [
                     'transitions' => $row['stats'],
-                    'pairs' => floatval($totalEntries),
+                    'total' => count($entries),
                     'finished' => $finished,
-                    'touched' => floatval($touched),
+                    'inProgress' => $inProgress
                 ]
             ];
         }

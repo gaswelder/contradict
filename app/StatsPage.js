@@ -17,8 +17,8 @@ export const StatsPage = ({ dictID }) => {
   return (
     <>
       <h2>{dict.name}</h2>
-      <p>Pairs: {dict.stats.pairs}</p>
-      <p>Touched: {dict.stats.touched}</p>
+      <p>Total cards: {dict.stats.total}</p>
+      <p>In progress: {dict.stats.inProgress}</p>
       <p>Finished: {dict.stats.finished}</p>
       <table>
         <tr>

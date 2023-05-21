@@ -48,8 +48,7 @@ const ColumnMeterDiv = styled.div`
 `;
 
 function Dictionary({ dict }) {
-  const { pairs, touched, finished } = dict.stats;
-  const total = pairs + finished;
+  const { total, finished, inProgress } = dict.stats;
   const pos = (n) => (100 * n) / total + "%";
   return (
     <RootDiv>
@@ -62,14 +61,14 @@ function Dictionary({ dict }) {
         <div
           className="finished"
           style={{ width: pos(finished) }}
-          title="finished"
+          title={"finished: " + finished}
         >
           &nbsp;
         </div>
         <div
           className="in-progress"
-          style={{ width: pos(touched) }}
-          title="touched"
+          style={{ width: pos(inProgress) }}
+          title={"in progress: " + inProgress}
         >
           &nbsp;
         </div>
