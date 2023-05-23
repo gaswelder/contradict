@@ -61,9 +61,10 @@ class Contradict
 
     function getDicts(): array
     {
+        $r = $this->reader();
         $list = [];
-        foreach ($this->_getDicts() as $row) {
-            $entries = $this->_getEntries($row['id']);
+        foreach ($r->getDicts() as $row) {
+            $entries = $r->getEntries($row['id']);
             $finished = 0;
             $inProgress = 0;
             foreach ($entries as $e) {
@@ -93,7 +94,7 @@ class Contradict
     function getDict(string $id)
     {
         return [
-            'name' => $this->_getDict($id)['name']
+            'name' => $this->reader()->getDict($id)['name']
         ];
     }
 
@@ -112,7 +113,7 @@ class Contradict
     function getEntries(string $dictID): array
     {
         $list = [];
-        foreach ($this->_getEntries($dictID) as $e) {
+        foreach ($this->reader()->getEntries($dictID) as $e) {
             $list[] = [
                 'id' => $e['id']
             ];
@@ -122,7 +123,7 @@ class Contradict
 
     function getEntry(string $dictID, string $id)
     {
-        return $this->_getentry($dictID, $id);
+        return $this->reader()->getEntry($dictID, $id);
     }
 
     function updateEntry(string $dictID, string $id, string $q, string $a)
@@ -133,7 +134,7 @@ class Contradict
     function generateTest(string $dict_id)
     {
         // Exclude finished entries.
-        $entries = array_filter($this->_getEntries($dict_id), function ($e) {
+        $entries = array_filter($this->reader()->getEntries($dict_id), function ($e) {
             return $e['answers1'] < self::GOAL;
         });
 
@@ -169,7 +170,7 @@ class Contradict
 
     function getSheet(string $dict_id)
     {
-        $entries = $this->_getEntries($dict_id);
+        $entries = $this->reader()->getEntries($dict_id);
         usort($entries, function ($a, $b) {
             return [$a['answers1'], $b['touched']] <=> [$b['answers1'], $a['touched']];
         });
@@ -201,7 +202,7 @@ class Contradict
             return [];
         }
         $word = implode(' ', $words);
-        $dict = $this->_getDict($dictID);
+        $dict = $this->reader()->getDict($dictID);
         return array_map(function ($template) use ($word) {
             return str_replace('{{word}}', urlencode($word), $template);
         }, $dict['lookupURLTemplates']);
@@ -232,7 +233,7 @@ class Contradict
 
     function markTouch(string $dictID, string $entryID, bool $success)
     {
-        $e = $this->_getentry($dictID, $entryID);
+        $e = $this->reader()->getEntry($dictID, $entryID);
         $upd = [
             'answers1' => $e['answers1'],
             'touched' => $e['touched'] + 1
@@ -245,9 +246,9 @@ class Contradict
         $this->begin()->updateEntry($dictID, $entryID, $upd)->commit();
     }
 
-    private function hasEntry($dictId, $q, $a): bool
+    private function hasEntry(string $dictId, $q, $a): bool
     {
-        foreach ($this->_getEntries($dictId) as $entry) {
+        foreach ($this->reader()->getEntries($dictId) as $entry) {
             if ($entry['q'] == $q && $entry['a'] == $a) {
                 return true;
             }
@@ -260,7 +261,22 @@ class Contradict
         return new writer($this->dataPath, $this->data);
     }
 
-    private function _getDicts()
+    private function reader()
+    {
+        return new reader($this->data);
+    }
+}
+
+class reader
+{
+    private $data;
+
+    function __construct($data)
+    {
+        $this->data = &$data;
+    }
+
+    function getDicts()
     {
         return array_map([self::class, '_parseDict'], $this->data['dicts']);
     }
@@ -268,7 +284,7 @@ class Contradict
     /**
      * Returns a saved dict with the given id.
      */
-    private function _getDict(string $id)
+    function getDict(string $id)
     {
         return self::_parseDict($this->data['dicts'][$id]);
     }
@@ -282,7 +298,7 @@ class Contradict
         return $d;
     }
 
-    private function _getEntries($dictId)
+    function getEntries(string $dictId)
     {
         $entries = [];
         foreach ($this->data['dicts'][$dictId]['words'] as $row) {
@@ -291,7 +307,7 @@ class Contradict
         return $entries;
     }
 
-    private function _getentry(string $dict_id, string $id)
+    function getEntry(string $dict_id, string $id)
     {
         $row = $this->data['dicts'][$dict_id]['words'][$id] ?? null;
         if (!$row) {
