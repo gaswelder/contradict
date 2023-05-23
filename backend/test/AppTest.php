@@ -154,7 +154,7 @@ class AppTest extends TestCase
         $id = $r['ids'][0];
 
         // action: generate a test
-        $test = $app->generateTest($dictID);
+        $test = $app->generateTest($dictID, 10);
 
         // post: valid test.
         $this->assertEquals($test, [

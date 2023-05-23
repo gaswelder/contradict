@@ -131,7 +131,7 @@ class Contradict
         $this->begin()->updateEntry($dictID, $id, compact('q', 'a'))->commit();
     }
 
-    function generateTest(string $dict_id)
+    function generateTest(string $dict_id, int $size)
     {
         // Exclude finished entries.
         $entries = array_filter($this->reader()->getEntries($dict_id), function ($e) {
@@ -152,8 +152,8 @@ class Contradict
             return [$a['touched'], $a['answers1'], rand()] <=> [$b['touched'], $b['answers1'], rand()];
         });
 
-        // Take 100 from the ordered window.
-        $entries = array_slice($entries, 0, 100);
+        // Take $size from the ordered window.
+        $entries = array_slice($entries, 0, $size);
         $tuples = [];
         foreach ($entries as $entry) {
             $tuples[] = [

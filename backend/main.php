@@ -93,7 +93,11 @@ $router = router::make()
         return response::json(getThe()->appendWords($dict_id, request::json()['entries']));
     })
     ->add('get', '/api/{\w+}/test', function ($dict_id) {
-        return response::json(getThe()->generateTest($dict_id));
+        $size = intval(request::param("size", "20"));
+        if (!$size) {
+            $size = 20;
+        }
+        return response::json(getThe()->generateTest($dict_id, $size));
     })
     ->add('get', '/api/{\w+}/sheet', function ($dict_id) {
         return response::json(getThe()->getSheet($dict_id));

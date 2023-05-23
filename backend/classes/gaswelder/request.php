@@ -26,13 +26,13 @@ class request
 		return $_SERVER['REQUEST_METHOD'];
 	}
 
-	static function get($key)
+	static function param(string $key, $default)
 	{
 		self::init();
 		if (array_key_exists($key, self::$get)) {
 			return self::$get[$key];
 		} else {
-			return null;
+			return $default;
 		}
 	}
 

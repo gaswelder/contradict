@@ -43,7 +43,7 @@ export const RepetitionsPage = ({ dictID }) => {
   const [yes, setYes] = useState(false);
 
   const nextBatch = async () => {
-    const r = await api.test(dictID);
+    const r = await api.test(dictID, 20);
     setCards(r.tuples1.map((c) => ({ ...c, inverse: Math.random() < 0.2 })));
   };
 
