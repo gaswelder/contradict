@@ -148,9 +148,14 @@ class Contradict
         // To add more time between displays of a single card, sort by "touched"
         // in the ascending order.
         // Also, delay those with higher answer counts.
-        usort($entries, function ($a, $b) {
-            return [$a['touched'], $a['answers1'], rand()] <=> [$b['touched'], $b['answers1'], rand()];
-        });
+        // $ordering = function ($a, $b) {
+        //     return [$a['touched'], $a['answers1'], rand()] <=> [$b['touched'], $b['answers1'], rand()];
+        // };
+
+        $ordering = function ($a, $b) {
+            return rand(0, 2) - 1;
+        };
+        usort($entries, $ordering);
 
         // Take $size from the ordered window.
         $entries = array_slice($entries, 0, $size);
