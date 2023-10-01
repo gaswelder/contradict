@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 import styled from "styled-components";
 import { LinkButton } from "./lib/LinkButton";
-import { urlTitle } from "./lib/url-title";
+import { CardSources } from "./CardSources";
 
 const CardDiv = styled.div`
   padding: 20px;
@@ -23,16 +23,6 @@ const CardDiv = styled.div`
     right: 10px;
     top: 10px;
     font-size: 90%;
-  }
-  & ul {
-    padding: 0;
-  }
-  & li {
-    font-size: 10pt;
-    display: inline-block;
-  }
-  & li + li {
-    margin-left: 0.5em;
   }
   & .h {
     font-weight: bold;
@@ -71,15 +61,7 @@ export const Card = ({ card, show, onShow, onChange, inverse }) => {
 
       {show && (
         <>
-          <ul>
-            {card.urls.map((url) => (
-              <li key={url}>
-                <a target="_blank" rel="noreferrer" href={url}>
-                  {urlTitle(url)}
-                </a>
-              </li>
-            ))}
-          </ul>
+          <CardSources card={card} />
           {editing ? (
             <Editor
               card={card}
