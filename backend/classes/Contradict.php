@@ -251,6 +251,11 @@ class Contradict
         $this->begin()->updateEntry($dictID, $entryID, $upd)->commit();
     }
 
+    function deleteEntry(string $dictID, string $entryID)
+    {
+        $this->begin()->deleteEntry($dictID, $entryID)->commit();
+    }
+
     private function hasEntry(string $dictId, $q, $a): bool
     {
         foreach ($this->reader()->getEntries($dictId) as $entry) {
@@ -390,6 +395,13 @@ class writer
             }
             $this->data['dicts'][$dictID]['words'][$id][$k] = $v;
         }
+        $this->touched = true;
+        return $this;
+    }
+
+    function deleteEntry($dictID, $id)
+    {
+        unset($this->data['dicts'][$dictID]['words'][$id]);
         $this->touched = true;
         return $this;
     }

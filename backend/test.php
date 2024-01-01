@@ -85,7 +85,7 @@ foreach (array_slice($argv, 1) as $path) {
                 call_user_func_array([$test, $name], []);
                 echo "OK $name\n";
                 $ok++;
-            } catch (AssertException) {
+            } catch (AssertException $e) {
                 echo "FAIL $name\n";
                 $fails++;
             }
@@ -98,4 +98,11 @@ if ($fails > 0) {
     echo "fails: $fails, successes: $ok\n";
 } else {
     echo "successes: $ok, fails: $fails\n";
+}
+
+function str_ends_with($s, $suffix)
+{
+    $sn = strlen($suffix);
+    $n = strlen($s);
+    return $n >= $sn && substr($s, $n - $sn) == $suffix;
 }

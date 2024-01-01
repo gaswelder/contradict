@@ -29,7 +29,7 @@ const CardDiv = styled.div`
   }
 `;
 
-export const Card = ({ card, show, onShow, onChange, inverse }) => {
+export const Card = ({ card, show, onShow, onChange, onDelete, inverse }) => {
   const [editing, setEditing] = useState(false);
   const title = <p className="h">{card.q}</p>;
   const description = (
@@ -71,17 +71,25 @@ export const Card = ({ card, show, onShow, onChange, inverse }) => {
               }}
             />
           ) : (
-            <LinkButton
-              onClick={() => {
-                setEditing(true);
+            <EditButtons
+              onEdit={() => setEditing(true)}
+              onDelete={() => {
+                confirm("delete?") && onDelete();
               }}
-            >
-              Edit
-            </LinkButton>
+            />
           )}
         </>
       )}
     </CardDiv>
+  );
+};
+
+const EditButtons = ({ onEdit, onDelete }) => {
+  return (
+    <>
+      <LinkButton onClick={onEdit}>Edit</LinkButton>
+      <LinkButton onClick={onDelete}>Delete</LinkButton>
+    </>
   );
 };
 

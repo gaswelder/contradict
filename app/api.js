@@ -83,6 +83,7 @@ export default {
 
   updateEntry: (dictID, id, entry) =>
     post(`/entries/${dictID}/${id}`, { q: entry.q, a: entry.a }),
+  deleteEntry: (dictID, id) => post(`/delete/${dictID}/${id}`, {}),
 
   addEntries: (dictID, entries) =>
     postJSON(`/${dictID}/add`, {

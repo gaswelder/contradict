@@ -133,6 +133,19 @@ class AppTest extends TestCase
         $this->assertEquals($e1['touched'], 1);
     }
 
+    function testDelete()
+    {
+        // pre: app with entries
+        $app = $this->app();
+        // action: delete one entry
+        $app->deleteEntry('1', '1');
+        // post: entry deleted
+        $ids = array_map(function ($e) {
+            return $e['id'];
+        }, $app->getEntries('1'));
+        $this->assertEquals($ids, ['2']);
+    }
+
     function testGetEntry()
     {
         // pre: app with entries

@@ -118,6 +118,10 @@ $router = router::make()
         getThe()->markTouch($dictID, $entryID, $body['success']);
         return response::status(200);
     })
+    ->add('post', '/api/delete/{\w+}/{\w+}', function ($dictID, $entryID) {
+        getThe()->deleteEntry($dictID, $entryID);
+        return response::status(200);
+    })
     ->add('get', '/', function () {
         return response::staticFile('text/html', __DIR__ . '/../public/index.html');
     });

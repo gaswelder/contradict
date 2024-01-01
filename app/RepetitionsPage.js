@@ -73,6 +73,10 @@ export const RepetitionsPage = ({ dictID }) => {
               api.updateEntry(dictID, card.id, { q: newCard.q, a: newCard.a });
               setCards([newCard, ...cards.slice(1)]);
             }}
+            onDelete={() => {
+              api.deleteEntry(dictID, card.id);
+              setCards(cards.slice(1));
+            }}
           />
           {show && (
             <>
