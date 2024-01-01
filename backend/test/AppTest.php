@@ -97,11 +97,13 @@ class AppTest extends TestCase
         // pre: app with data
         $app = $this->app();
 
-        // action: rename the dictionary
-        $app->updateDict('1', ['name' => 'foo']);
+        // action: edit the dictionary
+        $app->updateDict('1', ['name' => 'foo', 'windowSize' => 10]);
 
         // post: dictionary renamed
-        $this->assertEquals($app->getDict('1')['name'], 'foo');
+        $dict = $app->getDict('1');
+        $this->assertEquals($dict['name'], 'foo');
+        $this->assertEquals($dict['windowSize'], 10);
     }
 
     function testUpdateEntry()

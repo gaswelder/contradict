@@ -11,11 +11,6 @@ class Contradict
      */
     const GOAL = 6;
 
-    /**
-     * How many entries are in the "learning pool".
-     */
-    const WINDOW = 1000;
-
     private $dataPath;
     private $data = [];
 
@@ -80,6 +75,7 @@ class Contradict
                 'id' => $row['id'],
                 'name' => $row['name'],
                 'lookupURLTemplates' => $row['lookupURLTemplates'] ?? [],
+                'windowSize' => $row['windowSize'],
                 'stats' => [
                     'transitions' => $row['stats'],
                     'total' => count($entries),
@@ -93,8 +89,10 @@ class Contradict
 
     function getDict(string $id)
     {
+        $dict = $this->reader()->getDict($id);
         return [
-            'name' => $this->reader()->getDict($id)['name']
+            'name' => $dict['name'],
+            'windowSize' => $dict['windowSize'],
         ];
     }
 
@@ -133,6 +131,8 @@ class Contradict
 
     function generateTest(string $dict_id, int $size)
     {
+        $dict = $this->reader()->getDict($dict_id);
+
         // Exclude finished entries.
         $entries = array_filter($this->reader()->getEntries($dict_id), function ($e) {
             return $e['answers1'] < self::GOAL;
@@ -142,7 +142,7 @@ class Contradict
         usort($entries, function ($a, $b) {
             return $b['touched'] <=> $a['touched'];
         });
-        $entries = array_slice($entries, 0, self::WINDOW);
+        $entries = array_slice($entries, 0, $dict['windowSize']);
 
         // The window includes all touched and possibly some untouched.
         // To add more time between displays of a single card, sort by "touched"
@@ -305,6 +305,7 @@ class reader
         $d['name'] = $row['name'];
         $d['lookupURLTemplates'] = $row['lookupURLTemplates'] ?? [];
         $d['stats'] = $row['stats'] ?? [];
+        $d['windowSize'] = $row['windowSize'] ?? 1000;
         return $d;
     }
 
@@ -361,7 +362,7 @@ class writer
 
     function updateDict($id, $data)
     {
-        $ok = ['name', 'lookupURLTemplates'];
+        $ok = ['name', 'lookupURLTemplates', 'windowSize'];
         foreach ($data as $k => $v) {
             if (!in_array($k, $ok)) {
                 throw new Error("Unknown dict field: $k");
