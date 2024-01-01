@@ -22,23 +22,9 @@ const ClipDiv = styled.div`
   }
 `;
 
-const store = new Map();
-
-const useGlobalState = (initial, key) => {
-  const initialized = store.has(key);
-  const [val, set] = useState(initialized ? store.get(key) : initial);
-  useEffect(() => {
-    store.set(key, val);
-  }, [val]);
-  return [val, set, initialized];
-};
-
 export const RepetitionsPage = ({ dictID }) => {
   const { api, busy } = useAPI();
-  const [cards, setCards, initialized] = useGlobalState(
-    [],
-    "repetitions/" + dictID
-  );
+  const [cards, setCards] = useState([]);
   const [show, setShow] = useState(false);
   const [yes, setYes] = useState(false);
 
@@ -54,7 +40,7 @@ export const RepetitionsPage = ({ dictID }) => {
   };
 
   useEffect(() => {
-    !initialized && nextBatch();
+    nextBatch();
   }, []);
 
   const card = cards[0];
