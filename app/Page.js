@@ -28,7 +28,7 @@ const Content = styled.main`
   padding: 1em;
 `;
 
-export const Page = ({ children, header, back }) => {
+export const Page = ({ children, header, back, headerContent }) => {
   const history = useHistory();
   async function logout() {
     try {
@@ -44,6 +44,7 @@ export const Page = ({ children, header, back }) => {
       {header && (
         <HeaderContainer>
           {back || <Link to={ROOT_PATH}>〈</Link>}
+          {headerContent}
           <button className="logout" onClick={logout}>
             Logout
           </button>

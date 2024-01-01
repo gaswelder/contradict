@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import AddEntriesPage from "./AddEntriesPage";
-import { ROOT_PATH } from "./api";
+import api, { ROOT_PATH } from "./api";
 import { DictPage } from "./DictPage";
 import Export from "./Export";
 import LoginPage from "./LoginPage";
@@ -64,9 +64,22 @@ class Main extends React.Component {
           />
           <Route
             path={`${R}:id/add`}
-            component={page(({ match }) => {
-              return <AddEntriesPage dictID={match.params.id} />;
-            })}
+            component={({ match }) => {
+              const dictID = match.params.id;
+              const [dict, setDict] = useState(null);
+              const [err, setErr] = useState(null);
+              useEffect(() => {
+                setDict(null);
+                api.dict(dictID).then(setDict).catch(setErr);
+              }, [dictID]);
+              if (err) return `Error: ${err.message}`;
+              if (!dict) return <Page header>Loading</Page>;
+              return (
+                <Page header headerContent={dict.name}>
+                  <AddEntriesPage dictID={dictID} />
+                </Page>
+              );
+            }}
           />
           <Route
             path={`${R}dicts/:id`}
