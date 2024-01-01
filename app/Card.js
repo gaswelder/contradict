@@ -88,7 +88,12 @@ const EditButtons = ({ onEdit, onDelete }) => {
   return (
     <>
       <LinkButton onClick={onEdit}>Edit</LinkButton>
-      <LinkButton onClick={onDelete}>Delete</LinkButton>
+      <LinkButton
+        style={{ position: "absolute", bottom: 0, right: 0, fontSize: "12px" }}
+        onClick={onDelete}
+      >
+        Delete
+      </LinkButton>
     </>
   );
 };
