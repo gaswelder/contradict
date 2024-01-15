@@ -138,24 +138,21 @@ class Contradict
             return $e['answers1'] < self::GOAL;
         });
 
-        // Use a sliding window, include touched words first, then untouched.
-        usort($entries, function ($a, $b) {
-            return $b['touched'] <=> $a['touched'];
-        });
-        $entries = array_slice($entries, 0, $dict['windowSize']);
-
-        // The window includes all touched and possibly some untouched.
-        // To add more time between displays of a single card, sort by "touched"
-        // in the ascending order.
-        // Also, delay those with higher answer counts.
-        // $ordering = function ($a, $b) {
-        //     return [$a['touched'], $a['answers1'], rand()] <=> [$b['touched'], $b['answers1'], rand()];
-        // };
-
-        $ordering = function ($a, $b) {
-            return rand(0, 2) - 1;
-        };
-        usort($entries, $ordering);
+        $mode = "shuffle";
+        if ($mode == "shuffle") {
+            shuffle($entries);
+        } else {
+            // Use a sliding window, include touched words first, then untouched.
+            usort($entries, function ($a, $b) {
+                return $b['touched'] <=> $a['touched'];
+            });
+            $entries = array_slice($entries, 0, $dict['windowSize']);
+            // Delay those with higher answer counts.
+            $ordering = function ($a, $b) {
+                return [$a['touched'], $a['answers1'], rand()] <=> [$b['touched'], $b['answers1'], rand()];
+            };
+            usort($entries, $ordering);
+        }
 
         // Take $size from the ordered window.
         $entries = array_slice($entries, 0, $size);
