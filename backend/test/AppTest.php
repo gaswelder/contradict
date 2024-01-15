@@ -82,6 +82,7 @@ class AppTest extends TestCase
                 'id' => $id,
                 'name' => 'foo',
                 'lookupURLTemplates' => [],
+                'windowSize' => 1000,
                 'stats' => [
                     'transitions' => [],
                     'total' => 0,
@@ -201,6 +202,7 @@ class AppTest extends TestCase
                 'id' => '1',
                 'name' => 'Sample dict',
                 'lookupURLTemplates' => [],
+                'windowSize' => 1000,
                 'stats' => [
                     'transitions' => [],
                     'total' => 2,
