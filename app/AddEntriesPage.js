@@ -20,7 +20,7 @@ export const AddEntriesPage = withRouter(({ dictID }) => {
     }
   };
   const { loading, entries, lastResult } = state;
-  const api = useAPI();
+  const { api } = useAPI();
 
   const handleEntryInput = (number, field, event) => {
     const value = event.target.value;
