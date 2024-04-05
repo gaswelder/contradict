@@ -46,25 +46,26 @@ export const AddEntriesPage = withRouter(({ dictID }) => {
 
   const handlePaste = (event) => {
     const text = event.clipboardData.getData("text");
-    const tuples = text
+
+    const newEntries = text
       .split(/\r?\n/)
       .map((line) => line.trim())
       .filter((line) => line != "")
-      .map((line) => line.split(" - "));
-    if (!tuples.every((tuple) => tuple.length == 2)) {
-      return;
-    }
-    event.preventDefault();
-    setState((state) => ({
-      entries: [
-        ...state.entries,
-        ...tuples.map(([q, a], i) => ({
+      .map((line, i) => {
+        const [q, a] = line.split(" - ");
+        return {
           number: state.nextEntryNumber + i + 1,
           q,
-          a,
-        })),
-      ].filter((r) => r.q != "" || r.a != ""),
-      nextEntryNumber: state.nextEntryNumber + tuples.length + 1,
+          a: a || "?",
+        };
+      });
+
+    event.preventDefault();
+    setState((state) => ({
+      entries: [...state.entries, ...newEntries].filter(
+        (r) => r.q != "" || r.a != ""
+      ),
+      nextEntryNumber: state.nextEntryNumber + newEntries.length + 1,
     }));
   };
 
