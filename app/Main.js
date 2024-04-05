@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import AddEntriesPage from "./AddEntriesPage";
 import api, { ROOT_PATH } from "./api";
 import { DictPage } from "./DictPage";
 import Export from "./Export";
@@ -11,6 +10,7 @@ import { RepetitionsPage } from "./RepetitionsPage";
 import { ResultsPage } from "./ResultsPage";
 import { SheetPage } from "./SheetPage";
 import { StatsPage } from "./StatsPage";
+import { AddEntriesPage } from "./AddEntriesPage";
 
 function page(Component, header = true) {
   const wrappedPage = (props) => (

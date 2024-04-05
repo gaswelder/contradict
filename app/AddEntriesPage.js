@@ -1,62 +1,50 @@
-import React from "react";
-import withAPI from "./withAPI";
+import React, { useState } from "react";
+import { withRouter } from "react-router";
+import { useAPI } from "./withAPI";
 
 // Tells if an entry is empty.
 const empty = (entry) => (entry.q + entry.a).trim() == "";
 
-class AddEntriesPage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      loading: false,
-      entries: [{ number: 0, q: "", a: "" }],
-      nextEntryNumber: 1,
-      lastResult: null,
-    };
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.addMore = this.addMore.bind(this);
-    this.handlePaste = this.handlePaste.bind(this);
-  }
+export const AddEntriesPage = withRouter(({ dictID }) => {
+  const [state, _setState] = useState({
+    loading: false,
+    entries: [{ number: 0, q: "", a: "" }],
+    nextEntryNumber: 1,
+    lastResult: null,
+  });
+  const setState = (change) => {
+    if (typeof change == "function") {
+      _setState((x) => ({ ...x, ...change(x) }));
+    } else {
+      _setState((x) => ({ ...x, ...change }));
+    }
+  };
+  const { loading, entries, lastResult } = state;
+  const api = useAPI();
 
-  async handleSubmit(e) {
-    const { api, dictID } = this.props;
-    e.preventDefault();
-    const data = this.state.entries
-      .filter((e) => !empty(e))
-      .map(({ q, a }) => ({ q, a }));
-    this.setState({ loading: true });
-    const { added, skipped } = await api.addEntries(dictID, data);
-    this.setState({
-      loading: false,
-      entries: [{ number: 0, q: "", a: "" }],
-      nextEntryNumber: 1,
-      lastResult: { added, skipped },
-    });
-  }
-
-  handleEntryInput(number, field, event) {
+  const handleEntryInput = (number, field, event) => {
     const value = event.target.value;
-    this.setState(function (state) {
+    setState(function (state) {
       const entries = state.entries.slice();
       const pos = entries.findIndex((e) => e.number == number);
       entries[pos] = { ...entries[pos], [field]: value };
       return { entries };
     });
-  }
+  };
 
-  addMore() {
-    const freeRowsNumber = this.state.entries.filter(empty).length;
+  const addMore = () => {
+    const freeRowsNumber = entries.filter(empty).length;
     if (freeRowsNumber > 0) return;
-    this.setState(function (state) {
+    setState(function (state) {
       const entry = { number: state.nextEntryNumber, q: "", a: "" };
       return {
         entries: [...state.entries, entry],
         nextEntryNumber: state.nextEntryNumber + 1,
       };
     });
-  }
+  };
 
-  handlePaste(event) {
+  const handlePaste = (event) => {
     const text = event.clipboardData.getData("text");
     const tuples = text
       .split(/\r?\n/)
@@ -67,7 +55,7 @@ class AddEntriesPage extends React.Component {
       return;
     }
     event.preventDefault();
-    this.setState((state) => ({
+    setState((state) => ({
       entries: [
         ...state.entries,
         ...tuples.map(([q, a], i) => ({
@@ -78,43 +66,54 @@ class AddEntriesPage extends React.Component {
       ].filter((r) => r.q != "" || r.a != ""),
       nextEntryNumber: state.nextEntryNumber + tuples.length + 1,
     }));
-  }
+  };
 
-  render() {
-    const { loading, entries, lastResult } = this.state;
-    return (
-      <form method="post" onSubmit={this.handleSubmit}>
-        <p>
-          <small>You can paste text lines in form &quot;q - a&quot;.</small>
+  return (
+    <form
+      method="post"
+      onSubmit={async (e) => {
+        setState({ loading: true });
+        e.preventDefault();
+        const data = entries
+          .filter((e) => !empty(e))
+          .map(({ q, a }) => ({ q, a }));
+        const { added, skipped } = await api.addEntries(dictID, data);
+        setState({
+          loading: false,
+          entries: [{ number: 0, q: "", a: "" }],
+          nextEntryNumber: 1,
+          lastResult: { added, skipped },
+        });
+      }}
+    >
+      <p>
+        <small>You can paste text lines in form &quot;q - a&quot;.</small>
+      </p>
+      {lastResult && (
+        <p style={{ color: "rgb(51, 109, 221)" }}>
+          {lastResult.added} added, {lastResult.skipped} skipped
         </p>
-        {lastResult && (
-          <p style={{ color: "rgb(51, 109, 221)" }}>
-            {lastResult.added} added, {lastResult.skipped} skipped
-          </p>
-        )}
-        {entries.map((entry) => (
-          <div key={entry.number}>
-            <input
-              placeholder="Q"
-              value={entry.q}
-              onChange={(e) => this.handleEntryInput(entry.number, "q", e)}
-              onBlur={this.addMore}
-              onPaste={this.handlePaste}
-            />
-            <input
-              placeholder="A"
-              value={entry.a}
-              onChange={(e) => this.handleEntryInput(entry.number, "a", e)}
-              onBlur={this.addMore}
-            />
-          </div>
-        ))}
-        <div>
-          <button disabled={loading}>Add</button>
+      )}
+      {entries.map((entry) => (
+        <div key={entry.number}>
+          <input
+            placeholder="Q"
+            value={entry.q}
+            onChange={(e) => handleEntryInput(entry.number, "q", e)}
+            onBlur={addMore}
+            onPaste={handlePaste}
+          />
+          <input
+            placeholder="A"
+            value={entry.a}
+            onChange={(e) => handleEntryInput(entry.number, "a", e)}
+            onBlur={addMore}
+          />
         </div>
-      </form>
-    );
-  }
-}
-
-export default withAPI(AddEntriesPage);
+      ))}
+      <div>
+        <button disabled={loading}>Add</button>
+      </div>
+    </form>
+  );
+});
