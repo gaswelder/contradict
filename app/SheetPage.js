@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { CardSources } from "./CardSources";
 import { useAPI } from "./withAPI";
 
 const ContainerDiv = styled.div`
   display: flex;
   flex-wrap: wrap;
   & > div {
-    flex-basis: 10em;
+    flex-basis: 20em;
     flex-grow: 1;
     margin: 0;
   }
@@ -42,15 +41,30 @@ export const SheetPage = ({ dictID }) => {
   if (!data) {
     return "loading";
   }
+  const batches = chunk(data);
   return (
     <ContainerDiv>
-      {data.map((tuple) => (
-        <Div key={tuple.id}>
-          <p className="h">{tuple.q}</p>
-          <p>{tuple.a}</p>
-          <CardSources card={tuple} />
-        </Div>
-      ))}
+      {batches.map((batch, i) => {
+        return (
+          <Div key={i}>
+            {batch.map((tuple) => {
+              return (
+                <p>
+                  {tuple.q} &ndash; {tuple.a}
+                </p>
+              );
+            })}
+          </Div>
+        );
+      })}
     </ContainerDiv>
   );
+};
+
+const chunk = (xs) => {
+  const n = 10;
+  if (xs.length <= n) {
+    return [xs];
+  }
+  return [xs.slice(0, 10), ...chunk(xs.slice(10))];
 };

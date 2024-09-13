@@ -1,8 +1,6 @@
 <?php
 
-class DictNotFound extends Exception
-{
-}
+class DictNotFound extends Exception {}
 
 class Contradict
 {
@@ -170,14 +168,12 @@ class Contradict
         return ['tuples1' => $tuples];
     }
 
-    function getSheet(string $dict_id)
+    function getSheet(string $dict_id, $size)
     {
         $entries = $this->reader()->getEntries($dict_id);
         usort($entries, function ($a, $b) {
             return [$a['answers1'], $b['touched']] <=> [$b['answers1'], $a['touched']];
         });
-
-        $size = 100;
         $r = [];
         foreach (array_slice($entries, 0, $size) as $e) {
             $r[] = [

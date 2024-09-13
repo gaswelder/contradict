@@ -218,7 +218,7 @@ class AppTest extends TestCase
         // pre: app with a dict
         $app = $this->app();
         // action: get a sheet
-        $r = $app->getSheet('1');
+        $r = $app->getSheet('1', 100);
 
         // post: sheet returned
         $this->assertEquals($r, [

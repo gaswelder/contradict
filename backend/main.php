@@ -12,9 +12,7 @@ use gaswelder\response;
 use gaswelder\RouteNotFound;
 use gaswelder\router;
 
-class Unauthorized extends Exception
-{
-}
+class Unauthorized extends Exception {}
 
 class Auth
 {
@@ -100,7 +98,11 @@ $router = router::make()
         return response::json(getThe()->generateTest($dict_id, $size));
     })
     ->add('get', '/api/{\w+}/sheet', function ($dict_id) {
-        return response::json(getThe()->getSheet($dict_id));
+        $size = intval(request::param("size", "20"));
+        if (!$size) {
+            $size = 100;
+        }
+        return response::json(getThe()->getSheet($dict_id, $size));
     })
     ->add('get', '/api/entries/{\w+}/{\w+}', function ($dictID, $id) {
         $e = getThe()->getEntry($dictID, $id);
