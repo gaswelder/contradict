@@ -211,3 +211,21 @@ hr {
 .fail-card small {
   float: right;
 }
+
+@media print {
+
+  html,
+  body,
+  #app {
+    padding: 0;
+    height: auto;
+  }
+
+  #header {
+    display: none;
+  }
+
+  p {
+    margin: 0;
+  }
+}

@@ -42,7 +42,7 @@ export const Page = ({ children, header, back, headerContent }) => {
   return (
     <>
       {header && (
-        <HeaderContainer>
+        <HeaderContainer id="header">
           {back || <Link to={ROOT_PATH}>〈</Link>}
           {headerContent}
           <button className="logout" onClick={logout}>

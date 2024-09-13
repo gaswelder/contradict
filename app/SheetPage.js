@@ -5,11 +5,6 @@ import { useAPI } from "./withAPI";
 const ContainerDiv = styled.div`
   display: flex;
   flex-wrap: wrap;
-  & > div {
-    flex-basis: 20em;
-    flex-grow: 1;
-    margin: 0;
-  }
 `;
 
 const Div = styled.div`
@@ -19,12 +14,19 @@ const Div = styled.div`
   border-top: 1px solid #ccc;
   border-left: 1px solid #eee;
   text-align: center;
+  flex-basis: 20em;
+  flex-grow: 1;
+  margin: 0;
   & .h {
     font-weight: bold;
     margin-bottom: 0;
   }
   & p + p {
     margin-top: 0;
+  }
+  @media print {
+    padding: 10pt;
+    flex-basis: 16em;
   }
 `;
 
